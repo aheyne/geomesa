@@ -7,6 +7,8 @@
 # http://www.opensource.org/licenses/apache2.0.php.
 #
 
+# Set environment variables in bin/geomesa-env.sh
+
 setGeoHome ()
 {
     SOURCE="${BASH_SOURCE[0]}"
@@ -24,13 +26,14 @@ setGeoHome ()
     echo >&2 "Warning: GEOMESA_HOME is not set, using $GEOMESA_HOME"
 }
 
+# Load config Env Variables
+. ./geomesa-env.sh
+
 GEOMESA_OPTS="-Duser.timezone=UTC -DEPSG-HSQL.directory=/tmp/$(whoami)"
 GEOMESA_OPTS="${GEOMESA_OPTS} -Djava.awt.headless=true"
 GEOMESA_DEBUG_OPTS="-Xmx8192m -XX:MaxPermSize=512m -XX:-UseGCOverheadLimit -Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=9898"
 GEOMESA_CP=""
 JAVA_LIBRARY_PATH=""
-
-
 
 # Define GEOMESA_HOME and update the PATH if necessary.
 if [ -z "$GEOMESA_HOME" ]; then
@@ -51,7 +54,7 @@ fi
 if [ -z "$GEOMESA_LIB" ]; then
     GEOMESA_LIB=${GEOMESA_HOME}/lib
 elif [[ $1 = configure ]]; then
-    message="Warning: GEOMESA_LIB was already set, probably by a prior configuration."
+    message="Warning: GEOMESA_LIB was already set, probably by a prior configuration or the geomesa-env config."
     message="${message}\n The current value is ${GEOMESA_LIB}."
     echo >&2 ""
     echo -e >&2 "$message"
@@ -68,7 +71,7 @@ fi
 if [ -z "$GEOMESA_CONF_DIR" ]; then
     GEOMESA_CONF_DIR=${GEOMESA_HOME}/conf
 elif [[ $1 = configure ]]; then
-    message="Warning: GEOMESA_CONF_DIR was already set, probably by a prior configuration."
+    message="Warning: GEOMESA_CONF_DIR was already set, probably by a prior configuration or the geomesa-env config."
     message="${message}\n The current value is ${GEOMESA_CONF_DIR}."
     echo >&2 ""
     echo -e >&2 "$message"
@@ -85,7 +88,7 @@ fi
 GEOMESA_OPTS="${GEOMESA_OPTS} -Dlog4j.configuration=file://${GEOMESA_CONF_DIR}/log4j.properties"
 
 
-# ACCUMULO paths, user can hard set these, or rely on this script to find set them via ACCUMULO_HOME
+# ACCUMULO paths, user can hard set these in geomesa-env, or rely on this script to find set them via ACCUMULO_HOME
 if [ -n "$ACCUMULO_HOME" ]; then
     if [ -z "$ACCUMULO_LIB" -a -d "${ACCUMULO_HOME}/lib" ]; then
         ACCUMULO_LIB=${ACCUMULO_HOME}/lib
@@ -95,7 +98,7 @@ if [ -n "$ACCUMULO_HOME" ]; then
     fi
 fi
 
-# HADOOP paths, user can hard set these, or rely on this script to find set them via HADOOP_HOME
+# HADOOP paths, user can hard set these in geomesa-env, or rely on this script to find set them via HADOOP_HOME
 if [ -n "$HADOOP_HOME" ]; then
     if [ -z "$HADOOP_CONF_DIR" -a -d "${HADOOP_HOME}/etc/hadoop" ]; then
         HADOOP_CONF_DIR=${HADOOP_HOME}/etc/hadoop
@@ -111,7 +114,7 @@ if [[ (-z "$ACCUMULO_HOME") || (-z "$HADOOP_HOME") ]]; then
     echo >&2 ""
     echo -e >&2 "$message"
     echo >&2 ""
-elif [[ (-z "$ACCUMULO_CONF_DIR") || (-z "$HADOOP_CONF_DIR")]]; then
+elif [[ (-z "$ACCUMULO_CONF_DIR") || (-z "$HADOOP_CONF_DIR") ]]; then
     message="Warning: you have not set ACCUMULO_CONF_DIR and/or HADOOP_CONF_DIR as environment variables."
     message="${message}\nGeoMesa tools looks for these folders relative to the paths of the ACCUMULO_HOME and HADOOP_HOME environment variables."
     message="${message}\nGeoMesa tools can run without these variables set, however the user will be required to provide the additional instanceId and zookeepers parameters."
@@ -155,6 +158,10 @@ function findSftDirs() {
 GEOMESA_CP="${GEOMESA_CONF_DIR}:$(findJars $GEOMESA_LIB/common)"
 GEOMESA_CP="${GEOMESA_CP}:${ACCUMULO_CONF_DIR}:${HADOOP_CONF_DIR}"
 GEOMESA_CP="${GEOMESA_CP}:${GEOMESA_CONF_DIR}:$(findSftDirs)"
+# Add user defined directories to the classpath
+if [ -z "$CUSTOM_CONF_DIR"  ]; then
+    GEOMESA_CP="${GEOMESA_CP}:${CUSTOM_CONF_DIR}"
+fi
 ACCUMULO_CP="$(findJars $ACCUMULO_LIB true)"
 
 # Get the hadoop jars, ignoring jars with names containing slf4j and test

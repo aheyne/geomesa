@@ -7,6 +7,8 @@
 # http://www.opensource.org/licenses/apache2.0.php.
 #
 
+# Set environment variables in bin/geomesa-env.sh
+
 setGeoHome ()
 {
     SOURCE="${BASH_SOURCE[0]}"
@@ -23,6 +25,9 @@ setGeoHome ()
     export PATH=${GEOMESA_HOME}/bin:$PATH
     echo >&2 "Warning: GEOMESA_HOME is not set, using $GEOMESA_HOME"
 }
+
+# Load config Env Variables
+. ./geomesa-env.sh
 
 GEOMESA_OPTS="-Duser.timezone=UTC -DEPSG-HSQL.directory=/tmp/$(whoami)"
 GEOMESA_OPTS="${GEOMESA_OPTS} -Djava.awt.headless=true"
@@ -45,7 +50,7 @@ else
     fi
 fi
 
-# GEOMESA paths, GEOMESA_LIB should live inside GEOMESA_HOME, but can be pointed elsewhere
+# GEOMESA paths, GEOMESA_LIB should live inside GEOMESA_HOME, but can be pointed elsewhere in geomesa-env
 if [ -z "$GEOMESA_LIB" ]; then
     GEOMESA_LIB=${GEOMESA_HOME}/lib
 elif [[ $1 = configure ]]; then
@@ -110,6 +115,10 @@ function findJars() {
 # Start constructing GEOMESA_CP (classpath)
 # include geomesa first so that the correct log4j.properties is picked up
 GEOMESA_CP="${GEOMESA_CONF_DIR}:$(findJars $GEOMESA_LIB/common):$(findJars $GEOMESA_LIB/kafka)"
+# Add user defined directories to the classpath
+if [ -z "$CUSTOM_CONF_DIR"  ]; then
+    GEOMESA_CP="${GEOMESA_CP}:${CUSTOM_CONF_DIR}"
+fi
 
 if [ -n "$JAVA_LIBRARY_PATH" ]; then
   GEOMESA_OPTS="$GEOMESA_OPTS,java.library.path=$JAVA_LIBRARY_PATH"
