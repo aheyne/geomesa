@@ -75,6 +75,7 @@
 
 # Add directory to classpath
 # Add a colon separated list of directories to the GEOMESA_CP (class path variable).
+# Note this will exclude any slf4j files.
 # export CUSTOM_CONF_DIR=/some/dir/:/another/dir/
 
 # Java library path. Used to set GeoMesa Options.

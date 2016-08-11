@@ -9,84 +9,8 @@
 
 # Set environment variables in bin/geomesa-env.sh
 
-setGeoHome ()
-{
-    SOURCE="${BASH_SOURCE[0]}"
-    # resolve $SOURCE until the file is no longer a symlink
-    while [ -h "${SOURCE}" ]; do
-        bin="$( cd -P "$( dirname "${SOURCE}" )" && pwd )"
-        SOURCE="$(readlink "${SOURCE}")"
-        # if $SOURCE was a relative symlink, we need to resolve it relative to the path where
-        # the symlink file was located
-        [[ "${SOURCE}" != /* ]] && SOURCE="${bin}/${SOURCE}"
-    done
-    bin="$( cd -P "$( dirname "${SOURCE}" )" && cd ../ && pwd )"
-    export GEOMESA_HOME="$bin"
-    export PATH=${GEOMESA_HOME}/bin:$PATH
-    echo >&2 "Warning: GEOMESA_HOME is not set, using $GEOMESA_HOME"
-}
-
-# Load config Env Variables
-. ./geomesa-env.sh
-
-GEOMESA_OPTS="-Duser.timezone=UTC -DEPSG-HSQL.directory=/tmp/$(whoami)"
-GEOMESA_OPTS="${GEOMESA_OPTS} -Djava.awt.headless=true"
-GEOMESA_DEBUG_OPTS="-Xmx8192m -XX:MaxPermSize=512m -XX:-UseGCOverheadLimit -Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=9898"
-GEOMESA_CP=""
-JAVA_LIBRARY_PATH=""
-
-# Define GEOMESA_HOME and update the PATH if necessary.
-if [ -z "$GEOMESA_HOME" ]; then
-setGeoHome
-else
-    echo >&2 "Using GEOMESA_HOME = $GEOMESA_HOME"
-    if [[ $1 = configure ]]; then
-        read -p "Do you want to reset this? Y\n " -n 1 -r
-        if [[  $REPLY =~ ^[Yy]$ ]]; then
-            echo >&2 ""
-            setGeoHome
-        fi
-        echo >&2 ""
-    fi
-fi
-
-# GEOMESA paths, GEOMESA_LIB should live inside GEOMESA_HOME, but can be pointed elsewhere
-if [ -z "$GEOMESA_LIB" ]; then
-    GEOMESA_LIB=${GEOMESA_HOME}/lib
-elif [[ $1 = configure ]]; then
-    message="Warning: GEOMESA_LIB was already set, probably by a prior configuration or the geomesa-env config."
-    message="${message}\n The current value is ${GEOMESA_LIB}."
-    echo >&2 ""
-    echo -e >&2 "$message"
-    echo >&2 ""
-    read -p "Do you want to reset this to ${GEOMESA_HOME}/lib? Y\n " -n 1 -r
-    if [[  $REPLY =~ ^[Yy]$ ]]; then
-        GEOMESA_LIB=${GEOMESA_HOME}/lib
-        echo >&2 ""
-        echo "Now set to ${GEOMESA_LIB}"
-    fi
-    echo >&2 ""
-fi
-
-if [ -z "$GEOMESA_CONF_DIR" ]; then
-    GEOMESA_CONF_DIR=${GEOMESA_HOME}/conf
-elif [[ $1 = configure ]]; then
-    message="Warning: GEOMESA_CONF_DIR was already set, probably by a prior configuration or the geomesa-env config."
-    message="${message}\n The current value is ${GEOMESA_CONF_DIR}."
-    echo >&2 ""
-    echo -e >&2 "$message"
-    echo >&2 ""
-    read -p "Do you want to reset this to ${GEOMESA_HOME}/conf? Y\n " -n 1 -r
-    if [[  $REPLY =~ ^[Yy]$ ]]; then
-        GEOMESA_CONF_DIR=${GEOMESA_HOME}/conf
-        echo >&2 ""
-        echo "Now set to ${GEOMESA_CONF_DIR}"
-    fi
-    echo >&2 ""
-fi
-
-GEOMESA_OPTS="${GEOMESA_OPTS} -Dlog4j.configuration=file://${GEOMESA_CONF_DIR}/log4j.properties"
-
+# Load common functions and setup
+. ./geomesa-common.sh
 
 # ACCUMULO paths, user can hard set these in geomesa-env, or rely on this script to find set them via ACCUMULO_HOME
 if [ -n "$ACCUMULO_HOME" ]; then
@@ -124,31 +48,6 @@ elif [[ (-z "$ACCUMULO_CONF_DIR") || (-z "$HADOOP_CONF_DIR") ]]; then
     echo >&2 ""
 fi
 
-function findJars() {
-    home="$1"
-    CP=""
-    if [ -n "$home" -a -d "$home" ]; then
-        for jar in $(find ${home} -name "*.jar"); do
-            if [[ ("$2" != "true") || (("$jar" != *"test"*) && ("$jar" != *"slf4j"*)) ]]; then
-                if [ "$jar" = "${jar%-sources.jar}" -a "$jar" = "${jar%-test.jar}" ]; then
-                  CP="$CP:$jar"
-                fi
-            fi
-        done
-        if [ -d "$home/native" ]; then
-            if [ -z "$JAVA_LIBRARY_PATH" ]; then
-                JAVA_LIBRARY_PATH="$home/native"
-            else
-                JAVA_LIBRARY_PATH="$home/native:$JAVA_LIBRARY_PATH"
-            fi
-        fi
-    fi
-    if [ "${CP:0:1}" = ":" ]; then
-        CP="${CP:1}"
-    fi
-    echo $CP
-}
-
 function findSftDirs() {
     DIRS=$(find $GEOMESA_CONF_DIR/sfts -mindepth 1 -type d -exec printf {}: \;)
     echo ${DIRS%:}
@@ -160,7 +59,7 @@ GEOMESA_CP="${GEOMESA_CP}:${ACCUMULO_CONF_DIR}:${HADOOP_CONF_DIR}"
 GEOMESA_CP="${GEOMESA_CP}:${GEOMESA_CONF_DIR}:$(findSftDirs)"
 # Add user defined directories to the classpath
 if [ -z "$CUSTOM_CONF_DIR"  ]; then
-    GEOMESA_CP="${GEOMESA_CP}:${CUSTOM_CONF_DIR}"
+    GEOMESA_CP="${GEOMESA_CP}:$(findJars $CUSTOM_CONF_DIR true)"
 fi
 ACCUMULO_CP="$(findJars $ACCUMULO_LIB true)"
 
@@ -205,18 +104,6 @@ if [[ -d "${ZOOKEEPER_HOME}" ]]; then
   ZOOKEEPER_JAR="$(find $ZOOKEEPER_HOME -maxdepth 1 -type f -name *zookeeper*jar)"
 fi
 
-
-if [ -n "$JAVA_LIBRARY_PATH" ]; then
-  GEOMESA_OPTS="${GEOMESA_OPTS} -Djava.library.path=${JAVA_LIBRARY_PATH}"
-  export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$JAVA_LIBRARY_PATH"
-fi
-
-# Configure geomesa logging directory
-if [[ -z "${GEOMESA_LOG_DIR}" ]]; then
-  GEOMESA_LOG_DIR="${GEOMESA_HOME}/logs"
-fi
-GEOMESA_OPTS="-Dgeomesa.log.dir=${GEOMESA_LOG_DIR} $GEOMESA_OPTS"
-
 # Geomesa tools setup completed, below we parse user arguments
 #
 # configure runs the geomesa configuration, sets both the GEOMESA_HOME and PATH vars
@@ -224,36 +111,7 @@ GEOMESA_OPTS="-Dgeomesa.log.dir=${GEOMESA_LOG_DIR} $GEOMESA_OPTS"
 # else is running actual commands in the tools
 
 if  [[ $1 = configure ]]; then
-    echo >&2 "Using GEOMESA_HOME as set: $GEOMESA_HOME"
-    read -p "Is this intentional? Y\n " -n 1 -r
-    if [[  $REPLY =~ ^[Nn]$ ]]; then
-        bin="$( cd -P "$( dirname "${SOURCE}" )" && cd ../ && pwd )"
-        export GEOMESA_HOME="$bin"
-        echo >&2 ""
-        echo "Now set to ${GEOMESA_HOME}"
-    fi
-
-    if [ -z "$GEOMESA_LIB" ]; then
-        GEOMESA_LIB=${GEOMESA_HOME}/lib
-    else
-        message="Warning: GEOMESA_LIB already set, probably by a prior configuration."
-        message="${message}\n Current value is ${GEOMESA_LIB}."
-        echo >&2 ""
-        echo -e >&2 "$message"
-        echo >&2 ""
-        read -p "Is this intentional? Y\n " -n 1 -r
-        if [[  $REPLY =~ ^[Nn]$ ]]; then
-            GEOMESA_LIB=${GEOMESA_HOME}/lib
-            echo >&2 ""
-            echo "Now set to ${GEOMESA_LIB}"
-        fi
-        echo >&2 ""
-    fi
-
-    echo >&2 ""
-    echo "To persist the configuration please update your bashrc file to include: "
-    echo "export GEOMESA_HOME="$GEOMESA_HOME""
-    echo "export PATH=\${GEOMESA_HOME}/bin:\$PATH"
+    geomesaConfigure
 elif [[ $1 = classpath ]]; then
     CLASSPATH="$GEOMESA_CP:$ACCUMULO_CP:$HADOOP_CP:${ZOOKEEPER_JAR}"
     for element in ${CLASSPATH//:/ } ; do
