@@ -46,6 +46,8 @@ object Utils {
     val JSON    = Value("json")
     val GeoJson = Value("geojson")
     val GML     = Value("gml")
+    val GML2    = Value("gml2")
+    val GML3    = Value("gml3")
     val BIN     = Value("bin")
     val AVRO    = Value("avro")
     val XML     = Value("xml")

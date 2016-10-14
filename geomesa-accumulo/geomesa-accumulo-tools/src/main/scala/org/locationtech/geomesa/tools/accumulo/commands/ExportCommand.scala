@@ -38,15 +38,15 @@ class ExportCommand(parent: JCommander) extends CommandWithCatalog(parent) with 
     val features = getFeatureCollection(fmt)
     lazy val avroCompression = Option(params.gzip).map(_.toInt).getOrElse(Deflater.DEFAULT_COMPRESSION)
     val exporter: FeatureExporter = fmt match {
-      case CSV | TSV      => new DelimitedExport(getWriter(), fmt, !params.noHeader)
-      case SHP            => new ShapefileExport(checkShpFile())
-      case GeoJson | JSON => new GeoJsonExport(getWriter())
-      case GML            => new GmlExport(createOutputStream())
-      case BIN            => BinFileExport(createOutputStream(), params)
-      case AVRO           => new AvroExport(createOutputStream(true), features.getSchema, avroCompression)
-      case NULL           => NullExport
+      case CSV | TSV         => new DelimitedExport(getWriter(), fmt, !params.noHeader)
+      case SHP               => new ShapefileExport(checkShpFile())
+      case GeoJson | JSON    => new GeoJsonExport(getWriter())
+      case GML | GML2 | GML3 => new GmlExport(createOutputStream(), fmt)
+      case BIN               => BinFileExport(createOutputStream(), params)
+      case AVRO              => new AvroExport(createOutputStream(true), features.getSchema, avroCompression)
+      case NULL              => NullExport
       // shouldn't happen unless someone adds a new format and doesn't implement it here
-      case _              => throw new UnsupportedOperationException(s"Format $fmt can't be exported")
+      case _                 => throw new UnsupportedOperationException(s"Format $fmt can't be exported")
     }
     try {
       exporter.write(features)

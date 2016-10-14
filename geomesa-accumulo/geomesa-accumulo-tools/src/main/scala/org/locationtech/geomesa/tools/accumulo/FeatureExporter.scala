@@ -57,9 +57,14 @@ class GeoJsonExport(writer: Writer) extends FeatureExporter {
   }
 }
 
-class GmlExport(os: OutputStream) extends FeatureExporter {
+class GmlExport(os: OutputStream, fmt: Formats = Formats.GML) extends FeatureExporter {
 
-  val encode = new GML(Version.WFS1_0)
+  val encode = fmt match {
+    case Formats.GML2 => new GML(Version.GML2)
+    case Formats.GML3 => new GML(Version.GML3)
+    case _ => new GML(Version.WFS1_0)
+  }
+
   // JNH: "location" is unlikely to be a valid namespace.
   encode.setNamespace("location", "location.xsd")
 
