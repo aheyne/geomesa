@@ -13,7 +13,6 @@ import com.typesafe.scalalogging.LazyLogging
 import org.apache.accumulo.core.data.{Mutation, Range => aRange}
 import org.apache.hadoop.io.Text
 import org.geotools.factory.Hints
-import org.locationtech.geomesa.accumulo.GeomesaSystemProperties.QueryProperties
 import org.locationtech.geomesa.accumulo.data.{AccumuloDataStore, WritableFeature}
 import org.locationtech.geomesa.accumulo.index.AccumuloFeatureIndex.{AccumuloFeatureIndex, AccumuloFilterStrategy}
 import org.locationtech.geomesa.accumulo.index._
@@ -22,6 +21,7 @@ import org.locationtech.geomesa.curve.{BinnedTime, XZ3SFC}
 import org.locationtech.geomesa.filter._
 import org.locationtech.geomesa.index.strategies.SpatioTemporalFilterStrategy
 import org.locationtech.geomesa.index.utils.Explainer
+import org.locationtech.geomesa.utils.conf.GeoMesaProperties
 import org.locationtech.geomesa.utils.geotools.RichSimpleFeatureType.RichSimpleFeatureType
 import org.locationtech.geomesa.utils.geotools._
 import org.locationtech.geomesa.utils.index.VisibilityLevel
@@ -132,7 +132,7 @@ trait XZ3QueryableIndex extends AccumuloFeatureIndex
         }
       }
 
-      val rangeTarget = QueryProperties.SCAN_RANGES_TARGET.option.map(_.toInt)
+      val rangeTarget = GeoMesaProperties.GEOMESA_SCAN_RANGES_TARGET.option.map(_.toInt)
 
       def toZRanges(t: (Double, Double)): Seq[(Array[Byte], Array[Byte])] = {
         val query = xy.map { case (xmin, ymin, xmax, ymax) => (xmin, ymin, t._1, xmax, ymax, t._2) }

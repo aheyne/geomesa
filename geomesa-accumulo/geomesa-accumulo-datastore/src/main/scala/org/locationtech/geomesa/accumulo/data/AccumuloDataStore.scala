@@ -21,7 +21,6 @@ import org.geotools.data._
 import org.geotools.factory.Hints
 import org.geotools.feature.{FeatureTypes, NameImpl}
 import org.joda.time.DateTimeUtils
-import org.locationtech.geomesa.accumulo.GeomesaSystemProperties
 import org.locationtech.geomesa.accumulo.data.GeoMesaMetadata._
 import org.locationtech.geomesa.accumulo.data.stats._
 import org.locationtech.geomesa.accumulo.data.stats.usage.{GeoMesaUsageStats, GeoMesaUsageStatsImpl, HasGeoMesaUsageStats}
@@ -80,7 +79,7 @@ class AccumuloDataStore(val connector: Connector,
   private val defaultMaxShard = connector.instanceOperations().getTabletServers.size()
 
   private val queryTimeoutMillis: Option[Long] = config.queryTimeout
-      .orElse(GeomesaSystemProperties.QueryProperties.QUERY_TIMEOUT_MILLIS.option.map(_.toLong))
+      .orElse(GeoMesaProperties.GEOMESA_QUERY_TIMEOUT_MILLIS.option.map(_.toLong))
 
   private val defaultBWConfig = GeoMesaBatchWriterConfig().setMaxWriteThreads(config.writeThreads)
 

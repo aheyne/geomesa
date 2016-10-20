@@ -18,10 +18,10 @@ import org.apache.accumulo.core.client.security.tokens.PasswordToken
 import org.apache.accumulo.core.client.{ClientConfiguration, Connector, ZooKeeperInstance}
 import org.geotools.data.DataAccessFactory.Param
 import org.geotools.data.{DataStoreFactorySpi, Parameter}
-import org.locationtech.geomesa.accumulo.GeomesaSystemProperties
 import org.locationtech.geomesa.accumulo.data.stats.usage.ParamsAuditProvider
 import org.locationtech.geomesa.security
 import org.locationtech.geomesa.security.AuthorizationsProvider
+import org.locationtech.geomesa.utils.conf.GeoMesaProperties
 
 import scala.collection.JavaConversions._
 import scala.collection.immutable.HashMap
@@ -123,7 +123,7 @@ object AccumuloDataStoreFactory {
 
   def buildConfig(connector: Connector, params: JMap[String, Serializable] = EmptyParams): AccumuloDataStoreConfig = {
     val queryTimeout = queryTimeoutParam.lookupOpt[Int](params).map(i => i * 1000L).orElse {
-      GeomesaSystemProperties.QueryProperties.QUERY_TIMEOUT_MILLIS.option.map(_.toLong)
+      GeoMesaProperties.GEOMESA_QUERY_TIMEOUT_MILLIS.option.map(_.toLong)
     }
     val collectQueryStats =
       !connector.isInstanceOf[MockConnector] && collectQueryStatsParam.lookupWithDefault[Boolean](params)

@@ -63,14 +63,14 @@ package object index {
     val CONFIGURED_KEY       = new ClassKey(classOf[java.lang.Boolean])
 
     implicit class RichHints(val hints: Hints) extends AnyRef {
-      import org.locationtech.geomesa.accumulo.GeomesaSystemProperties.QueryProperties.QUERY_COST_TYPE
+      import org.locationtech.geomesa.utils.conf.GeoMesaProperties.GEOMESA_QUERY_COST_TYPE
 
       def getReturnSft: SimpleFeatureType = hints.get(RETURN_SFT_KEY).asInstanceOf[SimpleFeatureType]
       def getRequestedIndex: Option[AccumuloFeatureIndex] =
         Option(hints.get(QUERY_INDEX_KEY).asInstanceOf[AccumuloFeatureIndex])
       def getCostEvaluation: CostEvaluation = {
         Option(hints.get(COST_EVALUATION_KEY).asInstanceOf[CostEvaluation])
-            .orElse(QUERY_COST_TYPE.option.flatMap(t => CostEvaluation.values.find(_.toString.equalsIgnoreCase(t))))
+            .orElse(GEOMESA_QUERY_COST_TYPE.option.flatMap(t => CostEvaluation.values.find(_.toString.equalsIgnoreCase(t))))
             .getOrElse(CostEvaluation.Stats)
       }
       def isBinQuery: Boolean = hints.containsKey(BIN_TRACK_KEY)

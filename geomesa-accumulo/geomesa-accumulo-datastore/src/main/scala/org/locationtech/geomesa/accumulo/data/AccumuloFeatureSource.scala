@@ -22,7 +22,6 @@ import org.geotools.data.store.DataFeatureCollection
 import org.geotools.feature.collection.SortedSimpleFeatureCollection
 import org.geotools.feature.visitor.{BoundsVisitor, MaxVisitor, MinVisitor}
 import org.geotools.geometry.jts.ReferencedEnvelope
-import org.locationtech.geomesa.accumulo.GeomesaSystemProperties
 import org.locationtech.geomesa.accumulo.index.QueryHints.RichHints
 import org.locationtech.geomesa.accumulo.index.QueryPlanner
 import org.locationtech.geomesa.accumulo.process.SamplingVisitor
@@ -32,6 +31,7 @@ import org.locationtech.geomesa.accumulo.process.query.QueryVisitor
 import org.locationtech.geomesa.accumulo.process.stats.StatsVisitor
 import org.locationtech.geomesa.accumulo.process.tube.TubeVisitor
 import org.locationtech.geomesa.accumulo.process.unique.AttributeVisitor
+import org.locationtech.geomesa.utils.conf.GeoMesaProperties
 import org.locationtech.geomesa.utils.geotools.RichSimpleFeatureType.RichSimpleFeatureType
 import org.opengis.feature.FeatureVisitor
 import org.opengis.feature.`type`.Name
@@ -64,9 +64,9 @@ abstract class AccumuloFeatureSource(dataStore: AccumuloDataStore, override val 
    * @return count
    */
   override def getCount(query: Query): Int = {
-    import GeomesaSystemProperties.QueryProperties.QUERY_EXACT_COUNT
+    import GeoMesaProperties.GEOMESA_FORCE_COUNT
 
-    val useExactCount = query.getHints.isExactCount.getOrElse(QUERY_EXACT_COUNT.get.toBoolean)
+    val useExactCount = query.getHints.isExactCount.getOrElse(GEOMESA_FORCE_COUNT.get.toBoolean)
     lazy val exactCount = dataStore.stats.getCount(getSchema, query.getFilter, exact = true).getOrElse(-1L)
 
     val count = if (useExactCount) { exactCount } else {

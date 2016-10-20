@@ -15,7 +15,6 @@ import com.typesafe.scalalogging.LazyLogging
 import org.apache.accumulo.core.data.{Mutation, Range => aRange}
 import org.apache.hadoop.io.Text
 import org.geotools.factory.Hints
-import org.locationtech.geomesa.accumulo.GeomesaSystemProperties.QueryProperties
 import org.locationtech.geomesa.accumulo.data.{AccumuloDataStore, WritableFeature}
 import org.locationtech.geomesa.accumulo.index.AccumuloFeatureIndex.{AccumuloFeatureIndex, AccumuloFilterStrategy}
 import org.locationtech.geomesa.accumulo.index._
@@ -23,6 +22,7 @@ import org.locationtech.geomesa.accumulo.iterators._
 import org.locationtech.geomesa.curve.Z2SFC
 import org.locationtech.geomesa.index.strategies.SpatialFilterStrategy
 import org.locationtech.geomesa.index.utils.Explainer
+import org.locationtech.geomesa.utils.conf.GeoMesaProperties
 import org.locationtech.geomesa.utils.geotools.{GeometryUtils, WholeWorldPolygon}
 import org.locationtech.geomesa.utils.index.VisibilityLevel
 import org.opengis.feature.simple.SimpleFeatureType
@@ -109,7 +109,7 @@ trait Z2QueryableIndex extends AccumuloFeatureIndex
       // setup Z2 iterator
       import Z2Index.GEOM_Z_NUM_BYTES
       val xy = geometries.map(GeometryUtils.bounds)
-      val rangeTarget = QueryProperties.SCAN_RANGES_TARGET.option.map(_.toInt)
+      val rangeTarget = GeoMesaProperties.GEOMESA_SCAN_RANGES_TARGET.option.map(_.toInt)
       val zRanges = if (sft.isPoints) {
         Z2SFC.ranges(xy, 64, rangeTarget).map(r => (Longs.toByteArray(r.lower), Longs.toByteArray(r.upper)))
       } else {

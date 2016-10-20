@@ -19,11 +19,11 @@ import org.geotools.data.simple.SimpleFeatureWriter
 import org.geotools.data.{Query, Transaction}
 import org.geotools.factory.Hints
 import org.geotools.filter.identity.FeatureIdImpl
-import org.locationtech.geomesa.accumulo.GeomesaSystemProperties.FeatureIdProperties.FEATURE_ID_GENERATOR
 import org.locationtech.geomesa.accumulo.data.AccumuloFeatureWriter.FeatureWriterFn
 import org.locationtech.geomesa.accumulo.index._
 import org.locationtech.geomesa.accumulo.util.GeoMesaBatchWriterConfig
 import org.locationtech.geomesa.features.{ScalaSimpleFeature, ScalaSimpleFeatureFactory}
+import org.locationtech.geomesa.utils.conf.GeoMesaProperties
 import org.locationtech.geomesa.utils.index.IndexMode
 import org.locationtech.geomesa.utils.uuid.{FeatureIdGenerator, Z3FeatureIdGenerator}
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
@@ -70,11 +70,11 @@ object AccumuloFeatureWriter extends LazyLogging {
 
   private val idGenerator: FeatureIdGenerator =
     try {
-      logger.debug(s"Using feature id generator '${FEATURE_ID_GENERATOR.get}'")
-      Class.forName(FEATURE_ID_GENERATOR.get).newInstance().asInstanceOf[FeatureIdGenerator]
+      logger.debug(s"Using feature id generator '${GeoMesaProperties.GEOMESA_FEATURE_ID_GENERATOR.get}'")
+      Class.forName(GeoMesaProperties.GEOMESA_FEATURE_ID_GENERATOR.get).newInstance().asInstanceOf[FeatureIdGenerator]
     } catch {
       case e: Throwable =>
-        logger.error(s"Could not load feature id generator class '${FEATURE_ID_GENERATOR.get}'", e)
+        logger.error(s"Could not load feature id generator class '${GeoMesaProperties.GEOMESA_FEATURE_ID_GENERATOR.get}'", e)
         new Z3FeatureIdGenerator
     }
 

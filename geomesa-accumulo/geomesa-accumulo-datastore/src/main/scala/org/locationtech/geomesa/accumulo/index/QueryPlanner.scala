@@ -23,7 +23,6 @@ import org.geotools.filter.visitor.BindingFilterVisitor
 import org.geotools.geometry.jts.ReferencedEnvelope
 import org.geotools.process.vector.TransformProcess
 import org.geotools.process.vector.TransformProcess.Definition
-import org.locationtech.geomesa.accumulo.GeomesaSystemProperties.QueryProperties
 import org.locationtech.geomesa.accumulo.data._
 import org.locationtech.geomesa.accumulo.index.AccumuloFeatureIndex.AccumuloFeatureIndex
 import org.locationtech.geomesa.accumulo.index.QueryHints._
@@ -36,6 +35,7 @@ import org.locationtech.geomesa.filter.visitor.QueryPlanFilterVisitor
 import org.locationtech.geomesa.index.utils.{ExplainLogging, Explainer}
 import org.locationtech.geomesa.security.SecurityUtils
 import org.locationtech.geomesa.utils.cache.SoftThreadLocal
+import org.locationtech.geomesa.utils.conf.GeoMesaProperties
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes
 import org.locationtech.geomesa.utils.index.IndexMode
 import org.locationtech.geomesa.utils.stats.{MethodProfiling, Timing}
@@ -120,7 +120,7 @@ case class QueryPlanner(sft: SimpleFeatureType, ds: AccumuloDataStore) extends M
     val q = updateFilter(query, sft) // tweak the filter so it meets our expectations going forward
 
     val hints = q.getHints
-    val batchRanges = QueryProperties.SCAN_BATCH_RANGES.option.map(_.toInt).getOrElse(Int.MaxValue)
+    val batchRanges = GeoMesaProperties.GEOMESA_SCAN_RANGES_BATCH.option.map(_.toInt).getOrElse(Int.MaxValue)
 
     output.pushLevel(s"Planning '${q.getTypeName}' ${filterToString(q.getFilter)}")
     output(s"Original filter: ${filterToString(query.getFilter)}")
