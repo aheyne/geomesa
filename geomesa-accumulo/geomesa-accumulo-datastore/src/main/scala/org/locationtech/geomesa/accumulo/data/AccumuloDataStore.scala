@@ -79,7 +79,7 @@ class AccumuloDataStore(val connector: Connector,
   private val defaultMaxShard = connector.instanceOperations().getTabletServers.size()
 
   private val queryTimeoutMillis: Option[Long] = config.queryTimeout
-      .orElse(GeoMesaProperties.GEOMESA_QUERY_TIMEOUT_MILLIS.option.map(_.toLong))
+      .orElse(GEOMESA_QUERY_TIMEOUT_MILLIS.option.map(_.toLong))
 
   private val defaultBWConfig = GeoMesaBatchWriterConfig().setMaxWriteThreads(config.writeThreads)
 

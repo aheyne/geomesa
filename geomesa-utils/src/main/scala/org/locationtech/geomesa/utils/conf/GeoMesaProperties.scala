@@ -14,9 +14,9 @@ import com.typesafe.scalalogging.LazyLogging
 
 object GeoMesaProperties extends LazyLogging {
 
-  private val EmbeddedFile = "/org/locationtech/geomesa/geomesa.properties"
+   val EmbeddedFile = "/org/locationtech/geomesa/geomesa.properties"
 
-  private val props: Properties = {
+   val props: Properties = {
     val resource = getClass.getResourceAsStream(EmbeddedFile)
     if (resource == null) {
       logger.warn(s"Couldn't load $EmbeddedFile")
