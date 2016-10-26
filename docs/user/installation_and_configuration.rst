@@ -26,20 +26,23 @@ To build and install the source distribution:
 * Apache Maven (http://maven.apache.org/) |maven_version|
 * A ``git`` client (http://git-scm.com/)
 
+.. _versions_and_downloads:
+
 Versions and Downloads
 ----------------------
 
 .. note::
 
     The current recommended version of GeoMesa to install is |release|.
-    For Kafka 09 and Kafka 10 download and build the source release. (:ref:`building_from_source`)
 
 **Latest release**: |release|
 
 .. TODO: substitutions don't work in some kinds of markup, including URLs
 
 * Accumulo release tarball: |release_tarball_accumulo|
-* Kafka 08 release tarball: |release_tarball_kafka08|
+* Kafka 0.8.x release tarball: |release_tarball_kafka08|
+* Kafka 0.9.x release tarball: |release_tarball_kafka09|
+* Kafka 0.10.x release tarball: |release_tarball_kafka10|
 * Source: |release_source_tarball|
 
 **Development version (source only)**: |development|
@@ -102,10 +105,15 @@ Installing the Accumulo Distributed Runtime Library
 ---------------------------------------------------
 
 The ``geomesa-accumulo-dist_2.11-$VERSION/dist/accumulo/`` directory contains the distributed
-runtime JAR that contains server-side code for Accumulo that must be made
-available on each of the Accumulo tablet servers in the cluster. This JAR
-contains GeoMesa code and the Accumulo iterator required for querying
+runtime JARs that contains server-side code for Accumulo that must be made
+available on each of the Accumulo tablet servers in the cluster. These JARs
+contain GeoMesa code and the Accumulo iterator required for querying
 GeoMesa data.
+
+.. warning::
+
+    There are two runtime JARs available, with and without raster support. Only one is
+    needed and including both will cause classpath issues.
 
 The version of the distributed runtime JAR must match the version of the GeoMesa
 data store client JAR (usually installed in GeoServer; see below). If not,
@@ -114,13 +122,15 @@ queries might not work correctly or at all.
 Manual Install
 ^^^^^^^^^^^^^^
 
-The runtime JAR should be copied into the ``$ACCUMULO_HOME/lib/ext`` folder on
+The desired runtime JAR should be copied into the ``$ACCUMULO_HOME/lib/ext`` folder on
 each tablet server.
 
 .. code-block:: bash
 
     # something like this for each tablet server
     $ scp geomesa-accumulo-dist_2.11-$VERSION/dist/accumulo/geomesa-accumulo-distributed-runtime_2.11-$VERSION.jar tserver1:$ACCUMULO_HOME/lib/ext
+    # or for raster support
+    $ scp geomesa-accumulo-dist_2.11-$VERSION/dist/accumulo/geomesa-accumulo-distributed-runtime-raster_2.11-$VERSION.jar tserver1:$ACCUMULO_HOME/lib/ext
 
 .. note::
 
@@ -136,19 +146,19 @@ Copying the runtime JAR to each tablet server as above will work, but in
 Accumulo 1.6+, we can leverage namespaces to isolate the GeoMesa classpath
 from the rest of Accumulo.
 
-To install the distributed runtime JAR, use the ``install-geomesa-namespace.sh``
+To install the distributed runtime JAR, use the ``setup-namespace.sh``
 script in the ``geomesa-accumulo-dist_2.11-$VERSION/dist/accumulo`` directory.
 
 .. code::
 
-    $ ./install-geomesa-namespace.sh -u myUser -n myNamespace
+    $ ./setup-namespace.sh -u myUser -n myNamespace
 
 The command line arguments the script accepts are:
 
 * -u <Accumulo username>
 * -n <Accumulo namespace>
 * -p <Accumulo password> (optional, will prompt if not supplied)
-* -g <Path of GeoMesa distributed runtime JAR> (optional, will default to the distribution folder)
+* -g <Path of GeoMesa distributed runtime JAR> (optional, will default to the distribution folder and without raster support)
 * -h <HDFS URI e.g. hdfs://localhost:54310> (optional, will attempt to determine if not supplied)
 
 Alternatively you can manually install the distributed runtime JAR with these commands:
@@ -161,7 +171,7 @@ Alternatively you can manually install the distributed runtime JAR with these co
     > config -s general.vfs.context.classpath.myNamespace=hdfs://NAME_NODE_FDQN:54310/accumulo/classpath/myNamespace/[^.].*.jar
     > config -ns myNamespace -s table.classpath.context=myNamespace
 
-Then copy the distributed runtime jar into HDFS under the path you specified.
+Then copy the distributed runtime JAR into HDFS under the path you specified.
 The path above is just an example; you can included nested folders with project
 names, version numbers, and other information in order to have different versions of GeoMesa on
 the same Accumulo instance. You should remove any GeoMesa JARs under
@@ -253,28 +263,33 @@ Test the command that invokes the GeoMesa Tools:
     Using GEOMESA_HOME = /path/to/geomesa-accumulo-dist_2.11-$VERSION
     Usage: geomesa [command] [command options]
       Commands:
-        create           Create a feature definition in a GeoMesa catalog
-        deletecatalog    Delete a GeoMesa catalog completely (and all features in it)
-        deleteraster     Delete a GeoMesa Raster Table
-        describe         Describe the attributes of a given feature in GeoMesa
-        env              Examine the current GeoMesa environment
-        explain          Explain how a GeoMesa query will be executed
-        export           Export a GeoMesa feature
-        getsft           Get the SimpleFeatureType of a feature
-        help             Show help
-        ingest           Ingest a file of various formats into GeoMesa
-        ingestraster     Ingest a raster file or raster files in a directory into GeoMesa
-        keywords         Add/remove keywords on an existing schema
-        list             List GeoMesa features for a given catalog
-        queryrasterstats Export queries and statistics about the last X number of queries to a CSV file.
-        removeschema     Remove a schema and associated features from a GeoMesa catalog
-        stats-analyze    Analyze statistics on a GeoMesa feature type
-        stats-bounds     View bounds on attributes in a GeoMesa schema
-        stats-count      View feature counts in a GeoMesa schema
-        stats-enumerate  Enumerate attribute values in a GeoMesa feature type
-        stats-histogram  View statistics on a GeoMesa feature type
-        tableconf        Perform table configuration operations
-        version          GeoMesa Version
+        add-attribute-index    Run a Hadoop map reduce job to add an index for attributes
+        add-index              Add or update indices for an existing GeoMesa feature type
+        config-table           Perform table configuration operations
+        create-schema          Create a GeoMesa feature type
+        delete-catalog         Delete a GeoMesa catalog completely (and all features in it)
+        delete-features        Delete features from a table in GeoMesa. Does not delete any tables or schema information.
+        delete-raster          Delete a GeoMesa Raster table
+        env                    Examine the current GeoMesa environment
+        explain                Explain how a GeoMesa query will be executed
+        export                 Export features from a GeoMesa data store
+        export-bin             Export features from a GeoMesa data store in a binary format.
+        gen-avro-schema        Generate an Avro schema from a SimpleFeatureType
+        get-names              List GeoMesa feature types for a given catalog
+        get-schema             Describe the attributes of a given GeoMesa feature type
+        get-sft-config         Get the SimpleFeatureType of a feature
+        help                   Show help
+        ingest                 Ingest/convert various file formats into GeoMesa
+        ingest-raster          Ingest raster files into GeoMesa
+        keywords               Add/Remove/List keywords on an existing schema
+        query-raster-stats     Export queries and statistics about the last X number of queries to a CSV file.
+        remove-schema          Remove a schema and associated features from a GeoMesa catalog
+        stats-analyze          Analyze statistics on a GeoMesa feature type
+        stats-bounds           View or calculate bounds on attributes in a GeoMesa feature type
+        stats-count            Estimate or calculate feature counts in a GeoMesa feature type
+        stats-histogram        View or calculate counts of attribute in a GeoMesa feature type, grouped by sorted values
+        stats-top-k            Enumerate the most frequent values in a GeoMesa feature type
+        version                Display the installed GeoMesa version
 
 .. note::
 
@@ -285,10 +300,10 @@ Kafka Tools
 
 .. note::
 
-    These instructions assume the use of Kafka 0.8.x but the instructions are identical for Kafka 0.9.x and 0.10.x.
-    Just replace the version number with the appropriate value for your installation. ( ``$KAFKAVERSION`` = 08, 09 or 10 )
+    These instructions are identical for Kafka 0.8.x, 0.9.x, and 0.10.x. The value of ``$KAFKAVERSION`` is
+    "08" for Kafka 0.8.x, "09" for Kafka 0.9.x, or "10" for Kafka 0.10.x.
 
-GeoMesa comes with a set of command line tools for managing kafka features. For Kafka 08 a binary distribution is available and the tools are located in ``geomesa-kafka-08-dist_2.11-$VERSION-bin.tar.gz/bin/``. For Kafka 09 and 10 only the source distribution is available. After building from source (:ref:`building_from_source`) the Kafka tools are located in ``geomesa-kafka/geomesa-kafka-dist/geomesa-kafka-$KAFKAVERSION-dist/target/geomesa-kafka-$KAFKAVERSION_2.11-$VERSION-bin.tar.gz``.
+GeoMesa comes with a set of command line tools for managing Kafka features. For each version of Kafka, a binary GeoMesa Kafka distribution is available (:ref:`versions_and_downloads`). In each distribution the Kafka tools are located in ``geomesa-kafka-$KAFKAVERSION-dist_2.11-$VERSION-bin.tar.gz/bin/``. If building from source (:ref:`building_from_source`) the Kafka tools for each Kafka version are located in ``geomesa-kafka/geomesa-kafka-dist/geomesa-kafka-$KAFKAVERSION-dist/target/geomesa-kafka-$KAFKAVERSION_2.11-$VERSION-bin.tar.gz`` respectively.
 
 .. code-block:: bash
 
@@ -352,14 +367,13 @@ Test the command that invokes the GeoMesa Tools:
     Using GEOMESA_KAFKA_HOME = /path/to/geomesa-kafka-$KAFKAVERSION_2.11-$VERSION
     Usage: geomesa-kafka [command] [command options]
       Commands:
-        create          Create a feature definition in GeoMesa
-        describe        Describe the attributes of a given feature in GeoMesa
+        create-schema   Create a feature definition in GeoMesa
+        get-schema      Describe the attributes of a given feature in GeoMesa
+        get-names       List GeoMesa features for a given zkPath
         help            Show help
-        keywords        Add/Remove/List keywords on an existing schema
-        list            List GeoMesa features for a given zkPath
         listen          Listen to a GeoMesa Kafka topic
-        removeschema    Remove a schema and associated features from GeoMesa
-        version         Display the installed GeoMesa version
+        remove-schema   Remove a schema and associated features from GeoMesa
+        version         GeoMesa Version
 
 .. _slf4j_configuration:
 
@@ -424,8 +438,36 @@ the plugin. The GeoServer website includes `instructions for downloading and ins
 For Accumulo
 ^^^^^^^^^^^^
 
-To install the GeoMesa Accumulo GeoServer plugin, unpack the contents of the
-``geomesa-accumulo-gs-plugin_2.11-$VERSION-install.tar.gz`` file in ``geomesa-accumulo_2.11-$VERSION/dist/geoserver/`` in the binary distribution or ``geomesa-$VERSION/geomesa-accumulo/geomesa-accumulo-gs-plugin/target/`` in the source distribution
+To install GeoMesa's GeoServer plugin we can utilize the script ``geoserver-plugins.sh`` in ``bin`` directory
+of the GeoMesa Accumulo or GeoMesa Hadoop distributions. (``$VERSION`` = |release|)
+
+.. note::
+
+    If $GEOSERVER_HOME is set, then the ``--lib-dir`` parameter is not needed.
+
+.. code-block:: bash
+
+    $ bin/geoserver-plugins.sh --lib-dir /path/to/geoserver/WEB-INF/lib/ --install
+    Collecting Installed Jars
+    Collecting geomesa-gs-plugin Jars
+
+    Please choose which modules to install
+    Multiple may be specified, eg: 1 4 10
+    Type 'a' to specify all
+    --------------------------------------
+    0 | geomesa-accumulo-gs-plugin_2.11-$VERSION
+    1 | geomesa-blobstore-gs-plugin_2.11-$VERSION
+    2 | geomesa-process_2.11-$VERSION
+    3 | geomesa-stream-gs-plugin_2.11-$VERSION
+
+    Module(s) to install: 0 1
+    0 | Installing geomesa-accumulo-gs-plugin_2.11-$VERSION-install.tar.gz
+    1 | Installing geomesa-blobstore-gs-plugin_2.11-$VERSION-install.tar.gz
+    Done
+
+If you prefer to install the GeoMesa Accumulo GeoServer plugin manually, unpack the contents of the
+``geomesa-accumulo-gs-plugin_2.11-$VERSION-install.tar.gz`` file in ``geomesa-accumulo_2.11-$VERSION/dist/geoserver/``
+in the binary distribution or ``geomesa-$VERSION/geomesa-accumulo/geomesa-accumulo-gs-plugin/target/`` in the source distribution
 into your GeoServer's ``lib`` directory (``$VERSION`` = |release|):
 
 If you are using Tomcat:
@@ -525,7 +567,12 @@ Hadoop 2.4-2.7 (adjust versions as needed)
 * hadoop-common-2.6.4.jar
 * hadoop-hdfs-2.6.4.jar
 
+Restart GeoServer after the JARs are installed.
+
 .. _install_geomesa_process:
+
+A note about GeoMesa Process
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. note::
 
@@ -535,23 +582,53 @@ Hadoop 2.4-2.7 (adjust versions as needed)
     distribution, or is built in the ``geomesa-process`` module of the source
     distribution.
 
-Restart GeoServer after the JARs are installed.
-
 .. _install_kafka_geoserver:
 
 For Kafka
 ^^^^^^^^^
 
-The GeoMesa GeoServer plugin for Kafka |kafka_version| is found in the ``geomesa-kafka-$KAFKAVERSION-gs-plugin-$VERSION-install.tar.gz``
-file in ``geomesa-kafka-$KAFKAVERSION-gs-plugin/dist/gs-plugins/`` in the binary distribution, or is built in
-the ``geomesa-$VERSION/geomesa-kafka/geomesa-kafka-gs-plugin/geomesa-kafka-$KAFKAVERSION-gs-plugin/target/``
-directory of the source distribution. ( ``$KAFKAVERSION`` = |kafka_version| )
+.. note::
 
-The GeoMesa GeoServer plugin for Kafka 0.8 is found in ``geomesa-kafka-08-gs-plugin-$VERSION-install.tar.gz``
-(downloaded here: |release_kafka08_plugin|), or is built in the
-``geomesa-kafka/geomesa-kafka-gs-plugin/geomesa-kafka-08-gs-plugin`` directory of the source distribution.
+    These instructions are identical for Kafka 0.8.x, 0.9.x, and 0.10.x. The value of ``$KAFKAVERSION`` is
+    "08" for Kafka 0.8.x, "09" for Kafka 0.9.x, or "10" for Kafka 0.10.x.
 
-In either case, the contents of the appropriate archive should be unpacked in the GeoServer
+To install GeoMesa's GeoServer plugin we can use the script ``geoserver-plugins.sh`` in ``bin`` directory
+of the appropriate GeoMesa Kafka binary distribution (see :ref:`versions_and_downloads`).
+
+.. note::
+
+    If $GEOSERVER_HOME is set, then the ``--lib-dir`` parameter is not needed.
+
+.. code-block:: bash
+
+    $ bin/geoserver-plugins.sh --lib-dir /path/to/geoserver/WEB-INF/lib/ --install
+    Collecting Installed Jars
+    Collecting geomesa-gs-plugin Jars
+
+    Please choose which modules to install
+    Multiple may be specified, eg: 1 4 10
+    Type 'a' to specify all
+    --------------------------------------
+    0 | geomesa-kafka-$KAFKAVERSION-gs-plugin_2.11-$VERSION
+
+    Module(s) to install: 0
+    0 | Installing geomesa-kafka-$KAFKAVERSION-gs-plugin_2.11-$VERSION-install.tar.gz
+    Done
+
+Alternatively, direct bundle download links and the source directory for each Kafka version are listed in
+the table below (the source directories are subdirectories of ``geomesa-kafka/geomesa-kafka-gs-plugin``):
+
++------------------+--------------------------+--------------------------------+
+| Kafka version    | Binary download link     | Source directory               |
++==================+==========================+================================+
+| 0.8.2.x          | |release_kafka08_plugin| | ``geomesa-kafka-08-gs-plugin`` |
++------------------+--------------------------+--------------------------------+
+| 0.9.x            | |release_kafka09_plugin| | ``geomesa-kafka-09-gs-plugin`` |
++------------------+--------------------------+--------------------------------+
+| 0.10.x           | |release_kafka10_plugin| | ``geomesa-kafka-10-gs-plugin`` |
++------------------+--------------------------+--------------------------------+
+
+The contents of the appropriate plugin archive should be unpacked in the GeoServer
 ``WEB-INF/lib`` directory. If you are using Tomcat:
 
 .. code-block:: bash
@@ -571,8 +648,7 @@ If you are using GeoServer's built in Jetty web server:
 This will install the JARs for the Kafka GeoServer plugin and most of its dependencies.
 However, you will also need additional JARs for Kafka and Zookeeper that will
 be specific to your installation that you will also need to copy to GeoServer's
-``WEB-INF/lib`` directory. For example, GeoMesa only requires Kafka |kafka_version|,
-but if you are using Kafka 0.9.0 you should use the JARs that match the version of
+``WEB-INF/lib`` directory. For example,you should use the JARs that match the version of
 Kafka you are running.
 
 .. warning::
@@ -584,13 +660,29 @@ Kafka you are running.
 Copy these additional dependencies (or the equivalents for your Kafka installation) to
 your GeoServer ``WEB-INF/lib`` directory.
 
-* Kafka
+Kafka 0.8
+
     * kafka-clients-0.8.2.1.jar
     * kafka_2.11-0.8.2.1.jar
     * metrics-core-2.2.0.jar
     * zkclient-0.3.jar
-* Zookeeper
-    * zookeeper-3.4.5.jar
+    * zookeeper-3.4.6.jar
+
+Kafka 0.9
+
+    * kafka-clients-0.9.0.1.jar
+    * kafka_2.11-0.9.0.1.jar
+    * metrics-core-2.2.0.jar
+    * zkclient-0.7.jar
+    * zookeeper-3.4.6.jar
+
+Kafka 0.10
+
+    * kafka-clients-0.10.0.1.jar
+    * kafka-2.11-0.10.0.1.jar
+    * metrics-core-2.2.0.jar
+    * zkclient-0.8.jar
+    * zookeeper-3.4.6.jar
 
 There is a script in the ``geomesa-kafka-$KAFKAVERSION_2.11-$VERSION/bin`` directory
 (``$GEOMESA_KAFKA_HOME/bin/install-kafka.sh``) which will install these
@@ -675,6 +767,9 @@ It should be noted, however, that data ingested with older GeoMesa versions may
 not take full advantage of indexing improvements in newer releases. If
 it is not feasible to reingest old data, see :ref:`update_index_format_job`
 for more information on updating its index format.
+
+
+
 
 Security Concerns
 -----------------
