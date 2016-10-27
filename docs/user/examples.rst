@@ -347,7 +347,7 @@ Exporting Features
 
 Let's export your newly ingested features in a couple of file formats.
 Currently, the ``export`` command supports exports to CSV, TSV,
-Shapefile, GeoJSON, and GML. We'll do one of each format in this next
+Shapefile, GeoJSON, and GML versions 1-3. We'll do one of each format in this next
 section.
 
 The ``export`` command has 3 required flags:
@@ -355,7 +355,7 @@ The ``export`` command has 3 required flags:
 -  ``-c`` or ``--catalog``: the name of the catalog table
 -  ``-f`` or ``--feature-name``: the name of the feature to export
 -  ``-F`` or ``--format``: the output format (``csv``, ``tsv``,
-   ``shp``, ``geojson``, or ``gml``)
+   ``shp``, ``geojson``, ``gml``, ``gml2``, ``gml3``)
 
 Additionally, you can specify more details about the kind of export you
 would like to perform with optional flags for ``export``:
@@ -384,6 +384,6 @@ This command will output the relevant rows to the console. Inspect the
 rows now, or pipe the output into a file for later review.
 
 Now, run the above command four additional times, changing the
-``--format`` flag to ``tsv``, ``shp``, ``json``, and ``gml``. The
+``--format`` flag to ``tsv``, ``shp``, ``json``, and ``gml``, ``gml2`` or ``gml3``. The
 ``shp`` format also requires the ``-o`` option to specify the name of an
 output file.

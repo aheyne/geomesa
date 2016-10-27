@@ -72,7 +72,7 @@ class ExportCommand(parent: JCommander) extends CommandWithCatalog(parent)
 object ExportCommand {
   @Parameters(commandDescription = "Export features from a GeoMesa data store")
   class ExportParameters extends BaseExportCommands {
-    @Parameter(names = Array("-F", "--format"), description = "Format to export (csv|tsv|gml|json|shp|avro)")
+    @Parameter(names = Array("-F", "--format"), description = "Format to export (csv|tsv|gml|gml2|gml3|json|shp|avro)")
     var format: String = "csv"
 
     @Parameter(names = Array("--no-header"), description = "Export as a delimited text format (csv|tsv) without a type header", required = false)

@@ -64,6 +64,8 @@ class GmlExport(os: OutputStream, fmt: Formats = Formats.GML) extends FeatureExp
     case _ => new GML(Version.WFS1_0)
   }
 
+  if (fmt == Formats.GML2) encode.setLegacy(true)
+
   // JNH: "location" is unlikely to be a valid namespace.
   encode.setNamespace("location", "location.xsd")
 
