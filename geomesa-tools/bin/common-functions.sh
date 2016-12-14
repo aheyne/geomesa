@@ -98,14 +98,14 @@ function containsElement() {
 
 # Define %%gmtools.dist.name%%_HOME and update the PATH if necessary.
 if [[ -z "$%%gmtools.dist.name%%_HOME" ]]; then
-  setGeoHome
+  geomesaConfigure
 else
   echo >&2 "Using %%gmtools.dist.name%%_HOME = $%%gmtools.dist.name%%_HOME"
   if [[ $1 = configure ]]; then
     read -p "Do you want to reset this? Y\n " -n 1 -r
     if [[  $REPLY =~ ^[Yy]$ || $REPLY == "" ]]; then
       echo >&2 ""
-      setGeoHome
+      geomesaConfigure
     fi
     echo >&2 ""
   fi
