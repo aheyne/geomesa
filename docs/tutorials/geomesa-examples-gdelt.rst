@@ -223,8 +223,8 @@ GeoMesa GeoServer plugin if you haven't done so.
 Register the GeoMesa DataStore with GeoServer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Click "Stores" and "Add new Store". If you do not see the Accumulo
-Feature Data Store listed under Vector Data Sources, ensure the plugin
+Click "Stores" and "Add new Store". If you do not see the Accumulo (GeoMesa)
+listed under Vector Data Sources, ensure the plugin
 is in the right directory and restart GeoServer.
 
 .. figure:: _static/geomesa-examples-gdelt/Accumulo_Feature_Data_Store.png
