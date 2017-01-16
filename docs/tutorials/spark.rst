@@ -135,7 +135,7 @@ group.
 Run the Tutorial Code
 ^^^^^^^^^^^^^^^^^^^^^
 
-Edit the file ``geomesa-accumulo/geomesa-accumulo-computer/src/main/scala/org/locationtech/geomesa/compute/spark/analytics/CountByDay.scala``
+Edit the file ``geomesa-accumulo/geomesa-accumulo-compute/src/main/scala/org/locationtech/geomesa/compute/spark/analytics/CountByDay.scala``
 so that the parameter map points to your cloud instance. Ensure that the ``filter`` covers
 a valid range of your GDELT data.
 
