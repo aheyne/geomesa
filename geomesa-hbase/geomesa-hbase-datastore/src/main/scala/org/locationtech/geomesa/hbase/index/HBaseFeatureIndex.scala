@@ -72,7 +72,7 @@ trait HBaseFeatureIndex extends HBaseFeatureIndexType
       } else {
         GeoMesaSystemProperties.SystemProperty("geomesa.hbase.coprocessor.path", null).option match {
           case Some(path) => Option(new Path(path))
-          case None      => None
+          case None       => None
         }
       }
 
