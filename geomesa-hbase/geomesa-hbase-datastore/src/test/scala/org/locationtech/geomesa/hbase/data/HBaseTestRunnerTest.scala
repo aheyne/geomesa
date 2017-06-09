@@ -32,7 +32,6 @@ class HBaseTestRunnerTest extends Specification with LazyLogging {
     new HBaseBinAggregatorTest,
     new HBaseDataStoreTest,
     new HBaseDensityFilterTest,
-    new HBaseStatsAggregatorTest,
     new HBaseVisibilityTest
   )
 
