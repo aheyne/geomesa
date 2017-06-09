@@ -23,7 +23,6 @@ import org.locationtech.geomesa.utils.io.WithClose
 import org.opengis.filter.Filter
 
 class HBaseArrowTest extends HBaseTest with LazyLogging  {
-  sequential
 
   implicit val allocator = new RootAllocator(Long.MaxValue)
 
@@ -36,7 +35,6 @@ class HBaseArrowTest extends HBaseTest with LazyLogging  {
   var ds: HBaseDataStore = _
 
   step {
-    logger.info("Starting Arrow Test")
     import scala.collection.JavaConversions._
     val params = Map(ConnectionParam.getName -> connection, BigTableNameParam.getName -> "HBaseArrowTest")
     ds = DataStoreFinder.getDataStore(params).asInstanceOf[HBaseDataStore]
