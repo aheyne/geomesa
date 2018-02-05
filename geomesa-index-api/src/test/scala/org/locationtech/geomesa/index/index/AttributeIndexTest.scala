@@ -11,7 +11,7 @@ package org.locationtech.geomesa.index.index
 import org.geotools.data.{Query, Transaction}
 import org.geotools.factory.Hints
 import org.geotools.filter.text.ecql.ECQL
-import org.joda.time.format.ISODateTimeFormat
+import org.geotools.util.Converters
 import org.junit.runner.RunWith
 import org.locationtech.geomesa.features.ScalaSimpleFeature
 import org.locationtech.geomesa.index.TestGeoMesaDataStore
@@ -35,17 +35,15 @@ class AttributeIndexTest extends Specification {
 
   val sft = SimpleFeatureTypes.createType(typeName, spec)
 
-  val df = ISODateTimeFormat.dateTime()
-
   val aliceGeom   = WKTUtils.read("POINT(45.0 49.0)")
   val billGeom    = WKTUtils.read("POINT(46.0 49.0)")
   val bobGeom     = WKTUtils.read("POINT(47.0 49.0)")
   val charlesGeom = WKTUtils.read("POINT(48.0 49.0)")
 
-  val aliceDate   = df.parseDateTime("2012-01-01T12:00:00.000Z").toDate
-  val billDate    = df.parseDateTime("2013-01-01T12:00:00.000Z").toDate
-  val bobDate     = df.parseDateTime("2014-01-01T12:00:00.000Z").toDate
-  val charlesDate = df.parseDateTime("2014-01-01T12:30:00.000Z").toDate
+  val aliceDate   = Converters.convert("2012-01-01T12:00:00.000Z", classOf[java.util.Date])
+  val billDate    = Converters.convert("2013-01-01T12:00:00.000Z", classOf[java.util.Date])
+  val bobDate     = Converters.convert("2014-01-01T12:00:00.000Z", classOf[java.util.Date])
+  val charlesDate = Converters.convert("2014-01-01T12:30:00.000Z", classOf[java.util.Date])
 
   val features = Seq(
     Array("alice",   20,   10f, aliceDate,   aliceGeom),
@@ -57,10 +55,10 @@ class AttributeIndexTest extends Specification {
   }
 
   def overlaps(r1: TestRange, r2: TestRange): Boolean = {
-    TestGeoMesaDataStore.byteComparator.compare(r1.start, r2.start) match {
+    TestGeoMesaDataStore.ByteComparator.compare(r1.start, r2.start) match {
       case 0 => true
-      case i if i < 0 => TestGeoMesaDataStore.byteComparator.compare(r1.end, r2.start) > 0
-      case i if i > 0 => TestGeoMesaDataStore.byteComparator.compare(r2.end, r1.start) > 0
+      case i if i < 0 => TestGeoMesaDataStore.ByteComparator.compare(r1.end, r2.start) > 0
+      case i if i > 0 => TestGeoMesaDataStore.ByteComparator.compare(r2.end, r1.start) > 0
     }
   }
 
@@ -89,7 +87,7 @@ class AttributeIndexTest extends Specification {
         val q = new Query(typeName, ECQL.toFilter(filter))
         // validate that ranges do not overlap
         foreach(ds.getQueryPlan(q, explainer = explain)) { qp =>
-          val ordering = Ordering.comparatorToOrdering(TestGeoMesaDataStore.byteComparator)
+          val ordering = Ordering.comparatorToOrdering(TestGeoMesaDataStore.ByteComparator)
           val ranges = qp.asInstanceOf[TestQueryPlan].ranges.sortBy(_.start)(ordering)
           forall(ranges.sliding(2)) { case Seq(left, right) => overlaps(left, right) must beFalse }
         }
