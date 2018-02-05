@@ -90,14 +90,18 @@ def parseDeps(file):
         while line:
             if line.startswith("Building"):
                 # parse deps for a module
+                # skip dashes line
+                f.readline()
                 # need to skip warnings
                 while peekNextLine(f)[:9] == "[WARNING]":
                     f.readline()
+                # need to skip blank line
+                f.readline()
                 # need to skip plugins
                 if peekNextLine(f)[:3] == "---":
                     f.readline()
                 root_dep = parseDep(f.readline())
-                while peekNextLine(f)[0] != " ":
+                while peekNextLine(f)[0] != " " and peekNextLine(f)[0] != "-":
                     buildDep(f, root_dep)
                 root_deps.append(root_dep)
 
@@ -105,6 +109,8 @@ def parseDeps(file):
     return root_deps
 
 deps = parseDeps(file)
+
+# Get Top level deps for everything
 tlds = topLevelDeps(deps)
 tldsStrings = []
 
@@ -112,8 +118,25 @@ for i in tlds:
     tldsStrings.append(str(i))
 
 print("Top Level Deps")
-tldsStrings = list(set(tldsStrings))
+tldsStrings = sorted(list(set(tldsStrings)))
 for i in tldsStrings:
     print(i)
 
+# Get Top level deps for only the modules we want
+ato_deps = []
 for i in deps:
+    if "bigtable" not in str(i)  and "blobstore" not in str(i) and "cassandra" not in str(i):
+        print(i)
+        ato_deps.append(i)
+
+ato_tlds = topLevelDeps(ato_deps)
+ato_tlds_strings = []
+
+for i in ato_tlds:
+    ato_tlds_strings.append(str(i))
+
+print("Top Level Deps ATO only")
+ato_tlds_strings = sorted(list(set(ato_tlds_strings)))
+for i in ato_tlds_strings:
+    print(i)
+
