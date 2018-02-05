@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+# To use this this parse run on a file that was generated with this command
+#
+# mvn dependency:tree | sed 's/\[INFO\]\ //' | tee ./tree
+#
+# then
+#
+# ./depsParse.py -t ./tree
+
 import argparse
 import os
 from collections import OrderedDict
@@ -140,3 +148,20 @@ ato_tlds_strings = sorted(list(set(ato_tlds_strings)))
 for i in ato_tlds_strings:
     print(i)
 
+# Print out csv version
+ato_deps = []
+for i in deps:
+    if "bigtable" not in str(i)  and "blobstore" not in str(i) and "cassandra" not in str(i):
+        print(i)
+        ato_deps.append(i)
+
+ato_tlds = topLevelDeps(ato_deps)
+ato_tlds_strings = []
+
+for i in ato_tlds:
+    ato_tlds_strings.append(str(i))
+
+print("TLD ATO only, CSV")
+ato_tlds_strings = sorted(list(set(ato_tlds_strings)))
+for i in ato_tlds_strings:
+    print(i.replace(":",","))
