@@ -28,18 +28,27 @@ class Dependency:
         self._dependencies = []
 
 
-    def add_dep(self, dep):
+    def addDep(self, dep):
         self._dependencies.append(dep)
-
-
-    def getGroup(self):
-        return self._group
 
     def getDeps(self):
         return self._dependencies
 
+    def getGroup(self):
+        return self._group
+
+    def getScope(self):
+        return self._scope
+
     def __str__(self):
         return self._group + ":" + self._artifact + ":" + self._version
+
+    def __repr__(self):
+        return self._group + ":" + self._artifact + ":" + self._version + ":" + self._scope
+
+    def __eq__(self, other):
+        if str(self) == str(other):
+            return True
 
 
 def peekNextLine(file):
@@ -58,17 +67,20 @@ def buildDep(file, parent):
         level = line.index("-")
         child = parseDep(line[level + 2:])
 
-        # Using this child as the lower level's parent build this child's deps
-        nextLine = peekNextLine(file)
-        while nextLine[0] != " " and nextLine.index("-") > level:
-            buildDep(file, child)
+        if child.getScope() == "test":
+            return
+        else:
+            # Using this child as the lower level's parent build this child's deps
             nextLine = peekNextLine(file)
+            while nextLine[0] != " " and nextLine.index("-") > level:
+                buildDep(file, child)
+                nextLine = peekNextLine(file)
 
-        parent.add_dep(child)
+            parent.addDep(child)
 
 def parseDep(raw):
     print("parsing: " + raw)
-    raw = raw.split(":")
+    raw = raw.rstrip().split(":")
     group = raw[0]
     artifact = raw[1]
     type = raw[2]
@@ -125,15 +137,16 @@ tldsStrings = []
 for i in tlds:
     tldsStrings.append(str(i))
 
-print("Top Level Deps")
+print("\nTop Level Deps")
 tldsStrings = sorted(list(set(tldsStrings)))
 for i in tldsStrings:
     print(i)
 
-# Get Top level deps for only the modules we want
+# ATO TLDs
 ato_deps = []
+exclusions = ["bigtable", "blobstore", "cassandra", "provided"]
 for i in deps:
-    if "bigtable" not in str(i)  and "blobstore" not in str(i) and "cassandra" not in str(i):
+    if not any(x in str(i) for x in exclusions):
         print(i)
         ato_deps.append(i)
 
@@ -143,25 +156,32 @@ ato_tlds_strings = []
 for i in ato_tlds:
     ato_tlds_strings.append(str(i))
 
-print("Top Level Deps ATO only")
+# Get Top level deps for only the modules we want
+print("\nTop Level Deps ATO only")
 ato_tlds_strings = sorted(list(set(ato_tlds_strings)))
 for i in ato_tlds_strings:
     print(i)
 
 # Print out csv version
-ato_deps = []
-for i in deps:
-    if "bigtable" not in str(i)  and "blobstore" not in str(i) and "cassandra" not in str(i):
-        print(i)
-        ato_deps.append(i)
+# print("\nTLD ATO only, CSV")
+# ato_tlds_strings = sorted(list(set(ato_tlds_strings)))
+# for i in ato_tlds_strings:
+#     print(i.replace(":",","))
 
-ato_tlds = topLevelDeps(ato_deps)
-ato_tlds_strings = []
+# Print TLDs that are a child of another dep
+print("\nTLDs that are children of another dep")
+res = []
+def checkChildren(parent, search):
+    for dep in parent.getDeps():
+        if dep == search and parent.getGroup() != "org.locationtech.geomesa":
+            res.append("Child: " + str(dep) + " exists under Parent: " + str(parent))
+        else:
+            checkChildren(dep, search)
 
-for i in ato_tlds:
-    ato_tlds_strings.append(str(i))
 
-print("TLD ATO only, CSV")
-ato_tlds_strings = sorted(list(set(ato_tlds_strings)))
-for i in ato_tlds_strings:
-    print(i.replace(":",","))
+for search in ato_tlds:
+    for dep in deps:
+        checkChildren(dep, search)
+res = sorted(list(set(res)))
+for i in res:
+    print(i)
