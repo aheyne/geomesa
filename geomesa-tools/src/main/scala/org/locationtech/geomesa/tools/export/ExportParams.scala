@@ -16,7 +16,19 @@ import org.locationtech.geomesa.tools.utils.DataFormats.DataFormat
 import org.locationtech.geomesa.tools.utils.ParameterConverters.DataFormatConverter
 import org.locationtech.geomesa.tools.{OptionalCqlFilterParam, QueryHintsParams}
 
-trait FileExportParams extends OptionalCqlFilterParam with QueryHintsParams {
+trait LimitFeaturesParam {
+  @Parameter(names = Array("-m", "--max-features"), description = "Maximum number of features to return. default: Unlimited")
+  var maxFeatures: Integer = _
+}
+
+trait AttributeParam {
+  @Parameter(names = Array("-a", "--attributes"), description = "Attributes from feature to export (comma-separated)...Comma-separated expressions with each in the format attribute[=filter_function_expression]|derived-attribute=filter_function_expression|'id'. 'id' will export the feature ID, filter_function_expression is an expression of filter function applied to attributes, literals and filter functions, i.e. can be nested")
+  var attributes: java.util.List[String] = _
+}
+
+trait QueryParams extends LimitFeaturesParam with AttributeParam with OptionalCqlFilterParam with QueryHintsParams
+
+trait FileExportParams extends LimitFeaturesParam with OptionalCqlFilterParam with QueryHintsParams {
   @Parameter(names = Array("-o", "--output"), description = "Output to a file instead of std out")
   var file: File = _
 
@@ -28,12 +40,11 @@ trait FileExportParams extends OptionalCqlFilterParam with QueryHintsParams {
 
   @Parameter(names = Array("--no-header"), description = "Export as a delimited text format (csv|tsv) without a type header", required = false)
   var noHeader: Boolean = false
-
-  @Parameter(names = Array("-m", "--max-features"), description = "Maximum number of features to return. default: Unlimited")
-  var maxFeatures: Integer = _
 }
 
-trait ExportParams extends FileExportParams {
-  @Parameter(names = Array("-a", "--attributes"), description = "Attributes from feature to export (comma-separated)...Comma-separated expressions with each in the format attribute[=filter_function_expression]|derived-attribute=filter_function_expression|'id'. 'id' will export the feature ID, filter_function_expression is an expression of filter function applied to attributes, literals and filter functions, i.e. can be nested")
-  var attributes: java.util.List[String] = _
+trait ExportParams extends FileExportParams with QueryParams
+
+trait LeafletExportParams extends QueryParams {
+  @Parameter(names = Array("-o", "--output"), description = "Output directory to store files.")
+  var file: File = _
 }

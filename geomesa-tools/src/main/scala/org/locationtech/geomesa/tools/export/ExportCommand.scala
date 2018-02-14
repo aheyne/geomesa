@@ -47,7 +47,7 @@ trait ExportCommand[DS <: DataStore] extends DataStoreCommand[DS] with MethodPro
     import ExportCommand._
     import org.locationtech.geomesa.tools.utils.DataFormats._
 
-    val (query, attributes) = createQuery(getSchema(ds), params.outputFormat, params)
+    val (query, attributes) = createQuery(getSchema(ds), Option(params.outputFormat), params)
 
     val features = try { getFeatures(ds, query) } catch {
       case NonFatal(e) =>
@@ -91,8 +91,8 @@ trait ExportCommand[DS <: DataStore] extends DataStoreCommand[DS] with MethodPro
 object ExportCommand extends LazyLogging {
 
   def createQuery(toSft: => SimpleFeatureType,
-                  fmt: DataFormat,
-                  params: ExportParams): (Query, Option[ExportAttributes]) = {
+                  fmt: Option[DataFormat],
+                  params: QueryParams): (Query, Option[ExportAttributes]) = {
     val typeName = Option(params).collect { case p: TypeNameParam => p.featureName }.orNull
     val filter = Option(params.cqlFilter).getOrElse(Filter.INCLUDE)
     lazy val sft = toSft // only evaluate it once
@@ -106,11 +106,13 @@ object ExportCommand extends LazyLogging {
       }
     }
 
-    if (fmt == DataFormats.Arrow) {
-      query.getHints.put(QueryHints.ARROW_ENCODE, java.lang.Boolean.TRUE)
-    } else if (fmt == DataFormats.Bin) {
-      // this indicates to run a BIN query, will be overridden by hints if specified
-      query.getHints.put(QueryHints.BIN_TRACK, "id")
+    fmt match {
+      case Some(DataFormats.Arrow) =>
+        query.getHints.put(QueryHints.ARROW_ENCODE, java.lang.Boolean.TRUE)
+      case Some(DataFormats.Bin) =>
+        // this indicates to run a BIN query, will be overridden by hints if specified
+        query.getHints.put(QueryHints.BIN_TRACK, "id")
+      case _ => // NoOp
     }
 
     Option(params.hints).foreach { hints =>
@@ -121,16 +123,21 @@ object ExportCommand extends LazyLogging {
     val attributes = {
       import scala.collection.JavaConversions._
       val provided = Option(params.attributes).collect { case a if !a.isEmpty => a.toSeq }.orElse {
-        if (fmt == DataFormats.Bin) { Some(BinExporter.getAttributeList(sft, query.getHints)) } else { None }
-      }
-      if (fmt == DataFormats.Shp) {
-        val attributes = provided.map(ShapefileExporter.replaceGeom(sft, _)).getOrElse(ShapefileExporter.modifySchema(sft))
-        Some(ExportAttributes(attributes, fid = true))
-      } else {
-        provided.map { p =>
-          val (id, attributes) = p.partition(_.equalsIgnoreCase("id"))
-          ExportAttributes(attributes, id.nonEmpty)
+        fmt.find(_ == DataFormats.Bin) match {
+          case Some(_) => Some(BinExporter.getAttributeList(sft, query.getHints))
+          case None => None
         }
+      }
+
+      fmt.find(_ == DataFormats.Shp) match {
+        case Some(_) =>
+          val attributes = provided.map(ShapefileExporter.replaceGeom(sft, _)).getOrElse(ShapefileExporter.modifySchema(sft))
+          Some(ExportAttributes(attributes, fid = true))
+        case None =>
+          provided.map { p =>
+            val (id, attributes) = p.partition(_.equalsIgnoreCase("id"))
+            ExportAttributes(attributes, id.nonEmpty)
+          }
       }
     }
 
@@ -151,6 +158,8 @@ object ExportCommand extends LazyLogging {
   }
 
   def getWriter(params: FileExportParams): Writer = new OutputStreamWriter(createOutputStream(params.file, params.gzip))
+
+  def getWriter(file: File): Writer = new OutputStreamWriter(createOutputStream(file, null))
 
   def checkShpFile(params: FileExportParams): File = {
     if (params.file != null) { params.file } else {
