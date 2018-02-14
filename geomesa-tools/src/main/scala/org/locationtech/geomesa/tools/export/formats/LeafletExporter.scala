@@ -68,6 +68,17 @@ class LeafletExporter(dataWriter: Writer, htmlFile: File) extends FeatureExporte
     val bbox = envelope.toBounds(CRS.decode("EPSG:4326"))
     val maxDimention = math.max(bbox.getWidth, bbox.getHeight)
 
+    // calculate zoom
+    
+
+    // replace zoom
+
+    // inject data file location
+
+    // write html
+
+    // from bash detect default browser and auto launch or report location of index
+
     val factory = DocumentBuilderFactory.newInstance
     val builder = factory.newDocumentBuilder
     val htmlDoc: Document = builder.parse(getClass.getResourceAsStream("leafletIndex.html"))
