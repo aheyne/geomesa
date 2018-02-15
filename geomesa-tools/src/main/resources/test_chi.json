@@ -1,0 +1,871 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    { "type": "Feature", "properties": { "latitude": 30.555871, "longitude": 79.072887, "chi": 84.642000, "elevation": 1224, "flow distance": 43955.000000, "drainage area": 327720000.000000, "m_chi": 13.249000, "b_chi": 90.238000 }, "geometry": { "type": "Point", "coordinates": [ 79.072887, 30.555871 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.555884, "longitude": 79.073812, "chi": 84.349000, "elevation": 1205, "flow distance": 43866.000000, "drainage area": 327780000.000000, "m_chi": 15.354000, "b_chi": -86.445000 }, "geometry": { "type": "Point", "coordinates": [ 79.073812, 30.555884 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.555898, "longitude": 79.074738, "chi": 84.056000, "elevation": 1205, "flow distance": 43778.000000, "drainage area": 327930000.000000, "m_chi": 15.857000, "b_chi": -127.250000 }, "geometry": { "type": "Point", "coordinates": [ 79.074738, 30.555898 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.555111, "longitude": 79.075679, "chi": 83.642000, "elevation": 1205, "flow distance": 43652.000000, "drainage area": 327950000.000000, "m_chi": 14.784000, "b_chi": -35.912000 }, "geometry": { "type": "Point", "coordinates": [ 79.075679, 30.555111 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.554325, "longitude": 79.076620, "chi": 83.228000, "elevation": 1183, "flow distance": 43526.000000, "drainage area": 328340000.000000, "m_chi": 13.006000, "b_chi": 113.390000 }, "geometry": { "type": "Point", "coordinates": [ 79.076620, 30.554325 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.554338, "longitude": 79.077546, "chi": 82.936000, "elevation": 1183, "flow distance": 43438.000000, "drainage area": 328390000.000000, "m_chi": 10.471000, "b_chi": 324.310000 }, "geometry": { "type": "Point", "coordinates": [ 79.077546, 30.554338 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.554352, "longitude": 79.078471, "chi": 82.643000, "elevation": 1183, "flow distance": 43349.000000, "drainage area": 328420000.000000, "m_chi": 7.019000, "b_chi": 609.230000 }, "geometry": { "type": "Point", "coordinates": [ 79.078471, 30.554352 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.553563, "longitude": 79.079413, "chi": 82.230000, "elevation": 1183, "flow distance": 43223.000000, "drainage area": 328490000.000000, "m_chi": 5.820300, "b_chi": 707.930000 }, "geometry": { "type": "Point", "coordinates": [ 79.079413, 30.553563 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.552776, "longitude": 79.080354, "chi": 81.816000, "elevation": 1183, "flow distance": 43098.000000, "drainage area": 328560000.000000, "m_chi": 3.856600, "b_chi": 868.500000 }, "geometry": { "type": "Point", "coordinates": [ 79.080354, 30.552776 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.551976, "longitude": 79.080370, "chi": 81.524000, "elevation": 1183, "flow distance": 43009.000000, "drainage area": 328590000.000000, "m_chi": 0.986550, "b_chi": 1101.700000 }, "geometry": { "type": "Point", "coordinates": [ 79.080370, 30.551976 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.551175, "longitude": 79.080385, "chi": 81.231000, "elevation": 1183, "flow distance": 42920.000000, "drainage area": 328600000.000000, "m_chi": 4.019600, "b_chi": 853.390000 }, "geometry": { "type": "Point", "coordinates": [ 79.080385, 30.551175 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.550373, "longitude": 79.080401, "chi": 80.939000, "elevation": 1183, "flow distance": 42831.000000, "drainage area": 328620000.000000, "m_chi": 7.906000, "b_chi": 537.190000 }, "geometry": { "type": "Point", "coordinates": [ 79.080401, 30.550373 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.549572, "longitude": 79.080417, "chi": 80.647000, "elevation": 1180, "flow distance": 42742.000000, "drainage area": 328870000.000000, "m_chi": 10.867000, "b_chi": 298.220000 }, "geometry": { "type": "Point", "coordinates": [ 79.080417, 30.549572 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.548772, "longitude": 79.080433, "chi": 80.354000, "elevation": 1180, "flow distance": 42654.000000, "drainage area": 329200000.000000, "m_chi": 12.615000, "b_chi": 158.550000 }, "geometry": { "type": "Point", "coordinates": [ 79.080433, 30.548772 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.547971, "longitude": 79.080448, "chi": 80.062000, "elevation": 1180, "flow distance": 42565.000000, "drainage area": 329230000.000000, "m_chi": 13.337000, "b_chi": 101.830000 }, "geometry": { "type": "Point", "coordinates": [ 79.080448, 30.547971 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.547182, "longitude": 79.081390, "chi": 79.649000, "elevation": 1160, "flow distance": 42439.000000, "drainage area": 331050000.000000, "m_chi": 13.196000, "b_chi": 114.350000 }, "geometry": { "type": "Point", "coordinates": [ 79.081390, 30.547182 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.546396, "longitude": 79.082331, "chi": 79.237000, "elevation": 1150, "flow distance": 42313.000000, "drainage area": 511680000.000000, "m_chi": 12.460000, "b_chi": 173.920000 }, "geometry": { "type": "Point", "coordinates": [ 79.082331, 30.546396 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.545609, "longitude": 79.083272, "chi": 78.898000, "elevation": 1150, "flow distance": 42188.000000, "drainage area": 511770000.000000, "m_chi": 12.695000, "b_chi": 155.040000 }, "geometry": { "type": "Point", "coordinates": [ 79.083272, 30.545609 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.544822, "longitude": 79.084213, "chi": 78.559000, "elevation": 1150, "flow distance": 42062.000000, "drainage area": 513840000.000000, "m_chi": 13.788000, "b_chi": 68.043000 }, "geometry": { "type": "Point", "coordinates": [ 79.084213, 30.544822 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.544836, "longitude": 79.085138, "chi": 78.320000, "elevation": 1150, "flow distance": 41973.000000, "drainage area": 513860000.000000, "m_chi": 13.390000, "b_chi": 98.610000 }, "geometry": { "type": "Point", "coordinates": [ 79.085138, 30.544836 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.544047, "longitude": 79.086080, "chi": 77.982000, "elevation": 1150, "flow distance": 41848.000000, "drainage area": 514000000.000000, "m_chi": 11.117000, "b_chi": 275.340000 }, "geometry": { "type": "Point", "coordinates": [ 79.086080, 30.544047 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.544060, "longitude": 79.087005, "chi": 77.743000, "elevation": 1150, "flow distance": 41759.000000, "drainage area": 514020000.000000, "m_chi": 10.807000, "b_chi": 299.840000 }, "geometry": { "type": "Point", "coordinates": [ 79.087005, 30.544060 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.544074, "longitude": 79.087930, "chi": 77.504000, "elevation": 1137, "flow distance": 41670.000000, "drainage area": 514050000.000000, "m_chi": 11.030000, "b_chi": 283.670000 }, "geometry": { "type": "Point", "coordinates": [ 79.087930, 30.544074 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.544087, "longitude": 79.088856, "chi": 77.265000, "elevation": 1126, "flow distance": 41581.000000, "drainage area": 514180000.000000, "m_chi": 10.310000, "b_chi": 340.340000 }, "geometry": { "type": "Point", "coordinates": [ 79.088856, 30.544087 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.543301, "longitude": 79.089797, "chi": 76.927000, "elevation": 1126, "flow distance": 41456.000000, "drainage area": 514440000.000000, "m_chi": 11.119000, "b_chi": 277.700000 }, "geometry": { "type": "Point", "coordinates": [ 79.089797, 30.543301 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.542486, "longitude": 79.088888, "chi": 76.589000, "elevation": 1126, "flow distance": 41330.000000, "drainage area": 514470000.000000, "m_chi": 10.820000, "b_chi": 300.520000 }, "geometry": { "type": "Point", "coordinates": [ 79.088888, 30.542486 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.541700, "longitude": 79.089829, "chi": 76.251000, "elevation": 1126, "flow distance": 41205.000000, "drainage area": 515500000.000000, "m_chi": 9.524500, "b_chi": 399.020000 }, "geometry": { "type": "Point", "coordinates": [ 79.089829, 30.541700 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.540911, "longitude": 79.090770, "chi": 75.913000, "elevation": 1126, "flow distance": 41079.000000, "drainage area": 515710000.000000, "m_chi": 7.300200, "b_chi": 567.330000 }, "geometry": { "type": "Point", "coordinates": [ 79.090770, 30.540911 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.540124, "longitude": 79.091711, "chi": 75.575000, "elevation": 1126, "flow distance": 40953.000000, "drainage area": 515760000.000000, "m_chi": 6.160300, "b_chi": 653.510000 }, "geometry": { "type": "Point", "coordinates": [ 79.091711, 30.540124 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.539323, "longitude": 79.091726, "chi": 75.337000, "elevation": 1112, "flow distance": 40865.000000, "drainage area": 515810000.000000, "m_chi": 6.411800, "b_chi": 635.150000 }, "geometry": { "type": "Point", "coordinates": [ 79.091726, 30.539323 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.538536, "longitude": 79.092668, "chi": 74.999000, "elevation": 1112, "flow distance": 40739.000000, "drainage area": 516160000.000000, "m_chi": 7.012800, "b_chi": 590.180000 }, "geometry": { "type": "Point", "coordinates": [ 79.092668, 30.538536 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.538550, "longitude": 79.093593, "chi": 74.760000, "elevation": 1112, "flow distance": 40650.000000, "drainage area": 516350000.000000, "m_chi": 7.035300, "b_chi": 588.760000 }, "geometry": { "type": "Point", "coordinates": [ 79.093593, 30.538550 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.538563, "longitude": 79.094518, "chi": 74.522000, "elevation": 1112, "flow distance": 40561.000000, "drainage area": 516380000.000000, "m_chi": 6.329700, "b_chi": 641.550000 }, "geometry": { "type": "Point", "coordinates": [ 79.094518, 30.538563 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.537774, "longitude": 79.095459, "chi": 74.184000, "elevation": 1112, "flow distance": 40436.000000, "drainage area": 516530000.000000, "m_chi": 4.907900, "b_chi": 747.050000 }, "geometry": { "type": "Point", "coordinates": [ 79.095459, 30.537774 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.536974, "longitude": 79.095475, "chi": 73.946000, "elevation": 1112, "flow distance": 40347.000000, "drainage area": 516550000.000000, "m_chi": 2.684000, "b_chi": 911.120000 }, "geometry": { "type": "Point", "coordinates": [ 79.095475, 30.536974 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.536174, "longitude": 79.095490, "chi": 73.707000, "elevation": 1107, "flow distance": 40258.000000, "drainage area": 516570000.000000, "m_chi": 4.242900, "b_chi": 795.620000 }, "geometry": { "type": "Point", "coordinates": [ 79.095490, 30.536174 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.535373, "longitude": 79.095506, "chi": 73.469000, "elevation": 1107, "flow distance": 40169.000000, "drainage area": 887550000.000000, "m_chi": 7.614600, "b_chi": 546.490000 }, "geometry": { "type": "Point", "coordinates": [ 79.095506, 30.535373 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.534557, "longitude": 79.094596, "chi": 73.204000, "elevation": 1107, "flow distance": 40044.000000, "drainage area": 887620000.000000, "m_chi": 13.980000, "b_chi": 77.822000 }, "geometry": { "type": "Point", "coordinates": [ 79.094596, 30.534557 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.533756, "longitude": 79.094612, "chi": 73.017000, "elevation": 1107, "flow distance": 39955.000000, "drainage area": 887650000.000000, "m_chi": 19.427000, "b_chi": -320.920000 }, "geometry": { "type": "Point", "coordinates": [ 79.094612, 30.533756 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.532956, "longitude": 79.094628, "chi": 72.830000, "elevation": 1107, "flow distance": 39866.000000, "drainage area": 887680000.000000, "m_chi": 22.637000, "b_chi": -554.400000 }, "geometry": { "type": "Point", "coordinates": [ 79.094628, 30.532956 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.532153, "longitude": 79.094643, "chi": 72.643000, "elevation": 1099, "flow distance": 39777.000000, "drainage area": 887700000.000000, "m_chi": 23.636000, "b_chi": -625.820000 }, "geometry": { "type": "Point", "coordinates": [ 79.094643, 30.532153 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.531339, "longitude": 79.093734, "chi": 72.379000, "elevation": 1087, "flow distance": 39652.000000, "drainage area": 887720000.000000, "m_chi": 23.619000, "b_chi": -622.780000 }, "geometry": { "type": "Point", "coordinates": [ 79.093734, 30.531339 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.530539, "longitude": 79.093749, "chi": 72.192000, "elevation": 1068, "flow distance": 39563.000000, "drainage area": 888140000.000000, "m_chi": 21.667000, "b_chi": -480.100000 }, "geometry": { "type": "Point", "coordinates": [ 79.093749, 30.530539 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.530525, "longitude": 79.092824, "chi": 72.005000, "elevation": 1068, "flow distance": 39474.000000, "drainage area": 888210000.000000, "m_chi": 18.490000, "b_chi": -250.310000 }, "geometry": { "type": "Point", "coordinates": [ 79.092824, 30.530525 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.529712, "longitude": 79.091914, "chi": 71.741000, "elevation": 1068, "flow distance": 39348.000000, "drainage area": 888270000.000000, "m_chi": 15.502000, "b_chi": -36.072000 }, "geometry": { "type": "Point", "coordinates": [ 79.091914, 30.529712 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.528895, "longitude": 79.091005, "chi": 71.476000, "elevation": 1068, "flow distance": 39223.000000, "drainage area": 888890000.000000, "m_chi": 12.744000, "b_chi": 159.630000 }, "geometry": { "type": "Point", "coordinates": [ 79.091005, 30.528895 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.528108, "longitude": 79.091946, "chi": 71.212000, "elevation": 1068, "flow distance": 39097.000000, "drainage area": 889000000.000000, "m_chi": 9.703500, "b_chi": 374.990000 }, "geometry": { "type": "Point", "coordinates": [ 79.091946, 30.528108 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.527294, "longitude": 79.091036, "chi": 70.948000, "elevation": 1068, "flow distance": 38972.000000, "drainage area": 889110000.000000, "m_chi": 8.282800, "b_chi": 474.650000 }, "geometry": { "type": "Point", "coordinates": [ 79.091036, 30.527294 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.526494, "longitude": 79.091052, "chi": 70.761000, "elevation": 1068, "flow distance": 38883.000000, "drainage area": 889170000.000000, "m_chi": 9.867200, "b_chi": 362.660000 }, "geometry": { "type": "Point", "coordinates": [ 79.091052, 30.526494 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.525691, "longitude": 79.091067, "chi": 70.574000, "elevation": 1062, "flow distance": 38794.000000, "drainage area": 889320000.000000, "m_chi": 11.667000, "b_chi": 235.920000 }, "geometry": { "type": "Point", "coordinates": [ 79.091067, 30.525691 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.524877, "longitude": 79.090158, "chi": 70.310000, "elevation": 1052, "flow distance": 38668.000000, "drainage area": 889370000.000000, "m_chi": 12.848000, "b_chi": 153.390000 }, "geometry": { "type": "Point", "coordinates": [ 79.090158, 30.524877 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.524063, "longitude": 79.089248, "chi": 70.046000, "elevation": 1052, "flow distance": 38543.000000, "drainage area": 889710000.000000, "m_chi": 13.658000, "b_chi": 97.007000 }, "geometry": { "type": "Point", "coordinates": [ 79.089248, 30.524063 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.523263, "longitude": 79.089264, "chi": 69.859000, "elevation": 1049, "flow distance": 38454.000000, "drainage area": 889770000.000000, "m_chi": 13.683000, "b_chi": 95.556000 }, "geometry": { "type": "Point", "coordinates": [ 79.089264, 30.523263 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.522460, "longitude": 79.089280, "chi": 69.672000, "elevation": 1049, "flow distance": 38365.000000, "drainage area": 890270000.000000, "m_chi": 12.496000, "b_chi": 178.430000 }, "geometry": { "type": "Point", "coordinates": [ 79.089280, 30.522460 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.521646, "longitude": 79.088370, "chi": 69.408000, "elevation": 1045, "flow distance": 38240.000000, "drainage area": 891010000.000000, "m_chi": 10.274000, "b_chi": 332.610000 }, "geometry": { "type": "Point", "coordinates": [ 79.088370, 30.521646 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.520846, "longitude": 79.088386, "chi": 69.222000, "elevation": 1044, "flow distance": 38151.000000, "drainage area": 892760000.000000, "m_chi": 8.311100, "b_chi": 468.470000 }, "geometry": { "type": "Point", "coordinates": [ 79.088386, 30.520846 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.520032, "longitude": 79.087476, "chi": 68.958000, "elevation": 1040, "flow distance": 38025.000000, "drainage area": 894410000.000000, "m_chi": 8.011500, "b_chi": 489.430000 }, "geometry": { "type": "Point", "coordinates": [ 79.087476, 30.520032 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.519216, "longitude": 79.086567, "chi": 68.694000, "elevation": 1037, "flow distance": 37900.000000, "drainage area": 894590000.000000, "m_chi": 7.003000, "b_chi": 558.940000 }, "geometry": { "type": "Point", "coordinates": [ 79.086567, 30.519216 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.518415, "longitude": 79.086582, "chi": 68.508000, "elevation": 1037, "flow distance": 37811.000000, "drainage area": 894700000.000000, "m_chi": 6.112800, "b_chi": 620.190000 }, "geometry": { "type": "Point", "coordinates": [ 79.086582, 30.518415 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.517615, "longitude": 79.086598, "chi": 68.322000, "elevation": 1037, "flow distance": 37722.000000, "drainage area": 894750000.000000, "m_chi": 4.518400, "b_chi": 729.200000 }, "geometry": { "type": "Point", "coordinates": [ 79.086598, 30.517615 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.516814, "longitude": 79.086614, "chi": 68.136000, "elevation": 1037, "flow distance": 37633.000000, "drainage area": 894790000.000000, "m_chi": 4.619500, "b_chi": 721.830000 }, "geometry": { "type": "Point", "coordinates": [ 79.086614, 30.516814 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.515998, "longitude": 79.085704, "chi": 67.872000, "elevation": 1035, "flow distance": 37508.000000, "drainage area": 895030000.000000, "m_chi": 4.321900, "b_chi": 741.660000 }, "geometry": { "type": "Point", "coordinates": [ 79.085704, 30.515998 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.515197, "longitude": 79.085720, "chi": 67.686000, "elevation": 1035, "flow distance": 37419.000000, "drainage area": 895130000.000000, "m_chi": 5.498800, "b_chi": 661.440000 }, "geometry": { "type": "Point", "coordinates": [ 79.085720, 30.515197 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.514397, "longitude": 79.085736, "chi": 67.500000, "elevation": 1035, "flow distance": 37330.000000, "drainage area": 895260000.000000, "m_chi": 6.725400, "b_chi": 578.590000 }, "geometry": { "type": "Point", "coordinates": [ 79.085736, 30.514397 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.513610, "longitude": 79.086676, "chi": 67.236000, "elevation": 1035, "flow distance": 37204.000000, "drainage area": 895420000.000000, "m_chi": 7.464000, "b_chi": 529.060000 }, "geometry": { "type": "Point", "coordinates": [ 79.086676, 30.513610 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.512808, "longitude": 79.086692, "chi": 67.050000, "elevation": 1029, "flow distance": 37116.000000, "drainage area": 895530000.000000, "m_chi": 7.556200, "b_chi": 523.240000 }, "geometry": { "type": "Point", "coordinates": [ 79.086692, 30.512808 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.512007, "longitude": 79.086708, "chi": 66.864000, "elevation": 1029, "flow distance": 37027.000000, "drainage area": 895700000.000000, "m_chi": 6.977300, "b_chi": 562.380000 }, "geometry": { "type": "Point", "coordinates": [ 79.086708, 30.512007 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.511207, "longitude": 79.086724, "chi": 66.677000, "elevation": 1024, "flow distance": 36938.000000, "drainage area": 895760000.000000, "m_chi": 6.330000, "b_chi": 605.980000 }, "geometry": { "type": "Point", "coordinates": [ 79.086724, 30.511207 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.510406, "longitude": 79.086739, "chi": 66.491000, "elevation": 1024, "flow distance": 36849.000000, "drainage area": 896110000.000000, "m_chi": 5.177700, "b_chi": 682.890000 }, "geometry": { "type": "Point", "coordinates": [ 79.086739, 30.510406 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.509604, "longitude": 79.086755, "chi": 66.305000, "elevation": 1024, "flow distance": 36760.000000, "drainage area": 897070000.000000, "m_chi": 3.594800, "b_chi": 787.850000 }, "geometry": { "type": "Point", "coordinates": [ 79.086755, 30.509604 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.508790, "longitude": 79.085846, "chi": 66.042000, "elevation": 1024, "flow distance": 36635.000000, "drainage area": 897090000.000000, "m_chi": 1.715000, "b_chi": 911.720000 }, "geometry": { "type": "Point", "coordinates": [ 79.085846, 30.508790 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.507976, "longitude": 79.084936, "chi": 65.779000, "elevation": 1024, "flow distance": 36509.000000, "drainage area": 897100000.000000, "m_chi": 0.907390, "b_chi": 964.770000 }, "geometry": { "type": "Point", "coordinates": [ 79.084936, 30.507976 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.507175, "longitude": 79.084952, "chi": 65.593000, "elevation": 1024, "flow distance": 36420.000000, "drainage area": 925020000.000000, "m_chi": 0.000000, "b_chi": 1024.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.084952, 30.507175 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.506386, "longitude": 79.085893, "chi": 65.333000, "elevation": 1024, "flow distance": 36295.000000, "drainage area": 925110000.000000, "m_chi": 0.000000, "b_chi": 1024.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.085893, 30.506386 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.505599, "longitude": 79.086833, "chi": 65.074000, "elevation": 1024, "flow distance": 36169.000000, "drainage area": 925200000.000000, "m_chi": 0.000000, "b_chi": 1024.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.086833, 30.505599 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.504812, "longitude": 79.087774, "chi": 64.814000, "elevation": 1024, "flow distance": 36043.000000, "drainage area": 925250000.000000, "m_chi": 0.000000, "b_chi": 1024.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.087774, 30.504812 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.504023, "longitude": 79.088715, "chi": 64.555000, "elevation": 1024, "flow distance": 35918.000000, "drainage area": 926080000.000000, "m_chi": 0.000000, "b_chi": 1024.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.088715, 30.504023 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.503223, "longitude": 79.088730, "chi": 64.371000, "elevation": 1024, "flow distance": 35829.000000, "drainage area": 926090000.000000, "m_chi": 0.000000, "b_chi": 1024.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.088730, 30.503223 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.502409, "longitude": 79.087821, "chi": 64.112000, "elevation": 1024, "flow distance": 35703.000000, "drainage area": 926350000.000000, "m_chi": 0.000000, "b_chi": 1024.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.087821, 30.502409 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.501622, "longitude": 79.088762, "chi": 63.852000, "elevation": 1024, "flow distance": 35578.000000, "drainage area": 926530000.000000, "m_chi": 1.801600, "b_chi": 908.020000 }, "geometry": { "type": "Point", "coordinates": [ 79.088762, 30.501622 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.500819, "longitude": 79.088778, "chi": 63.669000, "elevation": 1024, "flow distance": 35489.000000, "drainage area": 926570000.000000, "m_chi": 3.367500, "b_chi": 807.860000 }, "geometry": { "type": "Point", "coordinates": [ 79.088778, 30.500819 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.500019, "longitude": 79.088793, "chi": 63.485000, "elevation": 1024, "flow distance": 35400.000000, "drainage area": 926730000.000000, "m_chi": 5.841200, "b_chi": 650.210000 }, "geometry": { "type": "Point", "coordinates": [ 79.088793, 30.500019 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.499219, "longitude": 79.088809, "chi": 63.302000, "elevation": 1024, "flow distance": 35311.000000, "drainage area": 926790000.000000, "m_chi": 9.991100, "b_chi": 386.530000 }, "geometry": { "type": "Point", "coordinates": [ 79.088809, 30.499219 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.498404, "longitude": 79.087900, "chi": 63.043000, "elevation": 1024, "flow distance": 35186.000000, "drainage area": 926830000.000000, "m_chi": 13.379000, "b_chi": 172.620000 }, "geometry": { "type": "Point", "coordinates": [ 79.087900, 30.498404 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.497602, "longitude": 79.087915, "chi": 62.859000, "elevation": 1015, "flow distance": 35097.000000, "drainage area": 927040000.000000, "m_chi": 17.167000, "b_chi": -65.744000 }, "geometry": { "type": "Point", "coordinates": [ 79.087915, 30.497602 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.496788, "longitude": 79.087006, "chi": 62.600000, "elevation": 1015, "flow distance": 34971.000000, "drainage area": 927140000.000000, "m_chi": 19.035000, "b_chi": -182.220000 }, "geometry": { "type": "Point", "coordinates": [ 79.087006, 30.496788 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.495987, "longitude": 79.087022, "chi": 62.417000, "elevation": 1009, "flow distance": 34883.000000, "drainage area": 927310000.000000, "m_chi": 19.253000, "b_chi": -194.820000 }, "geometry": { "type": "Point", "coordinates": [ 79.087022, 30.495987 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.495187, "longitude": 79.087037, "chi": 62.233000, "elevation": 998, "flow distance": 34794.000000, "drainage area": 927380000.000000, "m_chi": 20.538000, "b_chi": -274.670000 }, "geometry": { "type": "Point", "coordinates": [ 79.087037, 30.495187 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.494384, "longitude": 79.087053, "chi": 62.050000, "elevation": 998, "flow distance": 34705.000000, "drainage area": 927450000.000000, "m_chi": 19.851000, "b_chi": -231.470000 }, "geometry": { "type": "Point", "coordinates": [ 79.087053, 30.494384 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.493584, "longitude": 79.087069, "chi": 61.867000, "elevation": 991, "flow distance": 34616.000000, "drainage area": 927470000.000000, "m_chi": 17.199000, "b_chi": -67.313000 }, "geometry": { "type": "Point", "coordinates": [ 79.087069, 30.493584 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.492770, "longitude": 79.086159, "chi": 61.608000, "elevation": 991, "flow distance": 34491.000000, "drainage area": 927540000.000000, "m_chi": 15.042000, "b_chi": 66.208000 }, "geometry": { "type": "Point", "coordinates": [ 79.086159, 30.492770 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.491956, "longitude": 79.085250, "chi": 61.348000, "elevation": 991, "flow distance": 34365.000000, "drainage area": 927550000.000000, "m_chi": 11.607000, "b_chi": 277.090000 }, "geometry": { "type": "Point", "coordinates": [ 79.085250, 30.491956 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.491942, "longitude": 79.084325, "chi": 61.165000, "elevation": 981, "flow distance": 34276.000000, "drainage area": 927650000.000000, "m_chi": 8.690200, "b_chi": 455.320000 }, "geometry": { "type": "Point", "coordinates": [ 79.084325, 30.491942 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.491126, "longitude": 79.083416, "chi": 60.906000, "elevation": 981, "flow distance": 34151.000000, "drainage area": 927970000.000000, "m_chi": 7.334300, "b_chi": 538.190000 }, "geometry": { "type": "Point", "coordinates": [ 79.083416, 30.491126 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.490339, "longitude": 79.084357, "chi": 60.647000, "elevation": 980, "flow distance": 34025.000000, "drainage area": 928480000.000000, "m_chi": 5.379400, "b_chi": 656.790000 }, "geometry": { "type": "Point", "coordinates": [ 79.084357, 30.490339 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.489552, "longitude": 79.085297, "chi": 60.387000, "elevation": 980, "flow distance": 33899.000000, "drainage area": 999810000.000000, "m_chi": 4.262700, "b_chi": 724.520000 }, "geometry": { "type": "Point", "coordinates": [ 79.085297, 30.489552 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.488738, "longitude": 79.084388, "chi": 60.137000, "elevation": 980, "flow distance": 33774.000000, "drainage area": 999920000.000000, "m_chi": 2.565500, "b_chi": 826.700000 }, "geometry": { "type": "Point", "coordinates": [ 79.084388, 30.488738 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.487936, "longitude": 79.084404, "chi": 59.960000, "elevation": 980, "flow distance": 33685.000000, "drainage area": 999990000.000000, "m_chi": 0.379630, "b_chi": 957.410000 }, "geometry": { "type": "Point", "coordinates": [ 79.084404, 30.487936 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.487135, "longitude": 79.084419, "chi": 59.782000, "elevation": 980, "flow distance": 33596.000000, "drainage area": 1000200000.000000, "m_chi": 0.215720, "b_chi": 967.200000 }, "geometry": { "type": "Point", "coordinates": [ 79.084419, 30.487135 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.486335, "longitude": 79.084435, "chi": 59.605000, "elevation": 980, "flow distance": 33507.000000, "drainage area": 1000300000.000000, "m_chi": 0.000000, "b_chi": 980.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.084435, 30.486335 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.485548, "longitude": 79.085376, "chi": 59.355000, "elevation": 980, "flow distance": 33382.000000, "drainage area": 1000300000.000000, "m_chi": 0.000000, "b_chi": 980.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.085376, 30.485548 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.484732, "longitude": 79.084466, "chi": 59.104000, "elevation": 980, "flow distance": 33256.000000, "drainage area": 1000500000.000000, "m_chi": 2.167000, "b_chi": 850.970000 }, "geometry": { "type": "Point", "coordinates": [ 79.084466, 30.484732 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.483945, "longitude": 79.085407, "chi": 58.854000, "elevation": 980, "flow distance": 33130.000000, "drainage area": 1000600000.000000, "m_chi": 7.194600, "b_chi": 552.820000 }, "geometry": { "type": "Point", "coordinates": [ 79.085407, 30.483945 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.483144, "longitude": 79.085423, "chi": 58.676000, "elevation": 980, "flow distance": 33042.000000, "drainage area": 1000700000.000000, "m_chi": 11.632000, "b_chi": 291.190000 }, "geometry": { "type": "Point", "coordinates": [ 79.085423, 30.483144 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.482344, "longitude": 79.085438, "chi": 58.499000, "elevation": 980, "flow distance": 32953.000000, "drainage area": 1000800000.000000, "m_chi": 15.085000, "b_chi": 89.086000 }, "geometry": { "type": "Point", "coordinates": [ 79.085438, 30.482344 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.481541, "longitude": 79.085454, "chi": 58.322000, "elevation": 980, "flow distance": 32864.000000, "drainage area": 1000900000.000000, "m_chi": 17.755000, "b_chi": -65.960000 }, "geometry": { "type": "Point", "coordinates": [ 79.085454, 30.481541 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.480727, "longitude": 79.084545, "chi": 58.072000, "elevation": 970, "flow distance": 32738.000000, "drainage area": 1000900000.000000, "m_chi": 18.777000, "b_chi": -124.110000 }, "geometry": { "type": "Point", "coordinates": [ 79.084545, 30.480727 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.479927, "longitude": 79.084560, "chi": 57.894000, "elevation": 954, "flow distance": 32650.000000, "drainage area": 1001000000.000000, "m_chi": 17.994000, "b_chi": -77.379000 }, "geometry": { "type": "Point", "coordinates": [ 79.084560, 30.479927 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.479127, "longitude": 79.084576, "chi": 57.717000, "elevation": 952, "flow distance": 32561.000000, "drainage area": 1001800000.000000, "m_chi": 16.037000, "b_chi": 36.571000 }, "geometry": { "type": "Point", "coordinates": [ 79.084576, 30.479126 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.478310, "longitude": 79.083667, "chi": 57.467000, "elevation": 952, "flow distance": 32435.000000, "drainage area": 1001800000.000000, "m_chi": 14.464000, "b_chi": 127.150000 }, "geometry": { "type": "Point", "coordinates": [ 79.083667, 30.478310 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.478297, "longitude": 79.082742, "chi": 57.290000, "elevation": 952, "flow distance": 32346.000000, "drainage area": 1003000000.000000, "m_chi": 11.739000, "b_chi": 283.030000 }, "geometry": { "type": "Point", "coordinates": [ 79.082742, 30.478297 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.477483, "longitude": 79.081833, "chi": 57.040000, "elevation": 952, "flow distance": 32221.000000, "drainage area": 1003000000.000000, "m_chi": 7.650600, "b_chi": 515.520000 }, "geometry": { "type": "Point", "coordinates": [ 79.081833, 30.477483 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.476668, "longitude": 79.080924, "chi": 56.789000, "elevation": 952, "flow distance": 32095.000000, "drainage area": 1005000000.000000, "m_chi": 4.551500, "b_chi": 690.980000 }, "geometry": { "type": "Point", "coordinates": [ 79.080924, 30.476668 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.475868, "longitude": 79.080940, "chi": 56.612000, "elevation": 952, "flow distance": 32006.000000, "drainage area": 1005000000.000000, "m_chi": 6.111300, "b_chi": 602.070000 }, "geometry": { "type": "Point", "coordinates": [ 79.080940, 30.475868 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.475079, "longitude": 79.081880, "chi": 56.362000, "elevation": 945, "flow distance": 31881.000000, "drainage area": 1005200000.000000, "m_chi": 7.550400, "b_chi": 520.860000 }, "geometry": { "type": "Point", "coordinates": [ 79.081880, 30.475079 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.474279, "longitude": 79.081896, "chi": 56.186000, "elevation": 945, "flow distance": 31792.000000, "drainage area": 1005300000.000000, "m_chi": 8.759800, "b_chi": 452.950000 }, "geometry": { "type": "Point", "coordinates": [ 79.081896, 30.474279 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.473478, "longitude": 79.081912, "chi": 56.009000, "elevation": 945, "flow distance": 31703.000000, "drainage area": 1005300000.000000, "m_chi": 9.445700, "b_chi": 414.840000 }, "geometry": { "type": "Point", "coordinates": [ 79.081912, 30.473478 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.472662, "longitude": 79.081003, "chi": 55.759000, "elevation": 945, "flow distance": 31578.000000, "drainage area": 1005400000.000000, "m_chi": 9.357200, "b_chi": 420.160000 }, "geometry": { "type": "Point", "coordinates": [ 79.081003, 30.472662 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.471861, "longitude": 79.081018, "chi": 55.582000, "elevation": 937, "flow distance": 31489.000000, "drainage area": 1005500000.000000, "m_chi": 8.246300, "b_chi": 482.250000 }, "geometry": { "type": "Point", "coordinates": [ 79.081018, 30.471861 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.471047, "longitude": 79.080110, "chi": 55.332000, "elevation": 937, "flow distance": 31363.000000, "drainage area": 1005700000.000000, "m_chi": 6.310900, "b_chi": 589.590000 }, "geometry": { "type": "Point", "coordinates": [ 79.080110, 30.471047 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.471034, "longitude": 79.079185, "chi": 55.155000, "elevation": 935, "flow distance": 31274.000000, "drainage area": 1013400000.000000, "m_chi": 5.540500, "b_chi": 632.460000 }, "geometry": { "type": "Point", "coordinates": [ 79.079185, 30.471034 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.471020, "longitude": 79.078260, "chi": 54.979000, "elevation": 935, "flow distance": 31185.000000, "drainage area": 1013500000.000000, "m_chi": 4.542100, "b_chi": 687.490000 }, "geometry": { "type": "Point", "coordinates": [ 79.078260, 30.471020 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.471007, "longitude": 79.077335, "chi": 54.803000, "elevation": 935, "flow distance": 31097.000000, "drainage area": 1013500000.000000, "m_chi": 3.144300, "b_chi": 763.960000 }, "geometry": { "type": "Point", "coordinates": [ 79.077335, 30.471007 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.470193, "longitude": 79.076426, "chi": 54.554000, "elevation": 935, "flow distance": 30971.000000, "drainage area": 1015100000.000000, "m_chi": 3.228600, "b_chi": 758.180000 }, "geometry": { "type": "Point", "coordinates": [ 79.076426, 30.470192 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.469376, "longitude": 79.075518, "chi": 54.305000, "elevation": 935, "flow distance": 30845.000000, "drainage area": 1015700000.000000, "m_chi": 6.270900, "b_chi": 591.700000 }, "geometry": { "type": "Point", "coordinates": [ 79.075518, 30.469376 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.468576, "longitude": 79.075533, "chi": 54.129000, "elevation": 935, "flow distance": 30757.000000, "drainage area": 1015700000.000000, "m_chi": 9.711700, "b_chi": 404.340000 }, "geometry": { "type": "Point", "coordinates": [ 79.075533, 30.468576 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.467762, "longitude": 79.074624, "chi": 53.880000, "elevation": 934, "flow distance": 30631.000000, "drainage area": 1015800000.000000, "m_chi": 12.603000, "b_chi": 248.180000 }, "geometry": { "type": "Point", "coordinates": [ 79.074624, 30.467762 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.466961, "longitude": 79.074640, "chi": 53.704000, "elevation": 934, "flow distance": 30542.000000, "drainage area": 1015800000.000000, "m_chi": 14.939000, "b_chi": 122.960000 }, "geometry": { "type": "Point", "coordinates": [ 79.074640, 30.466961 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.466159, "longitude": 79.074656, "chi": 53.528000, "elevation": 925, "flow distance": 30453.000000, "drainage area": 1016200000.000000, "m_chi": 16.571000, "b_chi": 36.351000 }, "geometry": { "type": "Point", "coordinates": [ 79.074656, 30.466159 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.465358, "longitude": 79.074672, "chi": 53.352000, "elevation": 917, "flow distance": 30365.000000, "drainage area": 1016300000.000000, "m_chi": 17.535000, "b_chi": -14.331000 }, "geometry": { "type": "Point", "coordinates": [ 79.074672, 30.465358 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.464571, "longitude": 79.075612, "chi": 53.103000, "elevation": 911, "flow distance": 30239.000000, "drainage area": 1016500000.000000, "m_chi": 17.324000, "b_chi": -2.516700 }, "geometry": { "type": "Point", "coordinates": [ 79.075612, 30.464571 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.463771, "longitude": 79.075628, "chi": 52.928000, "elevation": 911, "flow distance": 30150.000000, "drainage area": 1016600000.000000, "m_chi": 15.914000, "b_chi": 72.723000 }, "geometry": { "type": "Point", "coordinates": [ 79.075628, 30.463771 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.462968, "longitude": 79.075643, "chi": 52.752000, "elevation": 910, "flow distance": 30061.000000, "drainage area": 1016900000.000000, "m_chi": 13.270000, "b_chi": 212.410000 }, "geometry": { "type": "Point", "coordinates": [ 79.075643, 30.462968 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.462168, "longitude": 79.075659, "chi": 52.576000, "elevation": 910, "flow distance": 29973.000000, "drainage area": 1016900000.000000, "m_chi": 10.484000, "b_chi": 358.150000 }, "geometry": { "type": "Point", "coordinates": [ 79.075659, 30.462168 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.461354, "longitude": 79.074750, "chi": 52.327000, "elevation": 906, "flow distance": 29847.000000, "drainage area": 1017000000.000000, "m_chi": 8.674800, "b_chi": 452.430000 }, "geometry": { "type": "Point", "coordinates": [ 79.074750, 30.461354 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.460540, "longitude": 79.073842, "chi": 52.078000, "elevation": 903, "flow distance": 29721.000000, "drainage area": 1017100000.000000, "m_chi": 8.074800, "b_chi": 483.590000 }, "geometry": { "type": "Point", "coordinates": [ 79.073842, 30.460540 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.459737, "longitude": 79.073857, "chi": 51.902000, "elevation": 903, "flow distance": 29633.000000, "drainage area": 1017100000.000000, "m_chi": 8.101700, "b_chi": 482.460000 }, "geometry": { "type": "Point", "coordinates": [ 79.073857, 30.459737 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.458950, "longitude": 79.074798, "chi": 51.654000, "elevation": 902, "flow distance": 29507.000000, "drainage area": 1017100000.000000, "m_chi": 7.829200, "b_chi": 496.720000 }, "geometry": { "type": "Point", "coordinates": [ 79.074798, 30.458950 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.458150, "longitude": 79.074813, "chi": 51.478000, "elevation": 898, "flow distance": 29418.000000, "drainage area": 1017200000.000000, "m_chi": 7.222400, "b_chi": 528.170000 }, "geometry": { "type": "Point", "coordinates": [ 79.074813, 30.458150 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.457363, "longitude": 79.075754, "chi": 51.229000, "elevation": 897, "flow distance": 29293.000000, "drainage area": 1017400000.000000, "m_chi": 6.484900, "b_chi": 565.850000 }, "geometry": { "type": "Point", "coordinates": [ 79.075754, 30.457363 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.456560, "longitude": 79.075770, "chi": 51.053000, "elevation": 896, "flow distance": 29204.000000, "drainage area": 1113000000.000000, "m_chi": 6.009900, "b_chi": 590.140000 }, "geometry": { "type": "Point", "coordinates": [ 79.075770, 30.456560 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.455760, "longitude": 79.075785, "chi": 50.885000, "elevation": 896, "flow distance": 29115.000000, "drainage area": 1113500000.000000, "m_chi": 5.572300, "b_chi": 612.600000 }, "geometry": { "type": "Point", "coordinates": [ 79.075785, 30.455760 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.454960, "longitude": 79.075801, "chi": 50.716000, "elevation": 895, "flow distance": 29026.000000, "drainage area": 1113800000.000000, "m_chi": 4.669100, "b_chi": 658.480000 }, "geometry": { "type": "Point", "coordinates": [ 79.075801, 30.454960 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.454946, "longitude": 79.074876, "chi": 50.547000, "elevation": 895, "flow distance": 28937.000000, "drainage area": 1113800000.000000, "m_chi": 5.151600, "b_chi": 633.460000 }, "geometry": { "type": "Point", "coordinates": [ 79.074876, 30.454946 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.454132, "longitude": 79.073968, "chi": 50.308000, "elevation": 892, "flow distance": 28812.000000, "drainage area": 1113800000.000000, "m_chi": 6.214600, "b_chi": 579.720000 }, "geometry": { "type": "Point", "coordinates": [ 79.073968, 30.454132 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.454118, "longitude": 79.073043, "chi": 50.139000, "elevation": 892, "flow distance": 28723.000000, "drainage area": 1113800000.000000, "m_chi": 7.024400, "b_chi": 539.030000 }, "geometry": { "type": "Point", "coordinates": [ 79.073043, 30.454118 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.453302, "longitude": 79.072134, "chi": 49.901000, "elevation": 892, "flow distance": 28597.000000, "drainage area": 1114200000.000000, "m_chi": 7.373700, "b_chi": 521.770000 }, "geometry": { "type": "Point", "coordinates": [ 79.072134, 30.453302 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.452501, "longitude": 79.072150, "chi": 49.732000, "elevation": 892, "flow distance": 28508.000000, "drainage area": 1114400000.000000, "m_chi": 7.229600, "b_chi": 529.180000 }, "geometry": { "type": "Point", "coordinates": [ 79.072150, 30.452501 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.451701, "longitude": 79.072165, "chi": 49.563000, "elevation": 885, "flow distance": 28420.000000, "drainage area": 1114400000.000000, "m_chi": 6.733700, "b_chi": 554.110000 }, "geometry": { "type": "Point", "coordinates": [ 79.072165, 30.451701 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.450914, "longitude": 79.073106, "chi": 49.324000, "elevation": 884, "flow distance": 28294.000000, "drainage area": 1114500000.000000, "m_chi": 5.686600, "b_chi": 606.060000 }, "geometry": { "type": "Point", "coordinates": [ 79.073106, 30.450914 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.450928, "longitude": 79.074031, "chi": 49.156000, "elevation": 883, "flow distance": 28205.000000, "drainage area": 1114500000.000000, "m_chi": 4.847400, "b_chi": 647.630000 }, "geometry": { "type": "Point", "coordinates": [ 79.074031, 30.450928 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.450139, "longitude": 79.074971, "chi": 48.917000, "elevation": 883, "flow distance": 28080.000000, "drainage area": 1114700000.000000, "m_chi": 3.910300, "b_chi": 693.590000 }, "geometry": { "type": "Point", "coordinates": [ 79.074971, 30.450139 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.449338, "longitude": 79.074987, "chi": 48.748000, "elevation": 883, "flow distance": 27991.000000, "drainage area": 1114700000.000000, "m_chi": 3.096300, "b_chi": 732.950000 }, "geometry": { "type": "Point", "coordinates": [ 79.074987, 30.449338 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.448552, "longitude": 79.075927, "chi": 48.509000, "elevation": 883, "flow distance": 27865.000000, "drainage area": 1115400000.000000, "m_chi": 3.055600, "b_chi": 733.920000 }, "geometry": { "type": "Point", "coordinates": [ 79.075927, 30.448552 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.447737, "longitude": 79.075018, "chi": 48.271000, "elevation": 883, "flow distance": 27740.000000, "drainage area": 1115400000.000000, "m_chi": 5.055500, "b_chi": 636.540000 }, "geometry": { "type": "Point", "coordinates": [ 79.075018, 30.447737 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.446921, "longitude": 79.074109, "chi": 48.032000, "elevation": 883, "flow distance": 27614.000000, "drainage area": 1115600000.000000, "m_chi": 7.301700, "b_chi": 527.960000 }, "geometry": { "type": "Point", "coordinates": [ 79.074109, 30.446921 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.446134, "longitude": 79.075050, "chi": 47.794000, "elevation": 882, "flow distance": 27488.000000, "drainage area": 1115700000.000000, "m_chi": 9.263700, "b_chi": 434.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.075050, 30.446134 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.445334, "longitude": 79.075065, "chi": 47.625000, "elevation": 880, "flow distance": 27400.000000, "drainage area": 1115800000.000000, "m_chi": 10.571000, "b_chi": 371.980000 }, "geometry": { "type": "Point", "coordinates": [ 79.075065, 30.445334 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.444534, "longitude": 79.075081, "chi": 47.456000, "elevation": 874, "flow distance": 27311.000000, "drainage area": 1115900000.000000, "m_chi": 11.454000, "b_chi": 330.630000 }, "geometry": { "type": "Point", "coordinates": [ 79.075081, 30.444534 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.443731, "longitude": 79.075097, "chi": 47.288000, "elevation": 869, "flow distance": 27222.000000, "drainage area": 1117800000.000000, "m_chi": 11.766000, "b_chi": 316.480000 }, "geometry": { "type": "Point", "coordinates": [ 79.075097, 30.443731 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.442917, "longitude": 79.074188, "chi": 47.049000, "elevation": 866, "flow distance": 27096.000000, "drainage area": 1117900000.000000, "m_chi": 11.061000, "b_chi": 350.270000 }, "geometry": { "type": "Point", "coordinates": [ 79.074188, 30.442917 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.442116, "longitude": 79.074204, "chi": 46.881000, "elevation": 866, "flow distance": 27008.000000, "drainage area": 1117900000.000000, "m_chi": 9.490800, "b_chi": 424.150000 }, "geometry": { "type": "Point", "coordinates": [ 79.074204, 30.442116 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.441314, "longitude": 79.074220, "chi": 46.712000, "elevation": 866, "flow distance": 26919.000000, "drainage area": 1121600000.000000, "m_chi": 7.187500, "b_chi": 531.750000 }, "geometry": { "type": "Point", "coordinates": [ 79.074220, 30.441314 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.440513, "longitude": 79.074235, "chi": 46.544000, "elevation": 866, "flow distance": 26830.000000, "drainage area": 1121800000.000000, "m_chi": 5.523500, "b_chi": 608.620000 }, "geometry": { "type": "Point", "coordinates": [ 79.074235, 30.440513 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.439713, "longitude": 79.074251, "chi": 46.376000, "elevation": 865, "flow distance": 26741.000000, "drainage area": 1121800000.000000, "m_chi": 5.658800, "b_chi": 601.660000 }, "geometry": { "type": "Point", "coordinates": [ 79.074251, 30.439713 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.438912, "longitude": 79.074267, "chi": 46.207000, "elevation": 865, "flow distance": 26652.000000, "drainage area": 1121900000.000000, "m_chi": 6.285800, "b_chi": 572.540000 }, "geometry": { "type": "Point", "coordinates": [ 79.074267, 30.438912 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.438096, "longitude": 79.073358, "chi": 45.969000, "elevation": 863, "flow distance": 26527.000000, "drainage area": 1122400000.000000, "m_chi": 7.590600, "b_chi": 512.520000 }, "geometry": { "type": "Point", "coordinates": [ 79.073358, 30.438096 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.437296, "longitude": 79.073374, "chi": 45.801000, "elevation": 863, "flow distance": 26438.000000, "drainage area": 1122400000.000000, "m_chi": 8.242000, "b_chi": 482.910000 }, "geometry": { "type": "Point", "coordinates": [ 79.073374, 30.437296 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.436482, "longitude": 79.072465, "chi": 45.563000, "elevation": 859, "flow distance": 26312.000000, "drainage area": 1122500000.000000, "m_chi": 8.215100, "b_chi": 484.510000 }, "geometry": { "type": "Point", "coordinates": [ 79.072465, 30.436482 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.435681, "longitude": 79.072481, "chi": 45.395000, "elevation": 855, "flow distance": 26223.000000, "drainage area": 1122600000.000000, "m_chi": 7.744700, "b_chi": 506.220000 }, "geometry": { "type": "Point", "coordinates": [ 79.072481, 30.435681 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.434865, "longitude": 79.071572, "chi": 45.157000, "elevation": 855, "flow distance": 26098.000000, "drainage area": 1123200000.000000, "m_chi": 7.072700, "b_chi": 536.940000 }, "geometry": { "type": "Point", "coordinates": [ 79.071572, 30.434865 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.434051, "longitude": 79.070664, "chi": 44.919000, "elevation": 852, "flow distance": 25972.000000, "drainage area": 1123400000.000000, "m_chi": 5.780100, "b_chi": 595.320000 }, "geometry": { "type": "Point", "coordinates": [ 79.070664, 30.434051 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.433250, "longitude": 79.070679, "chi": 44.751000, "elevation": 852, "flow distance": 25883.000000, "drainage area": 1123500000.000000, "m_chi": 4.353700, "b_chi": 659.350000 }, "geometry": { "type": "Point", "coordinates": [ 79.070679, 30.433250 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.432436, "longitude": 79.069771, "chi": 44.513000, "elevation": 852, "flow distance": 25758.000000, "drainage area": 1123600000.000000, "m_chi": 3.386400, "b_chi": 701.970000 }, "geometry": { "type": "Point", "coordinates": [ 79.069771, 30.432436 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.431634, "longitude": 79.069787, "chi": 44.345000, "elevation": 852, "flow distance": 25669.000000, "drainage area": 1123700000.000000, "m_chi": 2.827100, "b_chi": 726.450000 }, "geometry": { "type": "Point", "coordinates": [ 79.069787, 30.431634 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.430833, "longitude": 79.069802, "chi": 44.177000, "elevation": 852, "flow distance": 25580.000000, "drainage area": 1123700000.000000, "m_chi": 2.891600, "b_chi": 723.530000 }, "geometry": { "type": "Point", "coordinates": [ 79.069802, 30.430833 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.430019, "longitude": 79.068894, "chi": 43.939000, "elevation": 852, "flow distance": 25455.000000, "drainage area": 1124000000.000000, "m_chi": 2.811600, "b_chi": 726.900000 }, "geometry": { "type": "Point", "coordinates": [ 79.068894, 30.430019 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.429205, "longitude": 79.067985, "chi": 43.701000, "elevation": 852, "flow distance": 25329.000000, "drainage area": 1126300000.000000, "m_chi": 3.190800, "b_chi": 710.390000 }, "geometry": { "type": "Point", "coordinates": [ 79.067985, 30.429205 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.428402, "longitude": 79.068001, "chi": 43.533000, "elevation": 848, "flow distance": 25240.000000, "drainage area": 1126400000.000000, "m_chi": 3.334200, "b_chi": 704.330000 }, "geometry": { "type": "Point", "coordinates": [ 79.068001, 30.428402 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.427602, "longitude": 79.068017, "chi": 43.365000, "elevation": 848, "flow distance": 25151.000000, "drainage area": 1126500000.000000, "m_chi": 3.165300, "b_chi": 711.860000 }, "geometry": { "type": "Point", "coordinates": [ 79.068017, 30.427602 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.426801, "longitude": 79.068033, "chi": 43.198000, "elevation": 848, "flow distance": 25063.000000, "drainage area": 1126500000.000000, "m_chi": 2.842100, "b_chi": 725.990000 }, "geometry": { "type": "Point", "coordinates": [ 79.068033, 30.426801 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.425987, "longitude": 79.067124, "chi": 42.960000, "elevation": 847, "flow distance": 24937.000000, "drainage area": 1126600000.000000, "m_chi": 2.332600, "b_chi": 747.980000 }, "geometry": { "type": "Point", "coordinates": [ 79.067124, 30.425987 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.425185, "longitude": 79.067140, "chi": 42.792000, "elevation": 847, "flow distance": 24848.000000, "drainage area": 1126600000.000000, "m_chi": 1.535100, "b_chi": 782.090000 }, "geometry": { "type": "Point", "coordinates": [ 79.067140, 30.425185 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.424398, "longitude": 79.068080, "chi": 42.555000, "elevation": 847, "flow distance": 24723.000000, "drainage area": 1189500000.000000, "m_chi": 0.542650, "b_chi": 824.180000 }, "geometry": { "type": "Point", "coordinates": [ 79.068080, 30.424398 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.423584, "longitude": 79.067172, "chi": 42.323000, "elevation": 847, "flow distance": 24597.000000, "drainage area": 1189600000.000000, "m_chi": 3.730800, "b_chi": 687.760000 }, "geometry": { "type": "Point", "coordinates": [ 79.067172, 30.423584 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.422783, "longitude": 79.067187, "chi": 42.159000, "elevation": 847, "flow distance": 24508.000000, "drainage area": 1189600000.000000, "m_chi": 6.221300, "b_chi": 582.060000 }, "geometry": { "type": "Point", "coordinates": [ 79.067187, 30.422783 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.421981, "longitude": 79.067203, "chi": 41.995000, "elevation": 847, "flow distance": 24419.000000, "drainage area": 1189800000.000000, "m_chi": 8.104900, "b_chi": 502.830000 }, "geometry": { "type": "Point", "coordinates": [ 79.067203, 30.421981 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.421167, "longitude": 79.066295, "chi": 41.763000, "elevation": 847, "flow distance": 24294.000000, "drainage area": 1189900000.000000, "m_chi": 9.416100, "b_chi": 448.350000 }, "geometry": { "type": "Point", "coordinates": [ 79.066295, 30.421167 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.420352, "longitude": 79.065386, "chi": 41.531000, "elevation": 847, "flow distance": 24168.000000, "drainage area": 1190000000.000000, "m_chi": 10.087000, "b_chi": 421.080000 }, "geometry": { "type": "Point", "coordinates": [ 79.065386, 30.420352 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.419552, "longitude": 79.065402, "chi": 41.368000, "elevation": 832, "flow distance": 24079.000000, "drainage area": 1190100000.000000, "m_chi": 10.088000, "b_chi": 421.700000 }, "geometry": { "type": "Point", "coordinates": [ 79.065402, 30.419552 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.418736, "longitude": 79.064494, "chi": 41.136000, "elevation": 832, "flow distance": 23954.000000, "drainage area": 1190300000.000000, "m_chi": 9.241500, "b_chi": 457.180000 }, "geometry": { "type": "Point", "coordinates": [ 79.064494, 30.418736 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.417935, "longitude": 79.064510, "chi": 40.972000, "elevation": 832, "flow distance": 23865.000000, "drainage area": 1190900000.000000, "m_chi": 7.969000, "b_chi": 509.780000 }, "geometry": { "type": "Point", "coordinates": [ 79.064509, 30.417935 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.417121, "longitude": 79.063601, "chi": 40.740000, "elevation": 832, "flow distance": 23739.000000, "drainage area": 1191000000.000000, "m_chi": 5.980000, "b_chi": 591.100000 }, "geometry": { "type": "Point", "coordinates": [ 79.063601, 30.417121 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.416307, "longitude": 79.062693, "chi": 40.509000, "elevation": 832, "flow distance": 23614.000000, "drainage area": 1191300000.000000, "m_chi": 3.330400, "b_chi": 698.350000 }, "geometry": { "type": "Point", "coordinates": [ 79.062693, 30.416307 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.415504, "longitude": 79.062708, "chi": 40.345000, "elevation": 832, "flow distance": 23525.000000, "drainage area": 1191300000.000000, "m_chi": 0.000000, "b_chi": 832.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.062708, 30.415504 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.414690, "longitude": 79.061800, "chi": 40.113000, "elevation": 832, "flow distance": 23399.000000, "drainage area": 1191500000.000000, "m_chi": 0.686490, "b_chi": 804.180000 }, "geometry": { "type": "Point", "coordinates": [ 79.061800, 30.414690 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.413890, "longitude": 79.061816, "chi": 39.950000, "elevation": 832, "flow distance": 23310.000000, "drainage area": 1191500000.000000, "m_chi": 1.215300, "b_chi": 782.930000 }, "geometry": { "type": "Point", "coordinates": [ 79.061816, 30.413890 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.413076, "longitude": 79.060908, "chi": 39.718000, "elevation": 832, "flow distance": 23185.000000, "drainage area": 1191700000.000000, "m_chi": 2.514500, "b_chi": 730.960000 }, "geometry": { "type": "Point", "coordinates": [ 79.060908, 30.413076 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.412273, "longitude": 79.060924, "chi": 39.554000, "elevation": 832, "flow distance": 23096.000000, "drainage area": 1191800000.000000, "m_chi": 4.097100, "b_chi": 668.080000 }, "geometry": { "type": "Point", "coordinates": [ 79.060924, 30.412273 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.411459, "longitude": 79.060015, "chi": 39.323000, "elevation": 832, "flow distance": 22970.000000, "drainage area": 1191800000.000000, "m_chi": 6.421900, "b_chi": 576.120000 }, "geometry": { "type": "Point", "coordinates": [ 79.060015, 30.411459 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.410645, "longitude": 79.059107, "chi": 39.091000, "elevation": 829, "flow distance": 22845.000000, "drainage area": 1191900000.000000, "m_chi": 8.394700, "b_chi": 498.790000 }, "geometry": { "type": "Point", "coordinates": [ 79.059107, 30.410645 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.409828, "longitude": 79.058199, "chi": 38.859000, "elevation": 829, "flow distance": 22719.000000, "drainage area": 1219900000.000000, "m_chi": 9.711100, "b_chi": 447.730000 }, "geometry": { "type": "Point", "coordinates": [ 79.058199, 30.409828 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.409014, "longitude": 79.057290, "chi": 38.630000, "elevation": 825, "flow distance": 22594.000000, "drainage area": 1222800000.000000, "m_chi": 10.439000, "b_chi": 420.040000 }, "geometry": { "type": "Point", "coordinates": [ 79.057290, 30.409014 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.408200, "longitude": 79.056382, "chi": 38.401000, "elevation": 822, "flow distance": 22468.000000, "drainage area": 1223100000.000000, "m_chi": 10.281000, "b_chi": 426.700000 }, "geometry": { "type": "Point", "coordinates": [ 79.056382, 30.408200 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.408186, "longitude": 79.055458, "chi": 38.239000, "elevation": 816, "flow distance": 22379.000000, "drainage area": 1223200000.000000, "m_chi": 9.403600, "b_chi": 460.900000 }, "geometry": { "type": "Point", "coordinates": [ 79.055458, 30.408186 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.408986, "longitude": 79.055442, "chi": 38.078000, "elevation": 815, "flow distance": 22290.000000, "drainage area": 1223200000.000000, "m_chi": 8.677100, "b_chi": 488.560000 }, "geometry": { "type": "Point", "coordinates": [ 79.055442, 30.408986 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.408973, "longitude": 79.054518, "chi": 37.916000, "elevation": 815, "flow distance": 22202.000000, "drainage area": 1234100000.000000, "m_chi": 7.820500, "b_chi": 521.080000 }, "geometry": { "type": "Point", "coordinates": [ 79.054518, 30.408973 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.409759, "longitude": 79.053578, "chi": 37.688000, "elevation": 815, "flow distance": 22076.000000, "drainage area": 1234200000.000000, "m_chi": 6.056600, "b_chi": 587.390000 }, "geometry": { "type": "Point", "coordinates": [ 79.053578, 30.409759 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.410548, "longitude": 79.052638, "chi": 37.460000, "elevation": 815, "flow distance": 21950.000000, "drainage area": 1234300000.000000, "m_chi": 4.440100, "b_chi": 647.870000 }, "geometry": { "type": "Point", "coordinates": [ 79.052638, 30.410548 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.409732, "longitude": 79.051729, "chi": 37.232000, "elevation": 815, "flow distance": 21825.000000, "drainage area": 1234300000.000000, "m_chi": 2.997300, "b_chi": 701.510000 }, "geometry": { "type": "Point", "coordinates": [ 79.051729, 30.409732 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.409718, "longitude": 79.050805, "chi": 37.071000, "elevation": 811, "flow distance": 21736.000000, "drainage area": 1234400000.000000, "m_chi": 2.702700, "b_chi": 712.580000 }, "geometry": { "type": "Point", "coordinates": [ 79.050805, 30.409718 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.409704, "longitude": 79.049881, "chi": 36.909000, "elevation": 811, "flow distance": 21647.000000, "drainage area": 1234500000.000000, "m_chi": 3.661100, "b_chi": 676.940000 }, "geometry": { "type": "Point", "coordinates": [ 79.049881, 30.409704 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.409690, "longitude": 79.048957, "chi": 36.748000, "elevation": 811, "flow distance": 21558.000000, "drainage area": 1234600000.000000, "m_chi": 4.239500, "b_chi": 655.650000 }, "geometry": { "type": "Point", "coordinates": [ 79.048957, 30.409690 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.408876, "longitude": 79.048049, "chi": 36.520000, "elevation": 811, "flow distance": 21433.000000, "drainage area": 1234600000.000000, "m_chi": 4.865000, "b_chi": 632.660000 }, "geometry": { "type": "Point", "coordinates": [ 79.048049, 30.408876 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.408062, "longitude": 79.047141, "chi": 36.292000, "elevation": 811, "flow distance": 21307.000000, "drainage area": 1234700000.000000, "m_chi": 5.610700, "b_chi": 605.280000 }, "geometry": { "type": "Point", "coordinates": [ 79.047141, 30.408062 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.407248, "longitude": 79.046233, "chi": 36.065000, "elevation": 811, "flow distance": 21182.000000, "drainage area": 1234800000.000000, "m_chi": 5.701500, "b_chi": 601.810000 }, "geometry": { "type": "Point", "coordinates": [ 79.046233, 30.407248 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.406445, "longitude": 79.046249, "chi": 35.903000, "elevation": 806, "flow distance": 21093.000000, "drainage area": 1234900000.000000, "m_chi": 6.529700, "b_chi": 572.160000 }, "geometry": { "type": "Point", "coordinates": [ 79.046249, 30.406445 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.405631, "longitude": 79.045340, "chi": 35.675000, "elevation": 806, "flow distance": 20967.000000, "drainage area": 1235000000.000000, "m_chi": 7.019400, "b_chi": 554.920000 }, "geometry": { "type": "Point", "coordinates": [ 79.045340, 30.405631 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.404830, "longitude": 79.045356, "chi": 35.514000, "elevation": 804, "flow distance": 20878.000000, "drainage area": 1235100000.000000, "m_chi": 7.503800, "b_chi": 537.910000 }, "geometry": { "type": "Point", "coordinates": [ 79.045356, 30.404830 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.404016, "longitude": 79.044448, "chi": 35.286000, "elevation": 801, "flow distance": 20753.000000, "drainage area": 1237200000.000000, "m_chi": 7.214500, "b_chi": 548.430000 }, "geometry": { "type": "Point", "coordinates": [ 79.044448, 30.404016 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.403213, "longitude": 79.044464, "chi": 35.125000, "elevation": 801, "flow distance": 20664.000000, "drainage area": 1237300000.000000, "m_chi": 6.284400, "b_chi": 581.310000 }, "geometry": { "type": "Point", "coordinates": [ 79.044464, 30.403213 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.402413, "longitude": 79.044480, "chi": 34.964000, "elevation": 800, "flow distance": 20575.000000, "drainage area": 1237300000.000000, "m_chi": 4.719900, "b_chi": 635.970000 }, "geometry": { "type": "Point", "coordinates": [ 79.044480, 30.402413 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.401612, "longitude": 79.044496, "chi": 34.803000, "elevation": 800, "flow distance": 20486.000000, "drainage area": 1237300000.000000, "m_chi": 4.017800, "b_chi": 660.520000 }, "geometry": { "type": "Point", "coordinates": [ 79.044496, 30.401612 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.400798, "longitude": 79.043588, "chi": 34.576000, "elevation": 798, "flow distance": 20361.000000, "drainage area": 1238500000.000000, "m_chi": 2.815500, "b_chi": 702.110000 }, "geometry": { "type": "Point", "coordinates": [ 79.043588, 30.400798 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.399982, "longitude": 79.042680, "chi": 34.348000, "elevation": 798, "flow distance": 20235.000000, "drainage area": 1238800000.000000, "m_chi": 1.796100, "b_chi": 737.150000 }, "geometry": { "type": "Point", "coordinates": [ 79.042680, 30.399982 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.399968, "longitude": 79.041756, "chi": 34.187000, "elevation": 798, "flow distance": 20146.000000, "drainage area": 1238900000.000000, "m_chi": 1.395100, "b_chi": 750.920000 }, "geometry": { "type": "Point", "coordinates": [ 79.041756, 30.399968 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.399954, "longitude": 79.040832, "chi": 34.026000, "elevation": 798, "flow distance": 20057.000000, "drainage area": 1239000000.000000, "m_chi": 0.858460, "b_chi": 769.170000 }, "geometry": { "type": "Point", "coordinates": [ 79.040832, 30.399954 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.399940, "longitude": 79.039908, "chi": 33.865000, "elevation": 798, "flow distance": 19969.000000, "drainage area": 1239000000.000000, "m_chi": 0.471360, "b_chi": 782.240000 }, "geometry": { "type": "Point", "coordinates": [ 79.039908, 30.399940 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.399126, "longitude": 79.039000, "chi": 33.638000, "elevation": 798, "flow distance": 19843.000000, "drainage area": 1239100000.000000, "m_chi": 0.000000, "b_chi": 798.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.039000, 30.399126 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.399912, "longitude": 79.038060, "chi": 33.410000, "elevation": 798, "flow distance": 19717.000000, "drainage area": 1239800000.000000, "m_chi": 2.347900, "b_chi": 718.660000 }, "geometry": { "type": "Point", "coordinates": [ 79.038060, 30.399912 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.399898, "longitude": 79.037136, "chi": 33.249000, "elevation": 798, "flow distance": 19629.000000, "drainage area": 1239900000.000000, "m_chi": 4.454000, "b_chi": 648.100000 }, "geometry": { "type": "Point", "coordinates": [ 79.037136, 30.399898 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.399084, "longitude": 79.036228, "chi": 33.022000, "elevation": 798, "flow distance": 19503.000000, "drainage area": 1239900000.000000, "m_chi": 6.625100, "b_chi": 575.980000 }, "geometry": { "type": "Point", "coordinates": [ 79.036228, 30.399084 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.398270, "longitude": 79.035320, "chi": 32.794000, "elevation": 798, "flow distance": 19377.000000, "drainage area": 1240000000.000000, "m_chi": 8.144200, "b_chi": 526.190000 }, "geometry": { "type": "Point", "coordinates": [ 79.035320, 30.398270 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.397456, "longitude": 79.034412, "chi": 32.567000, "elevation": 798, "flow distance": 19252.000000, "drainage area": 1240500000.000000, "m_chi": 9.244400, "b_chi": 490.680000 }, "geometry": { "type": "Point", "coordinates": [ 79.034412, 30.397455 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.396639, "longitude": 79.033504, "chi": 32.339000, "elevation": 788, "flow distance": 19126.000000, "drainage area": 1241900000.000000, "m_chi": 9.841200, "b_chi": 471.840000 }, "geometry": { "type": "Point", "coordinates": [ 79.033504, 30.396639 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.395839, "longitude": 79.033520, "chi": 32.179000, "elevation": 786, "flow distance": 19037.000000, "drainage area": 1241900000.000000, "m_chi": 9.822800, "b_chi": 472.970000 }, "geometry": { "type": "Point", "coordinates": [ 79.033520, 30.395838 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.395024, "longitude": 79.032612, "chi": 31.951000, "elevation": 783, "flow distance": 18912.000000, "drainage area": 1242100000.000000, "m_chi": 9.158000, "b_chi": 494.820000 }, "geometry": { "type": "Point", "coordinates": [ 79.032612, 30.395024 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.394210, "longitude": 79.031704, "chi": 31.724000, "elevation": 783, "flow distance": 18786.000000, "drainage area": 1245800000.000000, "m_chi": 8.673100, "b_chi": 510.260000 }, "geometry": { "type": "Point", "coordinates": [ 79.031704, 30.394210 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.394196, "longitude": 79.030780, "chi": 31.563000, "elevation": 783, "flow distance": 18697.000000, "drainage area": 1245900000.000000, "m_chi": 7.242900, "b_chi": 555.300000 }, "geometry": { "type": "Point", "coordinates": [ 79.030780, 30.394196 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.393379, "longitude": 79.029872, "chi": 31.336000, "elevation": 782, "flow distance": 18572.000000, "drainage area": 1246000000.000000, "m_chi": 4.677000, "b_chi": 635.390000 }, "geometry": { "type": "Point", "coordinates": [ 79.029872, 30.393379 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.393365, "longitude": 79.028948, "chi": 31.176000, "elevation": 782, "flow distance": 18483.000000, "drainage area": 1246000000.000000, "m_chi": 3.943400, "b_chi": 658.270000 }, "geometry": { "type": "Point", "coordinates": [ 79.028948, 30.393365 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.392551, "longitude": 79.028040, "chi": 30.949000, "elevation": 782, "flow distance": 18357.000000, "drainage area": 1246100000.000000, "m_chi": 3.304700, "b_chi": 678.120000 }, "geometry": { "type": "Point", "coordinates": [ 79.028040, 30.392551 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.392537, "longitude": 79.027116, "chi": 30.788000, "elevation": 778, "flow distance": 18269.000000, "drainage area": 1246300000.000000, "m_chi": 3.165200, "b_chi": 682.610000 }, "geometry": { "type": "Point", "coordinates": [ 79.027116, 30.392537 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.392523, "longitude": 79.026192, "chi": 30.628000, "elevation": 778, "flow distance": 18180.000000, "drainage area": 1246400000.000000, "m_chi": 2.742700, "b_chi": 695.690000 }, "geometry": { "type": "Point", "coordinates": [ 79.026192, 30.392523 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.391709, "longitude": 79.025285, "chi": 30.401000, "elevation": 778, "flow distance": 18054.000000, "drainage area": 1247000000.000000, "m_chi": 2.160100, "b_chi": 713.480000 }, "geometry": { "type": "Point", "coordinates": [ 79.025285, 30.391709 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.392495, "longitude": 79.024345, "chi": 30.174000, "elevation": 778, "flow distance": 17928.000000, "drainage area": 1247700000.000000, "m_chi": 1.597000, "b_chi": 730.530000 }, "geometry": { "type": "Point", "coordinates": [ 79.024345, 30.392495 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.391681, "longitude": 79.023437, "chi": 29.947000, "elevation": 778, "flow distance": 17803.000000, "drainage area": 1248300000.000000, "m_chi": 2.886200, "b_chi": 691.010000 }, "geometry": { "type": "Point", "coordinates": [ 79.023437, 30.391681 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.391667, "longitude": 79.022513, "chi": 29.787000, "elevation": 778, "flow distance": 17714.000000, "drainage area": 1248400000.000000, "m_chi": 3.596400, "b_chi": 669.240000 }, "geometry": { "type": "Point", "coordinates": [ 79.022513, 30.391667 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.390852, "longitude": 79.021605, "chi": 29.560000, "elevation": 778, "flow distance": 17588.000000, "drainage area": 1248500000.000000, "m_chi": 4.840400, "b_chi": 632.320000 }, "geometry": { "type": "Point", "coordinates": [ 79.021605, 30.390852 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.390838, "longitude": 79.020681, "chi": 29.400000, "elevation": 778, "flow distance": 17500.000000, "drainage area": 1248500000.000000, "m_chi": 5.769700, "b_chi": 605.170000 }, "geometry": { "type": "Point", "coordinates": [ 79.020681, 30.390838 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.390022, "longitude": 79.019773, "chi": 29.173000, "elevation": 778, "flow distance": 17374.000000, "drainage area": 1248900000.000000, "m_chi": 7.703700, "b_chi": 548.480000 }, "geometry": { "type": "Point", "coordinates": [ 79.019773, 30.390022 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.390008, "longitude": 79.018849, "chi": 29.013000, "elevation": 769, "flow distance": 17285.000000, "drainage area": 1249300000.000000, "m_chi": 8.856300, "b_chi": 515.210000 }, "geometry": { "type": "Point", "coordinates": [ 79.018849, 30.390008 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.389193, "longitude": 79.017941, "chi": 28.786000, "elevation": 769, "flow distance": 17160.000000, "drainage area": 1249400000.000000, "m_chi": 9.284100, "b_chi": 503.210000 }, "geometry": { "type": "Point", "coordinates": [ 79.017941, 30.389193 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.388393, "longitude": 79.017957, "chi": 28.625000, "elevation": 769, "flow distance": 17071.000000, "drainage area": 1249400000.000000, "m_chi": 9.013000, "b_chi": 511.420000 }, "geometry": { "type": "Point", "coordinates": [ 79.017957, 30.388393 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.387578, "longitude": 79.017050, "chi": 28.399000, "elevation": 769, "flow distance": 16945.000000, "drainage area": 1277600000.000000, "m_chi": 8.055700, "b_chi": 538.970000 }, "geometry": { "type": "Point", "coordinates": [ 79.017050, 30.387578 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.386776, "longitude": 79.017066, "chi": 28.240000, "elevation": 763, "flow distance": 16856.000000, "drainage area": 1277600000.000000, "m_chi": 6.485700, "b_chi": 583.450000 }, "geometry": { "type": "Point", "coordinates": [ 79.017066, 30.386776 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.385961, "longitude": 79.016158, "chi": 28.016000, "elevation": 763, "flow distance": 16731.000000, "drainage area": 1277700000.000000, "m_chi": 4.039900, "b_chi": 651.900000 }, "geometry": { "type": "Point", "coordinates": [ 79.016158, 30.385961 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.385947, "longitude": 79.015234, "chi": 27.857000, "elevation": 763, "flow distance": 16642.000000, "drainage area": 1277700000.000000, "m_chi": 3.528500, "b_chi": 666.360000 }, "geometry": { "type": "Point", "coordinates": [ 79.015234, 30.385947 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.385133, "longitude": 79.014327, "chi": 27.632000, "elevation": 763, "flow distance": 16516.000000, "drainage area": 1305200000.000000, "m_chi": 2.633700, "b_chi": 691.230000 }, "geometry": { "type": "Point", "coordinates": [ 79.014327, 30.385133 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.385119, "longitude": 79.013403, "chi": 27.475000, "elevation": 763, "flow distance": 16428.000000, "drainage area": 1305300000.000000, "m_chi": 1.428900, "b_chi": 724.290000 }, "geometry": { "type": "Point", "coordinates": [ 79.013403, 30.385119 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.385105, "longitude": 79.012479, "chi": 27.318000, "elevation": 763, "flow distance": 16339.000000, "drainage area": 1305300000.000000, "m_chi": 0.000000, "b_chi": 763.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.012479, 30.385105 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.384290, "longitude": 79.011571, "chi": 27.096000, "elevation": 763, "flow distance": 16213.000000, "drainage area": 1305400000.000000, "m_chi": 0.475680, "b_chi": 749.930000 }, "geometry": { "type": "Point", "coordinates": [ 79.011571, 30.384290 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.384276, "longitude": 79.010648, "chi": 26.939000, "elevation": 763, "flow distance": 16124.000000, "drainage area": 1305400000.000000, "m_chi": 0.841260, "b_chi": 740.010000 }, "geometry": { "type": "Point", "coordinates": [ 79.010648, 30.384276 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.383460, "longitude": 79.009740, "chi": 26.716000, "elevation": 763, "flow distance": 15999.000000, "drainage area": 1305800000.000000, "m_chi": 2.486500, "b_chi": 695.520000 }, "geometry": { "type": "Point", "coordinates": [ 79.009740, 30.383460 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.382645, "longitude": 79.008832, "chi": 26.494000, "elevation": 763, "flow distance": 15873.000000, "drainage area": 1305900000.000000, "m_chi": 3.726500, "b_chi": 662.390000 }, "geometry": { "type": "Point", "coordinates": [ 79.008832, 30.382645 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.381831, "longitude": 79.007925, "chi": 26.272000, "elevation": 763, "flow distance": 15748.000000, "drainage area": 1306200000.000000, "m_chi": 4.691500, "b_chi": 636.950000 }, "geometry": { "type": "Point", "coordinates": [ 79.007925, 30.381830 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.381030, "longitude": 79.007941, "chi": 26.115000, "elevation": 761, "flow distance": 15659.000000, "drainage area": 1306200000.000000, "m_chi": 5.362900, "b_chi": 619.580000 }, "geometry": { "type": "Point", "coordinates": [ 79.007941, 30.381030 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.380213, "longitude": 79.007033, "chi": 25.892000, "elevation": 761, "flow distance": 15533.000000, "drainage area": 1306500000.000000, "m_chi": 5.665300, "b_chi": 612.010000 }, "geometry": { "type": "Point", "coordinates": [ 79.007033, 30.380213 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.380199, "longitude": 79.006110, "chi": 25.735000, "elevation": 755, "flow distance": 15444.000000, "drainage area": 1306600000.000000, "m_chi": 5.836800, "b_chi": 607.870000 }, "geometry": { "type": "Point", "coordinates": [ 79.006110, 30.380199 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.380185, "longitude": 79.005186, "chi": 25.578000, "elevation": 755, "flow distance": 15355.000000, "drainage area": 1306800000.000000, "m_chi": 5.545300, "b_chi": 615.590000 }, "geometry": { "type": "Point", "coordinates": [ 79.005186, 30.380185 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.380171, "longitude": 79.004262, "chi": 25.421000, "elevation": 755, "flow distance": 15267.000000, "drainage area": 1306800000.000000, "m_chi": 4.647200, "b_chi": 638.600000 }, "geometry": { "type": "Point", "coordinates": [ 79.004262, 30.380171 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.379357, "longitude": 79.003354, "chi": 25.199000, "elevation": 755, "flow distance": 15141.000000, "drainage area": 1306900000.000000, "m_chi": 3.257800, "b_chi": 673.650000 }, "geometry": { "type": "Point", "coordinates": [ 79.003354, 30.379357 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.379342, "longitude": 79.002430, "chi": 25.042000, "elevation": 755, "flow distance": 15052.000000, "drainage area": 1307000000.000000, "m_chi": 2.120600, "b_chi": 702.060000 }, "geometry": { "type": "Point", "coordinates": [ 79.002430, 30.379342 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.378528, "longitude": 79.001523, "chi": 24.820000, "elevation": 754, "flow distance": 14927.000000, "drainage area": 1307100000.000000, "m_chi": 1.198900, "b_chi": 724.520000 }, "geometry": { "type": "Point", "coordinates": [ 79.001523, 30.378528 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.378514, "longitude": 79.000599, "chi": 24.663000, "elevation": 754, "flow distance": 14838.000000, "drainage area": 1307300000.000000, "m_chi": 1.508700, "b_chi": 716.840000 }, "geometry": { "type": "Point", "coordinates": [ 79.000599, 30.378514 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.377697, "longitude": 78.999691, "chi": 24.440000, "elevation": 754, "flow distance": 14712.000000, "drainage area": 1307800000.000000, "m_chi": 1.678700, "b_chi": 712.700000 }, "geometry": { "type": "Point", "coordinates": [ 78.999691, 30.377697 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.376882, "longitude": 78.998784, "chi": 24.218000, "elevation": 754, "flow distance": 14587.000000, "drainage area": 1307900000.000000, "m_chi": 1.713800, "b_chi": 711.910000 }, "geometry": { "type": "Point", "coordinates": [ 78.998784, 30.376882 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.376082, "longitude": 78.998800, "chi": 24.061000, "elevation": 754, "flow distance": 14498.000000, "drainage area": 1308200000.000000, "m_chi": 1.617700, "b_chi": 714.280000 }, "geometry": { "type": "Point", "coordinates": [ 78.998800, 30.376082 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.375267, "longitude": 78.997893, "chi": 23.839000, "elevation": 752, "flow distance": 14372.000000, "drainage area": 1310600000.000000, "m_chi": 1.384900, "b_chi": 719.880000 }, "geometry": { "type": "Point", "coordinates": [ 78.997893, 30.375267 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.374465, "longitude": 78.997909, "chi": 23.682000, "elevation": 752, "flow distance": 14283.000000, "drainage area": 1310600000.000000, "m_chi": 1.272200, "b_chi": 722.640000 }, "geometry": { "type": "Point", "coordinates": [ 78.997909, 30.374465 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.373650, "longitude": 78.997002, "chi": 23.460000, "elevation": 752, "flow distance": 14158.000000, "drainage area": 1310700000.000000, "m_chi": 1.077200, "b_chi": 727.290000 }, "geometry": { "type": "Point", "coordinates": [ 78.997002, 30.373650 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.372836, "longitude": 78.996094, "chi": 23.239000, "elevation": 752, "flow distance": 14032.000000, "drainage area": 1311000000.000000, "m_chi": 0.807350, "b_chi": 733.590000 }, "geometry": { "type": "Point", "coordinates": [ 78.996094, 30.372836 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.372035, "longitude": 78.996111, "chi": 23.082000, "elevation": 752, "flow distance": 13943.000000, "drainage area": 1311000000.000000, "m_chi": 0.458030, "b_chi": 741.620000 }, "geometry": { "type": "Point", "coordinates": [ 78.996111, 30.372035 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.371218, "longitude": 78.995203, "chi": 22.860000, "elevation": 752, "flow distance": 13818.000000, "drainage area": 1311200000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.995203, 30.371218 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.370432, "longitude": 78.996143, "chi": 22.638000, "elevation": 752, "flow distance": 13692.000000, "drainage area": 1311500000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.996143, 30.370432 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.369618, "longitude": 78.995236, "chi": 22.416000, "elevation": 752, "flow distance": 13567.000000, "drainage area": 1311600000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.995236, 30.369618 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.368817, "longitude": 78.995252, "chi": 22.259000, "elevation": 752, "flow distance": 13478.000000, "drainage area": 1311700000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.995252, 30.368817 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.368015, "longitude": 78.995269, "chi": 22.102000, "elevation": 752, "flow distance": 13389.000000, "drainage area": 1311700000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.995269, 30.368015 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.367200, "longitude": 78.994361, "chi": 21.881000, "elevation": 752, "flow distance": 13263.000000, "drainage area": 1313100000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.994361, 30.367200 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.366385, "longitude": 78.993454, "chi": 21.659000, "elevation": 752, "flow distance": 13138.000000, "drainage area": 1313300000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.993454, 30.366385 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.366371, "longitude": 78.992530, "chi": 21.502000, "elevation": 752, "flow distance": 13049.000000, "drainage area": 1313400000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.992530, 30.366371 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.366357, "longitude": 78.991607, "chi": 21.345000, "elevation": 752, "flow distance": 12960.000000, "drainage area": 1313400000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.991607, 30.366357 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.367143, "longitude": 78.990667, "chi": 21.124000, "elevation": 752, "flow distance": 12835.000000, "drainage area": 1313400000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.990667, 30.367143 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.366329, "longitude": 78.989759, "chi": 20.902000, "elevation": 752, "flow distance": 12709.000000, "drainage area": 1313500000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.989759, 30.366329 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.367115, "longitude": 78.988819, "chi": 20.680000, "elevation": 752, "flow distance": 12583.000000, "drainage area": 1313500000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.988819, 30.367115 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.367901, "longitude": 78.987879, "chi": 20.459000, "elevation": 752, "flow distance": 12458.000000, "drainage area": 1313600000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.987879, 30.367901 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.367086, "longitude": 78.986972, "chi": 20.237000, "elevation": 752, "flow distance": 12332.000000, "drainage area": 1319300000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.986972, 30.367086 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.367873, "longitude": 78.986032, "chi": 20.016000, "elevation": 752, "flow distance": 12206.000000, "drainage area": 1319400000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.986032, 30.367873 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.368661, "longitude": 78.985091, "chi": 19.795000, "elevation": 752, "flow distance": 12081.000000, "drainage area": 1319700000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.985091, 30.368661 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.367844, "longitude": 78.984184, "chi": 19.573000, "elevation": 752, "flow distance": 11955.000000, "drainage area": 1319700000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.984184, 30.367844 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.367029, "longitude": 78.983277, "chi": 19.352000, "elevation": 752, "flow distance": 11830.000000, "drainage area": 1319700000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.983277, 30.367029 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.366215, "longitude": 78.982370, "chi": 19.131000, "elevation": 752, "flow distance": 11704.000000, "drainage area": 1319800000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.982370, 30.366215 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.365400, "longitude": 78.981462, "chi": 18.910000, "elevation": 752, "flow distance": 11578.000000, "drainage area": 1319800000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.981462, 30.365400 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.364597, "longitude": 78.981479, "chi": 18.753000, "elevation": 752, "flow distance": 11490.000000, "drainage area": 1327500000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.981479, 30.364597 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.363783, "longitude": 78.980572, "chi": 18.533000, "elevation": 752, "flow distance": 11364.000000, "drainage area": 1327700000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.980572, 30.363783 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.362968, "longitude": 78.979664, "chi": 18.312000, "elevation": 752, "flow distance": 11238.000000, "drainage area": 1327700000.000000, "m_chi": 0.000000, "b_chi": 752.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.979664, 30.362968 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.362153, "longitude": 78.978757, "chi": 18.092000, "elevation": 752, "flow distance": 11113.000000, "drainage area": 1328300000.000000, "m_chi": 5.344700, "b_chi": 652.870000 }, "geometry": { "type": "Point", "coordinates": [ 78.978757, 30.362153 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.361351, "longitude": 78.978774, "chi": 17.936000, "elevation": 752, "flow distance": 11024.000000, "drainage area": 1328400000.000000, "m_chi": 10.420000, "b_chi": 560.450000 }, "geometry": { "type": "Point", "coordinates": [ 78.978774, 30.361351 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.360550, "longitude": 78.978790, "chi": 17.780000, "elevation": 752, "flow distance": 10935.000000, "drainage area": 1328400000.000000, "m_chi": 15.401000, "b_chi": 471.180000 }, "geometry": { "type": "Point", "coordinates": [ 78.978790, 30.360550 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.359750, "longitude": 78.978807, "chi": 17.624000, "elevation": 752, "flow distance": 10846.000000, "drainage area": 1328500000.000000, "m_chi": 18.977000, "b_chi": 408.630000 }, "geometry": { "type": "Point", "coordinates": [ 78.978807, 30.359750 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.358935, "longitude": 78.977900, "chi": 17.403000, "elevation": 752, "flow distance": 10721.000000, "drainage area": 1328800000.000000, "m_chi": 21.033000, "b_chi": 373.790000 }, "geometry": { "type": "Point", "coordinates": [ 78.977900, 30.358935 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.358133, "longitude": 78.977916, "chi": 17.247000, "elevation": 729, "flow distance": 10632.000000, "drainage area": 1329000000.000000, "m_chi": 21.603000, "b_chi": 365.140000 }, "geometry": { "type": "Point", "coordinates": [ 78.977916, 30.358133 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.357318, "longitude": 78.977009, "chi": 17.027000, "elevation": 727, "flow distance": 10506.000000, "drainage area": 1329200000.000000, "m_chi": 20.276000, "b_chi": 388.990000 }, "geometry": { "type": "Point", "coordinates": [ 78.977009, 30.357318 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.356503, "longitude": 78.976102, "chi": 16.806000, "elevation": 722, "flow distance": 10381.000000, "drainage area": 1329300000.000000, "m_chi": 17.629000, "b_chi": 434.680000 }, "geometry": { "type": "Point", "coordinates": [ 78.976102, 30.356503 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.355689, "longitude": 78.975195, "chi": 16.586000, "elevation": 722, "flow distance": 10255.000000, "drainage area": 1329500000.000000, "m_chi": 13.763000, "b_chi": 499.710000 }, "geometry": { "type": "Point", "coordinates": [ 78.975195, 30.355689 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.354886, "longitude": 78.975211, "chi": 16.430000, "elevation": 722, "flow distance": 10166.000000, "drainage area": 1329600000.000000, "m_chi": 8.662600, "b_chi": 583.540000 }, "geometry": { "type": "Point", "coordinates": [ 78.975211, 30.354886 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.354086, "longitude": 78.975228, "chi": 16.274000, "elevation": 722, "flow distance": 10078.000000, "drainage area": 1329600000.000000, "m_chi": 2.457900, "b_chi": 683.220000 }, "geometry": { "type": "Point", "coordinates": [ 78.975228, 30.354086 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.353271, "longitude": 78.974321, "chi": 16.054000, "elevation": 722, "flow distance": 9952.000000, "drainage area": 1329700000.000000, "m_chi": 1.092600, "b_chi": 704.960000 }, "geometry": { "type": "Point", "coordinates": [ 78.974321, 30.353271 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.352485, "longitude": 78.975261, "chi": 15.833000, "elevation": 722, "flow distance": 9826.400000, "drainage area": 1329800000.000000, "m_chi": 0.000000, "b_chi": 722.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.975261, 30.352485 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.351668, "longitude": 78.974354, "chi": 15.613000, "elevation": 722, "flow distance": 9700.800000, "drainage area": 1329800000.000000, "m_chi": 0.000000, "b_chi": 722.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.974354, 30.351668 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.350882, "longitude": 78.975294, "chi": 15.392000, "elevation": 722, "flow distance": 9575.200000, "drainage area": 1329800000.000000, "m_chi": 0.000000, "b_chi": 722.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.975294, 30.350882 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.350096, "longitude": 78.976234, "chi": 15.172000, "elevation": 722, "flow distance": 9449.600000, "drainage area": 1330500000.000000, "m_chi": 1.004100, "b_chi": 706.280000 }, "geometry": { "type": "Point", "coordinates": [ 78.976234, 30.350096 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.349279, "longitude": 78.975327, "chi": 14.952000, "elevation": 722, "flow distance": 9324.000000, "drainage area": 1602700000.000000, "m_chi": 1.898600, "b_chi": 692.600000 }, "geometry": { "type": "Point", "coordinates": [ 78.975327, 30.349279 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.348493, "longitude": 78.976267, "chi": 14.749000, "elevation": 722, "flow distance": 9198.300000, "drainage area": 1602900000.000000, "m_chi": 2.699400, "b_chi": 680.630000 }, "geometry": { "type": "Point", "coordinates": [ 78.976267, 30.348493 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.347678, "longitude": 78.975360, "chi": 14.546000, "elevation": 722, "flow distance": 9072.700000, "drainage area": 1602900000.000000, "m_chi": 3.353000, "b_chi": 671.120000 }, "geometry": { "type": "Point", "coordinates": [ 78.975360, 30.347678 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.346878, "longitude": 78.975376, "chi": 14.403000, "elevation": 722, "flow distance": 8983.900000, "drainage area": 1603000000.000000, "m_chi": 3.828600, "b_chi": 664.400000 }, "geometry": { "type": "Point", "coordinates": [ 78.975376, 30.346878 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.346075, "longitude": 78.975393, "chi": 14.260000, "elevation": 717, "flow distance": 8895.100000, "drainage area": 1603100000.000000, "m_chi": 3.981700, "b_chi": 662.450000 }, "geometry": { "type": "Point", "coordinates": [ 78.975393, 30.346075 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.345274, "longitude": 78.975409, "chi": 14.116000, "elevation": 717, "flow distance": 8806.300000, "drainage area": 1603100000.000000, "m_chi": 3.737000, "b_chi": 666.150000 }, "geometry": { "type": "Point", "coordinates": [ 78.975409, 30.345274 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.344474, "longitude": 78.975426, "chi": 13.973000, "elevation": 717, "flow distance": 8717.500000, "drainage area": 1604600000.000000, "m_chi": 5.712000, "b_chi": 638.010000 }, "geometry": { "type": "Point", "coordinates": [ 78.975426, 30.344474 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.343659, "longitude": 78.974519, "chi": 13.770000, "elevation": 717, "flow distance": 8591.900000, "drainage area": 1604600000.000000, "m_chi": 6.859900, "b_chi": 621.880000 }, "geometry": { "type": "Point", "coordinates": [ 78.974519, 30.343659 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.343645, "longitude": 78.973595, "chi": 13.627000, "elevation": 717, "flow distance": 8503.100000, "drainage area": 1604800000.000000, "m_chi": 7.190200, "b_chi": 617.210000 }, "geometry": { "type": "Point", "coordinates": [ 78.973595, 30.343645 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.342828, "longitude": 78.972688, "chi": 13.425000, "elevation": 717, "flow distance": 8377.500000, "drainage area": 1605200000.000000, "m_chi": 6.739100, "b_chi": 623.180000 }, "geometry": { "type": "Point", "coordinates": [ 78.972688, 30.342828 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.342013, "longitude": 78.971782, "chi": 13.222000, "elevation": 717, "flow distance": 8251.900000, "drainage area": 1605200000.000000, "m_chi": 7.078100, "b_chi": 619.020000 }, "geometry": { "type": "Point", "coordinates": [ 78.971782, 30.342013 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.341999, "longitude": 78.970858, "chi": 13.079000, "elevation": 708, "flow distance": 8163.100000, "drainage area": 1605300000.000000, "m_chi": 7.078600, "b_chi": 619.400000 }, "geometry": { "type": "Point", "coordinates": [ 78.970858, 30.341999 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.341985, "longitude": 78.969935, "chi": 12.936000, "elevation": 708, "flow distance": 8074.200000, "drainage area": 1605500000.000000, "m_chi": 6.740400, "b_chi": 624.150000 }, "geometry": { "type": "Point", "coordinates": [ 78.969935, 30.341985 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.341970, "longitude": 78.969011, "chi": 12.792000, "elevation": 708, "flow distance": 7985.400000, "drainage area": 1605500000.000000, "m_chi": 5.740800, "b_chi": 637.230000 }, "geometry": { "type": "Point", "coordinates": [ 78.969011, 30.341970 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.341156, "longitude": 78.968104, "chi": 12.590000, "elevation": 708, "flow distance": 7859.800000, "drainage area": 1605600000.000000, "m_chi": 4.223900, "b_chi": 656.500000 }, "geometry": { "type": "Point", "coordinates": [ 78.968104, 30.341156 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.340341, "longitude": 78.967197, "chi": 12.387000, "elevation": 708, "flow distance": 7734.200000, "drainage area": 1605800000.000000, "m_chi": 2.234900, "b_chi": 681.100000 }, "geometry": { "type": "Point", "coordinates": [ 78.967197, 30.340341 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.339538, "longitude": 78.967214, "chi": 12.244000, "elevation": 708, "flow distance": 7645.400000, "drainage area": 1605900000.000000, "m_chi": 0.000000, "b_chi": 708.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.967214, 30.339538 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.338738, "longitude": 78.967230, "chi": 12.101000, "elevation": 708, "flow distance": 7556.600000, "drainage area": 1605900000.000000, "m_chi": 0.000000, "b_chi": 708.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.967230, 30.338738 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.337923, "longitude": 78.966323, "chi": 11.898000, "elevation": 708, "flow distance": 7431.000000, "drainage area": 1606000000.000000, "m_chi": 0.000000, "b_chi": 708.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.966323, 30.337923 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.337137, "longitude": 78.967263, "chi": 11.696000, "elevation": 708, "flow distance": 7305.400000, "drainage area": 1606000000.000000, "m_chi": 1.187400, "b_chi": 693.670000 }, "geometry": { "type": "Point", "coordinates": [ 78.967263, 30.337137 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.336349, "longitude": 78.968203, "chi": 11.493000, "elevation": 708, "flow distance": 7179.800000, "drainage area": 1606100000.000000, "m_chi": 2.627700, "b_chi": 676.660000 }, "geometry": { "type": "Point", "coordinates": [ 78.968203, 30.336349 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.335534, "longitude": 78.967296, "chi": 11.291000, "elevation": 708, "flow distance": 7054.200000, "drainage area": 1615600000.000000, "m_chi": 3.747500, "b_chi": 663.790000 }, "geometry": { "type": "Point", "coordinates": [ 78.967296, 30.335534 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.334748, "longitude": 78.968236, "chi": 11.089000, "elevation": 708, "flow distance": 6928.600000, "drainage area": 1620800000.000000, "m_chi": 4.625700, "b_chi": 654.010000 }, "geometry": { "type": "Point", "coordinates": [ 78.968236, 30.334748 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.333948, "longitude": 78.968253, "chi": 10.946000, "elevation": 708, "flow distance": 6839.800000, "drainage area": 1620800000.000000, "m_chi": 5.335300, "b_chi": 646.390000 }, "geometry": { "type": "Point", "coordinates": [ 78.968253, 30.333948 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.333145, "longitude": 78.968269, "chi": 10.804000, "elevation": 703, "flow distance": 6751.000000, "drainage area": 1621000000.000000, "m_chi": 5.733200, "b_chi": 642.360000 }, "geometry": { "type": "Point", "coordinates": [ 78.968269, 30.333145 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.332345, "longitude": 78.968286, "chi": 10.661000, "elevation": 701, "flow distance": 6662.100000, "drainage area": 1621000000.000000, "m_chi": 5.733200, "b_chi": 642.660000 }, "geometry": { "type": "Point", "coordinates": [ 78.968286, 30.332345 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.331530, "longitude": 78.967379, "chi": 10.460000, "elevation": 701, "flow distance": 6536.500000, "drainage area": 1621100000.000000, "m_chi": 5.111100, "b_chi": 649.490000 }, "geometry": { "type": "Point", "coordinates": [ 78.967379, 30.331530 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.330730, "longitude": 78.967396, "chi": 10.317000, "elevation": 701, "flow distance": 6447.700000, "drainage area": 1621800000.000000, "m_chi": 5.199500, "b_chi": 648.390000 }, "geometry": { "type": "Point", "coordinates": [ 78.967396, 30.330730 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.329927, "longitude": 78.967412, "chi": 10.174000, "elevation": 701, "flow distance": 6358.900000, "drainage area": 1621900000.000000, "m_chi": 4.610300, "b_chi": 654.180000 }, "geometry": { "type": "Point", "coordinates": [ 78.967412, 30.329927 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.329127, "longitude": 78.967429, "chi": 10.032000, "elevation": 701, "flow distance": 6270.100000, "drainage area": 1622000000.000000, "m_chi": 3.977400, "b_chi": 660.050000 }, "geometry": { "type": "Point", "coordinates": [ 78.967429, 30.329127 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.328326, "longitude": 78.967445, "chi": 9.889400, "elevation": 701, "flow distance": 6181.300000, "drainage area": 1622000000.000000, "m_chi": 4.309200, "b_chi": 656.680000 }, "geometry": { "type": "Point", "coordinates": [ 78.967445, 30.328326 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.327540, "longitude": 78.968385, "chi": 9.687800, "elevation": 701, "flow distance": 6055.700000, "drainage area": 1622100000.000000, "m_chi": 4.924000, "b_chi": 650.850000 }, "geometry": { "type": "Point", "coordinates": [ 78.968385, 30.327540 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.326737, "longitude": 78.968402, "chi": 9.545300, "elevation": 697, "flow distance": 5966.900000, "drainage area": 1622300000.000000, "m_chi": 5.001000, "b_chi": 650.350000 }, "geometry": { "type": "Point", "coordinates": [ 78.968402, 30.326737 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.325937, "longitude": 78.968418, "chi": 9.402700, "elevation": 697, "flow distance": 5878.100000, "drainage area": 1622400000.000000, "m_chi": 4.805300, "b_chi": 652.440000 }, "geometry": { "type": "Point", "coordinates": [ 78.968418, 30.325937 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.325137, "longitude": 78.968435, "chi": 9.260200, "elevation": 695, "flow distance": 5789.200000, "drainage area": 1622400000.000000, "m_chi": 4.244200, "b_chi": 657.860000 }, "geometry": { "type": "Point", "coordinates": [ 78.968435, 30.325137 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.324322, "longitude": 78.967528, "chi": 9.058600, "elevation": 695, "flow distance": 5663.600000, "drainage area": 1622500000.000000, "m_chi": 3.451900, "b_chi": 665.180000 }, "geometry": { "type": "Point", "coordinates": [ 78.967528, 30.324322 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.323519, "longitude": 78.967545, "chi": 8.916100, "elevation": 695, "flow distance": 5574.800000, "drainage area": 1623100000.000000, "m_chi": 2.375400, "b_chi": 674.780000 }, "geometry": { "type": "Point", "coordinates": [ 78.967545, 30.323519 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.322705, "longitude": 78.966638, "chi": 8.714600, "elevation": 695, "flow distance": 5449.200000, "drainage area": 1630000000.000000, "m_chi": 0.967100, "b_chi": 686.920000 }, "geometry": { "type": "Point", "coordinates": [ 78.966638, 30.322705 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.321904, "longitude": 78.966654, "chi": 8.572300, "elevation": 695, "flow distance": 5360.400000, "drainage area": 1630000000.000000, "m_chi": 0.527060, "b_chi": 690.670000 }, "geometry": { "type": "Point", "coordinates": [ 78.966654, 30.321904 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.321089, "longitude": 78.965748, "chi": 8.371200, "elevation": 695, "flow distance": 5234.800000, "drainage area": 1630100000.000000, "m_chi": 0.000000, "b_chi": 695.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.965748, 30.321089 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.320287, "longitude": 78.965764, "chi": 8.229000, "elevation": 695, "flow distance": 5146.000000, "drainage area": 1630200000.000000, "m_chi": 0.000000, "b_chi": 695.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.965764, 30.320287 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.319486, "longitude": 78.965781, "chi": 8.086700, "elevation": 695, "flow distance": 5057.200000, "drainage area": 1630300000.000000, "m_chi": 0.000000, "b_chi": 695.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.965781, 30.319486 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.318700, "longitude": 78.966721, "chi": 7.885600, "elevation": 695, "flow distance": 4931.600000, "drainage area": 1630400000.000000, "m_chi": 0.000000, "b_chi": 695.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.966721, 30.318700 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.317912, "longitude": 78.967660, "chi": 7.684500, "elevation": 695, "flow distance": 4806.000000, "drainage area": 1630500000.000000, "m_chi": 0.000000, "b_chi": 695.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.967660, 30.317912 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.317126, "longitude": 78.968600, "chi": 7.483400, "elevation": 695, "flow distance": 4680.400000, "drainage area": 1630500000.000000, "m_chi": 4.266400, "b_chi": 661.370000 }, "geometry": { "type": "Point", "coordinates": [ 78.968600, 30.317126 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.316340, "longitude": 78.969540, "chi": 7.282200, "elevation": 695, "flow distance": 4554.800000, "drainage area": 1631000000.000000, "m_chi": 7.761400, "b_chi": 634.830000 }, "geometry": { "type": "Point", "coordinates": [ 78.969540, 30.316340 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.315554, "longitude": 78.970480, "chi": 7.081100, "elevation": 695, "flow distance": 4429.200000, "drainage area": 1631200000.000000, "m_chi": 10.734000, "b_chi": 613.220000 }, "geometry": { "type": "Point", "coordinates": [ 78.970480, 30.315554 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.314751, "longitude": 78.970496, "chi": 6.939000, "elevation": 695, "flow distance": 4340.400000, "drainage area": 1631200000.000000, "m_chi": 13.191000, "b_chi": 596.290000 }, "geometry": { "type": "Point", "coordinates": [ 78.970496, 30.314751 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.313951, "longitude": 78.970513, "chi": 6.796800, "elevation": 695, "flow distance": 4251.500000, "drainage area": 1631300000.000000, "m_chi": 14.549000, "b_chi": 587.700000 }, "geometry": { "type": "Point", "coordinates": [ 78.970513, 30.313951 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.313150, "longitude": 78.970529, "chi": 6.654600, "elevation": 677, "flow distance": 4162.700000, "drainage area": 1631300000.000000, "m_chi": 14.550000, "b_chi": 588.590000 }, "geometry": { "type": "Point", "coordinates": [ 78.970529, 30.313150 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.312350, "longitude": 78.970546, "chi": 6.512400, "elevation": 677, "flow distance": 4073.900000, "drainage area": 1631400000.000000, "m_chi": 14.077000, "b_chi": 592.280000 }, "geometry": { "type": "Point", "coordinates": [ 78.970546, 30.312350 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.311547, "longitude": 78.970563, "chi": 6.370200, "elevation": 677, "flow distance": 3985.100000, "drainage area": 1632500000.000000, "m_chi": 12.256000, "b_chi": 604.280000 }, "geometry": { "type": "Point", "coordinates": [ 78.970562, 30.311547 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.310761, "longitude": 78.971502, "chi": 6.169200, "elevation": 677, "flow distance": 3859.500000, "drainage area": 1633100000.000000, "m_chi": 9.475800, "b_chi": 621.500000 }, "geometry": { "type": "Point", "coordinates": [ 78.971502, 30.310761 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.309975, "longitude": 78.972442, "chi": 5.968200, "elevation": 677, "flow distance": 3733.900000, "drainage area": 1633100000.000000, "m_chi": 6.216500, "b_chi": 640.610000 }, "geometry": { "type": "Point", "coordinates": [ 78.972442, 30.309975 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.309189, "longitude": 78.973381, "chi": 5.767300, "elevation": 677, "flow distance": 3608.300000, "drainage area": 1633400000.000000, "m_chi": 2.231600, "b_chi": 662.770000 }, "geometry": { "type": "Point", "coordinates": [ 78.973381, 30.309189 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.310004, "longitude": 78.974288, "chi": 5.566300, "elevation": 674, "flow distance": 3482.700000, "drainage area": 1633500000.000000, "m_chi": 2.215700, "b_chi": 662.980000 }, "geometry": { "type": "Point", "coordinates": [ 78.974288, 30.310004 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.310819, "longitude": 78.975195, "chi": 5.365400, "elevation": 674, "flow distance": 3357.100000, "drainage area": 1633600000.000000, "m_chi": 2.113300, "b_chi": 663.660000 }, "geometry": { "type": "Point", "coordinates": [ 78.975195, 30.310819 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.311633, "longitude": 78.976101, "chi": 5.164400, "elevation": 674, "flow distance": 3231.500000, "drainage area": 1633800000.000000, "m_chi": 4.048600, "b_chi": 652.830000 }, "geometry": { "type": "Point", "coordinates": [ 78.976101, 30.311633 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.311647, "longitude": 78.977025, "chi": 5.022300, "elevation": 674, "flow distance": 3142.700000, "drainage area": 1634400000.000000, "m_chi": 6.841400, "b_chi": 637.910000 }, "geometry": { "type": "Point", "coordinates": [ 78.977025, 30.311647 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.311662, "longitude": 78.977948, "chi": 4.880300, "elevation": 674, "flow distance": 3053.900000, "drainage area": 1634400000.000000, "m_chi": 8.922900, "b_chi": 627.410000 }, "geometry": { "type": "Point", "coordinates": [ 78.977948, 30.311662 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.310876, "longitude": 78.978887, "chi": 4.679400, "elevation": 674, "flow distance": 2928.300000, "drainage area": 1635200000.000000, "m_chi": 10.211000, "b_chi": 621.310000 }, "geometry": { "type": "Point", "coordinates": [ 78.978887, 30.310876 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.310075, "longitude": 78.978904, "chi": 4.537300, "elevation": 674, "flow distance": 2839.400000, "drainage area": 1635200000.000000, "m_chi": 11.664000, "b_chi": 615.110000 }, "geometry": { "type": "Point", "coordinates": [ 78.978904, 30.310075 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.309275, "longitude": 78.978920, "chi": 4.395300, "elevation": 665, "flow distance": 2750.600000, "drainage area": 1635200000.000000, "m_chi": 12.274000, "b_chi": 613.000000 }, "geometry": { "type": "Point", "coordinates": [ 78.978920, 30.309275 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.308487, "longitude": 78.979860, "chi": 4.194500, "elevation": 660, "flow distance": 2625.000000, "drainage area": 1635400000.000000, "m_chi": 11.920000, "b_chi": 615.100000 }, "geometry": { "type": "Point", "coordinates": [ 78.979860, 30.308487 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.307686, "longitude": 78.979876, "chi": 4.052400, "elevation": 660, "flow distance": 2536.200000, "drainage area": 1635400000.000000, "m_chi": 10.545000, "b_chi": 621.310000 }, "geometry": { "type": "Point", "coordinates": [ 78.979876, 30.307686 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.306886, "longitude": 78.979893, "chi": 3.910400, "elevation": 660, "flow distance": 2447.400000, "drainage area": 1635600000.000000, "m_chi": 10.221000, "b_chi": 622.430000 }, "geometry": { "type": "Point", "coordinates": [ 78.979893, 30.306886 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.306085, "longitude": 78.979909, "chi": 3.768400, "elevation": 660, "flow distance": 2358.600000, "drainage area": 1635800000.000000, "m_chi": 8.626900, "b_chi": 628.170000 }, "geometry": { "type": "Point", "coordinates": [ 78.979909, 30.306085 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.305283, "longitude": 78.979925, "chi": 3.626400, "elevation": 660, "flow distance": 2269.800000, "drainage area": 1635800000.000000, "m_chi": 6.975300, "b_chi": 633.310000 }, "geometry": { "type": "Point", "coordinates": [ 78.979925, 30.305283 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.304482, "longitude": 78.979942, "chi": 3.484400, "elevation": 660, "flow distance": 2181.000000, "drainage area": 1635900000.000000, "m_chi": 7.056200, "b_chi": 632.810000 }, "geometry": { "type": "Point", "coordinates": [ 78.979942, 30.304482 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.303696, "longitude": 78.980881, "chi": 3.283600, "elevation": 660, "flow distance": 2055.300000, "drainage area": 1636300000.000000, "m_chi": 7.715200, "b_chi": 630.890000 }, "geometry": { "type": "Point", "coordinates": [ 78.980881, 30.303696 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.302896, "longitude": 78.980898, "chi": 3.141600, "elevation": 654, "flow distance": 1966.500000, "drainage area": 1636300000.000000, "m_chi": 7.732300, "b_chi": 631.230000 }, "geometry": { "type": "Point", "coordinates": [ 78.980898, 30.302896 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.302882, "longitude": 78.979975, "chi": 2.999600, "elevation": 654, "flow distance": 1877.700000, "drainage area": 1636400000.000000, "m_chi": 7.396500, "b_chi": 632.610000 }, "geometry": { "type": "Point", "coordinates": [ 78.979975, 30.302882 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.302065, "longitude": 78.979068, "chi": 2.798800, "elevation": 650, "flow distance": 1752.100000, "drainage area": 1636400000.000000, "m_chi": 6.727600, "b_chi": 634.800000 }, "geometry": { "type": "Point", "coordinates": [ 78.979068, 30.302065 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.301250, "longitude": 78.978161, "chi": 2.598000, "elevation": 650, "flow distance": 1626.500000, "drainage area": 1636500000.000000, "m_chi": 5.563200, "b_chi": 638.090000 }, "geometry": { "type": "Point", "coordinates": [ 78.978161, 30.301250 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.300435, "longitude": 78.977255, "chi": 2.397200, "elevation": 650, "flow distance": 1500.900000, "drainage area": 1636600000.000000, "m_chi": 3.908800, "b_chi": 642.180000 }, "geometry": { "type": "Point", "coordinates": [ 78.977255, 30.300435 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.299649, "longitude": 78.978194, "chi": 2.196500, "elevation": 650, "flow distance": 1375.300000, "drainage area": 1636800000.000000, "m_chi": 3.327800, "b_chi": 642.730000 }, "geometry": { "type": "Point", "coordinates": [ 78.978194, 30.299649 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.298846, "longitude": 78.978211, "chi": 2.054500, "elevation": 650, "flow distance": 1286.500000, "drainage area": 1636900000.000000, "m_chi": 3.701100, "b_chi": 641.670000 }, "geometry": { "type": "Point", "coordinates": [ 78.978211, 30.298846 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.298046, "longitude": 78.978227, "chi": 1.912500, "elevation": 650, "flow distance": 1197.700000, "drainage area": 1636900000.000000, "m_chi": 3.630100, "b_chi": 641.580000 }, "geometry": { "type": "Point", "coordinates": [ 78.978227, 30.298046 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.297231, "longitude": 78.977321, "chi": 1.711800, "elevation": 650, "flow distance": 1072.100000, "drainage area": 1636900000.000000, "m_chi": 4.251100, "b_chi": 640.650000 }, "geometry": { "type": "Point", "coordinates": [ 78.977321, 30.297231 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.296417, "longitude": 78.976414, "chi": 1.511000, "elevation": 650, "flow distance": 946.480000, "drainage area": 1641000000.000000, "m_chi": 4.600300, "b_chi": 640.340000 }, "geometry": { "type": "Point", "coordinates": [ 78.976414, 30.296417 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.295628, "longitude": 78.977354, "chi": 1.310500, "elevation": 644, "flow distance": 820.880000, "drainage area": 1641000000.000000, "m_chi": 4.672100, "b_chi": 640.500000 }, "geometry": { "type": "Point", "coordinates": [ 78.977354, 30.295628 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.294842, "longitude": 78.978293, "chi": 1.109900, "elevation": 644, "flow distance": 695.280000, "drainage area": 1641200000.000000, "m_chi": 4.448000, "b_chi": 641.010000 }, "geometry": { "type": "Point", "coordinates": [ 78.978293, 30.294842 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.554144, "longitude": 79.119210, "chi": 84.096000, "elevation": 1255, "flow distance": 43554.000000, "drainage area": 359640000.000000, "m_chi": 0.000000, "b_chi": 1255.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.119210, 30.554144 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.553330, "longitude": 79.118300, "chi": 83.699000, "elevation": 1255, "flow distance": 43429.000000, "drainage area": 359660000.000000, "m_chi": 0.000000, "b_chi": 1255.000000 }, "geometry": { "type": "Point", "coordinates": [ 79.118300, 30.553330 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.552530, "longitude": 79.118315, "chi": 83.418000, "elevation": 1255, "flow distance": 43340.000000, "drainage area": 361040000.000000, "m_chi": 0.352470, "b_chi": 1225.300000 }, "geometry": { "type": "Point", "coordinates": [ 79.118315, 30.552530 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.551716, "longitude": 79.117406, "chi": 83.022000, "elevation": 1255, "flow distance": 43214.000000, "drainage area": 361750000.000000, "m_chi": 3.308600, "b_chi": 977.830000 }, "geometry": { "type": "Point", "coordinates": [ 79.117406, 30.551716 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.550900, "longitude": 79.116495, "chi": 82.626000, "elevation": 1255, "flow distance": 43089.000000, "drainage area": 361920000.000000, "m_chi": 5.714300, "b_chi": 778.030000 }, "geometry": { "type": "Point", "coordinates": [ 79.116495, 30.550900 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.550086, "longitude": 79.115585, "chi": 82.230000, "elevation": 1255, "flow distance": 42963.000000, "drainage area": 362010000.000000, "m_chi": 10.077000, "b_chi": 417.150000 }, "geometry": { "type": "Point", "coordinates": [ 79.115585, 30.550086 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.549272, "longitude": 79.114676, "chi": 81.834000, "elevation": 1255, "flow distance": 42837.000000, "drainage area": 362230000.000000, "m_chi": 16.014000, "b_chi": -71.404000 }, "geometry": { "type": "Point", "coordinates": [ 79.114676, 30.549272 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.548472, "longitude": 79.114691, "chi": 81.554000, "elevation": 1252, "flow distance": 42749.000000, "drainage area": 362250000.000000, "m_chi": 21.437000, "b_chi": -514.820000 }, "geometry": { "type": "Point", "coordinates": [ 79.114691, 30.548472 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.547656, "longitude": 79.113781, "chi": 81.158000, "elevation": 1230, "flow distance": 42623.000000, "drainage area": 362490000.000000, "m_chi": 27.077000, "b_chi": -972.840000 }, "geometry": { "type": "Point", "coordinates": [ 79.113781, 30.547656 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.546842, "longitude": 79.112871, "chi": 80.763000, "elevation": 1230, "flow distance": 42497.000000, "drainage area": 362660000.000000, "m_chi": 31.311000, "b_chi": -1313.900000 }, "geometry": { "type": "Point", "coordinates": [ 79.112871, 30.546842 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.546028, "longitude": 79.111961, "chi": 80.367000, "elevation": 1209, "flow distance": 42372.000000, "drainage area": 362730000.000000, "m_chi": 33.203000, "b_chi": -1463.800000 }, "geometry": { "type": "Point", "coordinates": [ 79.111961, 30.546028 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.545214, "longitude": 79.111051, "chi": 79.972000, "elevation": 1186, "flow distance": 42246.000000, "drainage area": 362770000.000000, "m_chi": 33.299000, "b_chi": -1469.200000 }, "geometry": { "type": "Point", "coordinates": [ 79.111051, 30.545214 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.544398, "longitude": 79.110141, "chi": 79.576000, "elevation": 1174, "flow distance": 42121.000000, "drainage area": 362790000.000000, "m_chi": 31.206000, "b_chi": -1300.800000 }, "geometry": { "type": "Point", "coordinates": [ 79.110141, 30.544398 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.543584, "longitude": 79.109231, "chi": 79.181000, "elevation": 1158, "flow distance": 41995.000000, "drainage area": 364300000.000000, "m_chi": 27.759000, "b_chi": -1026.600000 }, "geometry": { "type": "Point", "coordinates": [ 79.109231, 30.543584 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.542770, "longitude": 79.108321, "chi": 78.786000, "elevation": 1149, "flow distance": 41869.000000, "drainage area": 364340000.000000, "m_chi": 25.243000, "b_chi": -827.110000 }, "geometry": { "type": "Point", "coordinates": [ 79.108321, 30.542770 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.541956, "longitude": 79.107411, "chi": 78.391000, "elevation": 1146, "flow distance": 41744.000000, "drainage area": 366750000.000000, "m_chi": 21.215000, "b_chi": -511.760000 }, "geometry": { "type": "Point", "coordinates": [ 79.107411, 30.541956 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.541943, "longitude": 79.106486, "chi": 78.113000, "elevation": 1143, "flow distance": 41655.000000, "drainage area": 366780000.000000, "m_chi": 17.551000, "b_chi": -226.190000 }, "geometry": { "type": "Point", "coordinates": [ 79.106486, 30.541943 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.542730, "longitude": 79.105545, "chi": 77.719000, "elevation": 1138, "flow distance": 41529.000000, "drainage area": 366920000.000000, "m_chi": 15.901000, "b_chi": -98.443000 }, "geometry": { "type": "Point", "coordinates": [ 79.105545, 30.542730 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.541916, "longitude": 79.104635, "chi": 77.326000, "elevation": 1132, "flow distance": 41404.000000, "drainage area": 367400000.000000, "m_chi": 14.140000, "b_chi": 37.545000 }, "geometry": { "type": "Point", "coordinates": [ 79.104635, 30.541916 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.541113, "longitude": 79.104651, "chi": 77.048000, "elevation": 1129, "flow distance": 41315.000000, "drainage area": 367430000.000000, "m_chi": 13.265000, "b_chi": 105.440000 }, "geometry": { "type": "Point", "coordinates": [ 79.104651, 30.541113 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.540300, "longitude": 79.103741, "chi": 76.654000, "elevation": 1118, "flow distance": 41189.000000, "drainage area": 367480000.000000, "m_chi": 12.334000, "b_chi": 177.760000 }, "geometry": { "type": "Point", "coordinates": [ 79.103741, 30.540299 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.539486, "longitude": 79.102831, "chi": 76.261000, "elevation": 1116, "flow distance": 41064.000000, "drainage area": 367560000.000000, "m_chi": 10.718000, "b_chi": 301.930000 }, "geometry": { "type": "Point", "coordinates": [ 79.102831, 30.539486 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.538672, "longitude": 79.101921, "chi": 75.868000, "elevation": 1108, "flow distance": 40938.000000, "drainage area": 369550000.000000, "m_chi": 8.674800, "b_chi": 457.670000 }, "geometry": { "type": "Point", "coordinates": [ 79.101921, 30.538672 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.537855, "longitude": 79.101011, "chi": 75.476000, "elevation": 1107, "flow distance": 40813.000000, "drainage area": 369650000.000000, "m_chi": 6.606500, "b_chi": 614.200000 }, "geometry": { "type": "Point", "coordinates": [ 79.101011, 30.537855 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.537842, "longitude": 79.100086, "chi": 75.198000, "elevation": 1107, "flow distance": 40724.000000, "drainage area": 369680000.000000, "m_chi": 4.693900, "b_chi": 758.030000 }, "geometry": { "type": "Point", "coordinates": [ 79.100086, 30.537842 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.537028, "longitude": 79.099176, "chi": 74.806000, "elevation": 1107, "flow distance": 40598.000000, "drainage area": 370500000.000000, "m_chi": 2.518400, "b_chi": 920.460000 }, "geometry": { "type": "Point", "coordinates": [ 79.099176, 30.537028 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.536214, "longitude": 79.098266, "chi": 74.414000, "elevation": 1107, "flow distance": 40473.000000, "drainage area": 370550000.000000, "m_chi": 1.406800, "b_chi": 1003.100000 }, "geometry": { "type": "Point", "coordinates": [ 79.098266, 30.536214 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.535400, "longitude": 79.097357, "chi": 74.023000, "elevation": 1107, "flow distance": 40347.000000, "drainage area": 370570000.000000, "m_chi": 0.154880, "b_chi": 1095.600000 }, "geometry": { "type": "Point", "coordinates": [ 79.097357, 30.535400 ] } }
+  ,
+    { "type": "Feature", "properties": { "latitude": 30.535387, "longitude": 79.096431, "chi": 73.746000, "elevation": 1107, "flow distance": 40258.000000, "drainage area": 370980000.000000, "m_chi": 1.056500, "b_chi": 1028.200000 }, "geometry": { "type": "Point", "coordinates": [ 79.096431, 30.535387 ] } }
+
+  ]
+}

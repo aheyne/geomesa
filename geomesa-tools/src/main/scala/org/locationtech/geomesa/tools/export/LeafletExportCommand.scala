@@ -60,7 +60,7 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommand[DS] {
     if(! file.isDirectory) {
       throw new RuntimeException("Output destination must not exist or must be a directory.")
     } else {
-      val dataFile: File = new File(file.getAbsolutePath + "/data.geojson")
+      val dataFile: File = new File(file.getAbsolutePath + "/data.js")
       val htmlFile: File = new File(file.getAbsolutePath + "/index.html")
       (dataFile, htmlFile)
     }
