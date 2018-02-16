@@ -54,29 +54,21 @@
     <div id="mapid"></div>
 <script>
 
-    var geojsonLayer = new L.GeoJSON.AJAX("data.json");
+    var mymap = L.map('mapid');
 
-    // Initiate the map
-    //var mymap = L.map('mapid').setView([30.4, 79.1], 10);
-    var mymap = L.map('mapid').fitBounds(geojsonLayer.getBounds());
+    L.Util.ajax("data.json").then(function (d) {
+            var geojsonLayer = L.geoJSON(d);
+            mymap.fitBounds(geojsonLayer.getBounds());
+            geojsonLayer.addTo(mymap);
+    });
 
-    geojsonLayer.addTo(mymap);
-
-    // This adds the tiles
-    //L.tileLayer(
-    //    'https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png', {
-    //    attribution: 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest</a>, Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-    //    maxZoom: 18,
-    //    }).addTo(mymap);
     new L.TileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
         subdomains: 'abcd',
         maxZoom: 19
     }).addTo(mymap);
 
-    // here I add a scale bar
-    L.control.scale({position: 'topright', imperial: false})
-        .addTo(mymap);
+    L.control.scale().addTo(mymap);
 
     // control that shows chi info on hover
     var info = L.control();
@@ -91,35 +83,9 @@
     // the properties field from the json
     info.update = function (props) {
         this._div.innerHTML = '<h4>Chi slope</h4>' +  (props ?
-            '<b>' + props.chi + ' dimensionless'
+            '<b>' + props.id + ' dimensionless'
             : 'Hover over a dot');
     };
-
-
-    // get color depending on population density value
-    // These values come from colorbrewer
-    function getColor(d) {
-        return d > 50  ? '#800026' :
-               d > 25  ? '#BD0026' :
-               d > 10  ? '#E31A1C' :
-               d > 5   ? '#FC4E2A' :
-               d > 2.5 ? '#FD8D3C' :
-               d > 1   ? '#FEB24C' :
-               d > 0.5 ? '#FED976' :
-                         '#FFEDA0';
-    }
-
-    // This colour the feature by the chi value
-    function style(feature) {
-        return {
-            weight: 2,
-            opacity: 1,
-            color: 'white',
-            dashArray: '3',
-            fillOpacity: 0.7,
-            fillColor: getColor(feature.properties.chi)
-        };
-    }
 
     // This sets the feature
     function highlightFeature(e) {
@@ -161,11 +127,6 @@
         });
     }
 
-    // This loads the data
-    //geojsonLayer({
-    //	style: style,
-    //	onEachFeature: onEachFeature
-    //}).addTo(map);
     // Create a legend
     var legend = L.control({position: 'bottomright'});
     // here is all the data for the legend
