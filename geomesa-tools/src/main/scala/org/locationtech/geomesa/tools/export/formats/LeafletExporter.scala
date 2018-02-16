@@ -30,10 +30,7 @@ class LeafletExporter(dataWriter: Writer, htmlFile: File) extends FeatureExporte
 
   private val visitor = new BoundsVisitor
 
-  override def start(sft: SimpleFeatureType): Unit = {
-    // We store the data in a javascript variable.
-    dataWriter.write("""{type:"FeatureCollection",features:[""")
-  }
+  override def start(sft: SimpleFeatureType): Unit = dataWriter.write("""{"type:"FeatureCollection","features":[""")
 
   override def export(features: Iterator[SimpleFeature]): Option[Long] = {
     var count = 0L

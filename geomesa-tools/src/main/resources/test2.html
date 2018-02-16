@@ -51,8 +51,13 @@
 
 
 <script>
+
+
+		var geojsonLayer = new L.GeoJSON.AJAX("test_chi.json");
+
         // Initiate the map
-		var mymap = L.map('mapid').setView([30.4, 79.1], 10);
+		//var mymap = L.map('mapid').setView([30.4, 79.1], 10);
+		var mymap = L.map('mapid').fitBounds(geojsonLayer.getBounds());
         // This adds the tiles
         L.tileLayer(
             'https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png', {
@@ -132,9 +137,6 @@
 			geojson.resetStyle(e.target);
 			info.update();
 		}
-        
-		var geojsonLayer = new L.GeoJSON.AJAX("data.json");
-        
         geojsonLayer.addTo(mymap);
  
         geojson.eachLayer(function (layer) {
