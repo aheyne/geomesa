@@ -59,7 +59,7 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommandInterface[DS] {
       exporter.start(features.getSchema)
       val res = export(exporter, features)
 
-      // Use println to ensure we write the destination to standard out
+      // Use println to ensure we write the destination to stdout
       // so the bash wrapper can pick it up.
       System.out.println("Successfully wrote Leaflet html to: " + indexFile.toString)
 

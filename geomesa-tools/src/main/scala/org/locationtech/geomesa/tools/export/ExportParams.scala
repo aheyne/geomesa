@@ -14,7 +14,7 @@ import com.beust.jcommander.Parameter
 import org.locationtech.geomesa.tools.utils.DataFormats
 import org.locationtech.geomesa.tools.utils.DataFormats.DataFormat
 import org.locationtech.geomesa.tools.utils.ParameterConverters.DataFormatConverter
-import org.locationtech.geomesa.tools.{OptionalCqlFilterParam, QueryHintsParams}
+import org.locationtech.geomesa.tools.{OptionalCqlFilterParam, OptionalIndexParam, QueryHintsParams}
 
 trait MaxFeaturesParam {
   @Parameter(names = Array("-m", "--max-features"), description = "Maximum number of features to return. default: Unlimited")

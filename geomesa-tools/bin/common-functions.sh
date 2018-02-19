@@ -343,10 +343,11 @@ function geomesaScalaConsole() {
 }
 
 function launchLeafletMap() {
-  # Attempt to launch the leaflet map after the command runs.
+  # Attempt to launch the leaflet map after the command successfully runs.
   res=($@)
   url="${res[${#res[@]}-1]}" # get the last item in the array
   if [[ -f $url ]]; then
+    echo "${res[@]}"
     if [[ -x $BROWSER ]]; then
       exec "${BROWSER}" "${url}"
     elif which xdg-open > /dev/null; then
