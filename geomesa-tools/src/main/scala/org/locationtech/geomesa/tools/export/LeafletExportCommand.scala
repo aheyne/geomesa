@@ -43,11 +43,12 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommandInterface[DS] {
             "that all arguments are correct", e)
     }
 
+    val GEOMESA_HOME = SystemProperty("geomesa.home")
+    val root = new File(GEOMESA_HOME.getOrElse("/tmp"))
+
     val dest: File = Option(params.file) match {
       case Some(file) => checkDestination(file)
       case None =>
-        val GEOMESA_HOME = SystemProperty("geomesa.home")
-        val root = new File(GEOMESA_HOME.getOrElse("/tmp"))
         checkDestination(new File(root, "leaflet"))
     }
     val indexFile: File = new File(dest, "index.html")
@@ -56,7 +57,13 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommandInterface[DS] {
     try {
       user.info("Writing output to " + indexFile.toString)
       exporter.start(features.getSchema)
-      export(exporter, features)
+      val res = export(exporter, features)
+
+      // Use println to ensure we write the destination to standard out
+      // so the bash wrapper can pick it up.
+      System.out.println("Successfully wrote Leaflet html to: " + indexFile.toString)
+
+      res
     } finally {
       CloseWithLogging(exporter)
     }
