@@ -12,10 +12,11 @@ import java.io._
 
 import com.typesafe.scalalogging.LazyLogging
 import org.geotools.geojson.feature.FeatureJSON
+import org.locationtech.geomesa.tools.Command.user
 import org.locationtech.geomesa.tools.export.ExportCommandInterface
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
-import org.locationtech.geomesa.tools.Command.user
 
+import scala.collection.JavaConversions._
 import scala.io.Source
 
 class LeafletExporter(indexFile: File) extends FeatureExporter with LazyLogging {
@@ -23,6 +24,7 @@ class LeafletExporter(indexFile: File) extends FeatureExporter with LazyLogging 
   private val json = new FeatureJSON()
 
   private var first = true
+  private var sft: SimpleFeatureType = _
 
   val (indexHead, indexTail): (String, String) = {
     val indexStream: InputStream = getClass.getClassLoader.getResourceAsStream("leaflet/index.html")
@@ -40,13 +42,14 @@ class LeafletExporter(indexFile: File) extends FeatureExporter with LazyLogging 
 
   override def start(sft: SimpleFeatureType): Unit = {
     indexWriter.write(indexHead)
-    indexWriter.write("""{"type":"FeatureCollection","features":[""")
+    indexWriter.write("""var data = {"type":"FeatureCollection","features":[""")
   }
 
   override def export(features: Iterator[SimpleFeature]): Option[Long] = {
     var count = 0L
     features.foreach { feature =>
       if (first) {
+        sft = feature.getFeatureType
         first = false
       } else {
         indexWriter.write(",")
@@ -61,8 +64,25 @@ class LeafletExporter(indexFile: File) extends FeatureExporter with LazyLogging 
   }
 
   override def close(): Unit  = {
-    indexWriter.write("]}")
+    indexWriter.write("]};\n\n")
+    indexWriter.write(getFeatureInfo)
     indexWriter.write(indexTail)
     indexWriter.close()
+  }
+
+  private def getFeatureInfo: String = {
+    val str: StringBuilder = new StringBuilder()
+    str.append("    function onEachFeature(feature, layer) {\n")
+    Option(sft) match {
+      case None => str.append("    }").toString
+      case Some(_) =>
+        str.append("""        layer.bindPopup("ID: " + feature.id + "<br>" + """)
+        str.append(""""GEOM: " + feature.geometry.type + "[" + feature.geometry.coordinates + "]<br>" + """)
+        str.append(sft.getAttributeDescriptors.filter(_.getLocalName != "geom") .map(attr =>
+          s""""${attr.getLocalName}: " + feature.properties.${attr.getLocalName}"""
+        ).mkString(""" + "<br>" + """))
+        str.append(");\n    }")
+        str.toString()
+    }
   }
 }

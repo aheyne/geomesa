@@ -25,10 +25,25 @@
 <div id="mapid"></div>
 <script>
 
-    var data = |data|; // Variable used to split file in order to inject data.
+    // Marker used to split file in order to inject data and generated code.
+    |data|
+
+    var geojsonMarkerOptions = {
+        radius: 8,
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+    }
 
     var geomesaMap = L.map('mapid');
-    var geojsonLayer = L.geoJSON(data);
+    var geojsonLayer = L.geoJSON(data, {
+        pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng, geojsonMarkerOptions);
+        },
+        onEachFeature: onEachFeature
+    });
     geomesaMap.fitBounds(geojsonLayer.getBounds());
     geojsonLayer.addTo(geomesaMap);
 

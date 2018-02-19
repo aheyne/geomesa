@@ -111,8 +111,7 @@ else
       shift 1
     fi
     if [[ $1 == export-leaflet ]]; then
-      res=$(java ${CUSTOM_JAVA_OPTS} ${GEOMESA_OPTS} -cp ${CLASSPATH} org.locationtech.geomesa.fs.tools.FsRunner "$@")
-      launchLeafletMap $res
+      launchLeafletMap $(java ${CUSTOM_JAVA_OPTS} ${GEOMESA_OPTS} -cp ${CLASSPATH} org.locationtech.geomesa.fs.tools.FsRunner "$@")
     else
       java ${CUSTOM_JAVA_OPTS} ${GEOMESA_OPTS} -cp ${CLASSPATH} org.locationtech.geomesa.fs.tools.FsRunner "$@"
     fi
