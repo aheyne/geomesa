@@ -98,8 +98,8 @@ object ConvertCommand extends LazyLogging {
   def getExporter(params: ConvertParameters, features: => Iterator[SimpleFeature]): FeatureExporter = {
     import org.locationtech.geomesa.index.conf.QueryHints.RichHints
 
-    lazy val outputStream: OutputStream = ExportCommand.createOutputStream(params.file, params.gzip)
-    lazy val writer: Writer = ExportCommand.getWriter(params)
+    lazy val outputStream: OutputStream = ExportCommandInterface.createOutputStream(params.file, params.gzip)
+    lazy val writer: Writer = ExportCommandInterface.getWriter(params.file, params.gzip)
     lazy val avroCompression = Option(params.gzip).map(_.toInt).getOrElse(Deflater.DEFAULT_COMPRESSION)
     lazy val hints = {
       val q = new Query("")

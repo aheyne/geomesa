@@ -13,24 +13,27 @@ import java.io._
 import org.geotools.data.DataStore
 import org.locationtech.geomesa.tools.Command
 import org.locationtech.geomesa.tools.export.formats.LeafletExporter
+import org.locationtech.geomesa.utils.conf.GeoMesaSystemProperties.SystemProperty
 import org.locationtech.geomesa.utils.io.CloseWithLogging
 
 import scala.util.control.NonFatal
 
-trait LeafletExportCommand[DS <: DataStore] extends ExportCommand[DS] {
+trait LeafletExportCommand[DS <: DataStore] extends ExportCommandInterface[DS] {
+
+  import LeafletExportCommand._
+  import org.locationtech.geomesa.tools.export.ExportCommandInterface._
+  import Command.user
 
   override val name = "export-leaflet"
   override def params: LeafletExportParams
 
   override def execute(): Unit = {
     profile(withDataStore(export)) { (count, time) =>
-      Command.user.info(s"Feature export complete to ${Option(params.file).map(_.getPath).getOrElse("standard out")} " +
-          s"in ${time}ms${count.map(" for " + _ + " features").getOrElse("")}")
+      Command.user.info(s"Leaflet export completed in ${time}ms${count.map(" for " + _ + " features").getOrElse("")}")
     }
   }
 
-  override protected def export(ds: DS): Option[Long] = {
-    import ExportCommand._
+  protected def export(ds: DS): Option[Long] = {
 
     val (query, _) = createQuery(getSchema(ds), None, params)
 
@@ -40,29 +43,37 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommand[DS] {
             "that all arguments are correct", e)
     }
 
-    val (dataFile, htmlFile) = getDestinations(params.file)
-    val exporter = new LeafletExporter(getWriter(dataFile), htmlFile)
+    val dest: File = Option(params.file) match {
+      case Some(file) => checkDestination(file)
+      case None =>
+        val GEOMESA_HOME = SystemProperty("geomesa.home")
+        val root = new File(GEOMESA_HOME.getOrElse("/tmp"))
+        checkDestination(new File(root, "leaflet"))
+    }
+    val indexFile: File = new File(dest, "index.html")
+    val exporter = new LeafletExporter(indexFile)
 
     try {
+      user.info("Writing output to " + indexFile.toString)
       exporter.start(features.getSchema)
       export(exporter, features)
     } finally {
       CloseWithLogging(exporter)
     }
   }
+}
 
-  private def getDestinations(file: File): (File, File) = {
-    if (! file.exists()) {
-      try { file.mkdir() } catch {
-        case e: SecurityException => throw new RuntimeException("Unable to create output destination.", e)
+object LeafletExportCommand {
+
+  def checkDestination(file: File): File = {
+    try {
+      file.mkdir()
+      if (! file.isDirectory) {
+        throw new RuntimeException(s"Output destination ${file.toString} must not exist or must be a directory.")
       }
-    }
-    if(! file.isDirectory) {
-      throw new RuntimeException("Output destination must not exist or must be a directory.")
-    } else {
-      val dataFile: File = new File(file.getAbsolutePath + "/data.js")
-      val htmlFile: File = new File(file.getAbsolutePath + "/index.html")
-      (dataFile, htmlFile)
+      file
+    } catch {
+      case e: SecurityException => throw new RuntimeException("Unable to create output destination, check permissions.", e)
     }
   }
 }

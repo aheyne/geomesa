@@ -16,7 +16,7 @@ import org.locationtech.geomesa.tools.utils.DataFormats.DataFormat
 import org.locationtech.geomesa.tools.utils.ParameterConverters.DataFormatConverter
 import org.locationtech.geomesa.tools.{OptionalCqlFilterParam, QueryHintsParams}
 
-trait LimitFeaturesParam {
+trait MaxFeaturesParam {
   @Parameter(names = Array("-m", "--max-features"), description = "Maximum number of features to return. default: Unlimited")
   var maxFeatures: Integer = _
 }
@@ -26,9 +26,9 @@ trait AttributeParam {
   var attributes: java.util.List[String] = _
 }
 
-trait QueryParams extends LimitFeaturesParam with AttributeParam with OptionalCqlFilterParam with QueryHintsParams
+trait QueryParams extends MaxFeaturesParam with AttributeParam with OptionalCqlFilterParam with QueryHintsParams
 
-trait FileExportParams extends LimitFeaturesParam with OptionalCqlFilterParam with QueryHintsParams {
+trait FileExportParams extends MaxFeaturesParam with OptionalCqlFilterParam with QueryHintsParams {
   @Parameter(names = Array("-o", "--output"), description = "Output to a file instead of std out")
   var file: File = _
 
@@ -45,6 +45,6 @@ trait FileExportParams extends LimitFeaturesParam with OptionalCqlFilterParam wi
 trait ExportParams extends FileExportParams with QueryParams
 
 trait LeafletExportParams extends QueryParams {
-  @Parameter(names = Array("-o", "--output"), description = "Output directory to store files.")
+  @Parameter(names = Array("-o", "--output"), description = "(Optional) Output directory to store files.")
   var file: File = _
 }

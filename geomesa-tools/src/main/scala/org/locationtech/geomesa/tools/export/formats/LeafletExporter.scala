@@ -9,82 +9,60 @@
 package org.locationtech.geomesa.tools.export.formats
 
 import java.io._
-import java.nio.file.{Files, StandardCopyOption}
-import javax.xml.parsers.DocumentBuilderFactory
 
 import com.typesafe.scalalogging.LazyLogging
-import org.geotools.feature.visitor.{BoundsVisitor, CalcResult}
 import org.geotools.geojson.feature.FeatureJSON
-import org.geotools.geometry.jts.ReferencedEnvelope
-import org.geotools.referencing.CRS
+import org.locationtech.geomesa.tools.export.ExportCommandInterface
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
-import org.w3c.dom.Document
+import org.locationtech.geomesa.tools.Command.user
 
-import scala.io.{Codec, Source}
+import scala.io.Source
 
-class LeafletExporter(dataWriter: Writer, htmlFile: File) extends FeatureExporter with LazyLogging {
+class LeafletExporter(indexFile: File) extends FeatureExporter with LazyLogging {
 
   private val json = new FeatureJSON()
 
   private var first = true
 
-  private val visitor = new BoundsVisitor
+  val (indexHead, indexTail): (String, String) = {
+    val indexStream: InputStream = getClass.getClassLoader.getResourceAsStream("leaflet/index.html")
+    try {
+      val indexString: String = Source.fromInputStream(indexStream).mkString
+      val indexArray: Array[String] = indexString.split("\\|data\\|")
+      require(indexArray.length == 2, "Malformed index.html unable to render map.")
+      (indexArray(0), indexArray(1))
+    } finally {
+      indexStream.close()
+    }
+  }
 
-  override def start(sft: SimpleFeatureType): Unit = dataWriter.write("""{"type:"FeatureCollection","features":[""")
+  val indexWriter: Writer = ExportCommandInterface.getWriter(indexFile, null)
+
+  override def start(sft: SimpleFeatureType): Unit = {
+    indexWriter.write(indexHead)
+    indexWriter.write("""{"type":"FeatureCollection","features":[""")
+  }
 
   override def export(features: Iterator[SimpleFeature]): Option[Long] = {
     var count = 0L
     features.foreach { feature =>
-      visitor.visit(feature)
       if (first) {
         first = false
       } else {
-        dataWriter.write(",")
+        indexWriter.write(",")
       }
-      json.writeFeature(feature, dataWriter)
+      json.writeFeature(feature, indexWriter)
       count += 1L
     }
-    dataWriter.flush()
+    indexWriter.flush()
+    if (count < 1) user.warn("No features were exported. This will cause the map to fail to render correctly.")
+    if (count > 500) user.warn("Large number of features were exported. This can cause performance issues. For large numbers of points try using the flag --heatmap or using GeoServer to render the map.")
     Some(count)
   }
 
   override def close(): Unit  = {
-    dataWriter.write("]}\n")
-    dataWriter.close()
-
-    logger.info("Writing Leaflet HTML")
-    Files.copy(getClass.getResourceAsStream("leafletIndex.html"), htmlFile.toPath, StandardCopyOption.REPLACE_EXISTING)
-
-    val htmlRaw = Source.fromInputStream(getClass.getResourceAsStream("leafletIndex.html"), Codec.UTF8.toString()).mkString
-
-    val visitorResult: CalcResult = visitor.getResult
-    val envelope: ReferencedEnvelope = visitorResult.getValue.asInstanceOf[ReferencedEnvelope]
-    val centerX: Double = envelope.getMedian(0)
-    val centerY: Double = envelope.getMedian(1)
-    htmlRaw.replace("|mapCenter.x|", centerX.toString).replace("|mapCenter.y|", centerY.toString)
-
-    val bbox = envelope.toBounds(CRS.decode("EPSG:4326"))
-    val maxDimention = math.max(bbox.getWidth, bbox.getHeight)
-
-    // calculate zoom
-
-
-    // replace zoom
-
-    // inject data file location
-
-    // write html
-
-    // from bash detect default browser and auto launch or report location of index
-
-    val factory = DocumentBuilderFactory.newInstance
-    val builder = factory.newDocumentBuilder
-    val htmlDoc: Document = builder.parse(getClass.getResourceAsStream("leafletIndex.html"))
-    htmlDoc.
-
-    File html = new File(getClass.getResource("leafletIndex.html"))
-
+    indexWriter.write("]};\n")
+    indexWriter.write(indexTail)
+    indexWriter.close()
   }
-
-
 }
