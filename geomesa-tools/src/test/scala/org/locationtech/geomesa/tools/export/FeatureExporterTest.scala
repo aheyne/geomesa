@@ -18,7 +18,6 @@ import org.junit.runner.RunWith
 import org.locationtech.geomesa.features.ScalaSimpleFeatureFactory
 import org.locationtech.geomesa.features.avro.AvroDataFileReader
 import org.locationtech.geomesa.tools.export.ExportCommand.ExportAttributes
-import org.locationtech.geomesa.tools.export.FileExportCommand.ExportAttributes
 import org.locationtech.geomesa.tools.export.formats.{AvroExporter, DelimitedExporter, ShapefileExporter}
 import org.locationtech.geomesa.tools.utils.DataFormats
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes

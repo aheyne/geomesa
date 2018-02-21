@@ -122,7 +122,7 @@ class KafkaFileExportCommand extends FileExportCommand[KafkaDataStore] with Kafk
 object KafkaFileExportCommand {
 
   @Parameters(commandDescription = "Export features from a GeoMesa Kafka topic")
-  class KafkaFileExportParameters extends ConsumerDataStoreParams with RequiredTypeNameParam with FileExportParams
+  class KafkaFileExportParameters extends FileExportParams with RequiredTypeNameParam with ConsumerDataStoreParams
 
   class ExportFeatureListener(sft: SimpleFeatureType,
                               filter: Option[Filter],

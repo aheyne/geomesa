@@ -33,7 +33,7 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommand[DS] {
   override def execute(): Unit = {
     profile(withDataStore(export)) { (count, time) =>
       Command.user.info(s"Leaflet export completed in ${time}ms${count.map(" for " + _ + " features").getOrElse("")}")
-      if (count.getOrElse(0) < 1) user.warn("No features were exported. " +
+      if ((count.getOrElse(0): Long) < 1) user.warn("No features were exported. " +
         "This will cause the map to fail to render correctly.")
     }
   }
