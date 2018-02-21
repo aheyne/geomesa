@@ -47,7 +47,7 @@ object ExportCommandInterface extends LazyLogging {
 
   def createQuery(toSft: => SimpleFeatureType,
                   fmt: Option[DataFormat],
-                  params: QueryParams): (Query, Option[ExportAttributes]) = {
+                  params: ExportQueryParams): (Query, Option[ExportAttributes]) = {
     val typeName = Option(params).collect { case p: TypeNameParam => p.featureName }.orNull
     val filter = Option(params.cqlFilter).getOrElse(Filter.INCLUDE)
     lazy val sft = toSft // only evaluate it once

@@ -58,8 +58,6 @@ class LeafletExporter(indexFile: File) extends FeatureExporter with LazyLogging 
       count += 1L
     }
     indexWriter.flush()
-    if (count < 1) user.warn("No features were exported. This will cause the map to fail to render correctly.")
-    if (count > 10000) user.warn("A large number of features were exported. This can cause performance issues. For large numbers of points try using the flag -m to limit features or use GeoServer to render the map.")
     Some(count)
   }
 

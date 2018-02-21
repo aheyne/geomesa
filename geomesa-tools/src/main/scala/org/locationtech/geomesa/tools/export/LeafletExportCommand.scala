@@ -9,6 +9,7 @@
 package org.locationtech.geomesa.tools.export
 
 import java.io._
+import java.util.regex.Pattern
 
 import org.geotools.data.DataStore
 import org.locationtech.geomesa.tools.Command
@@ -16,7 +17,9 @@ import org.locationtech.geomesa.tools.export.formats.LeafletExporter
 import org.locationtech.geomesa.utils.conf.GeoMesaSystemProperties.SystemProperty
 import org.locationtech.geomesa.utils.io.CloseWithLogging
 
+import util.matching.Regex
 import scala.util.control.NonFatal
+import scala.io.StdIn.readLine
 
 trait LeafletExportCommand[DS <: DataStore] extends ExportCommandInterface[DS] {
 
@@ -30,6 +33,7 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommandInterface[DS] {
   override def execute(): Unit = {
     profile(withDataStore(export)) { (count, time) =>
       Command.user.info(s"Leaflet export completed in ${time}ms${count.map(" for " + _ + " features").getOrElse("")}")
+      if (count.getOrElse(0) < 1) user.warn("No features were exported. This will cause the map to fail to render correctly.")
     }
   }
 
@@ -41,6 +45,17 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommandInterface[DS] {
       case NonFatal(e) =>
         throw new RuntimeException("Could not execute export query. Please ensure " +
             "that all arguments are correct", e)
+    }
+
+    Option(params.maxFeatures) match {
+      case Some(limit) =>
+        if (limit > 10000) {
+          user.warn("A large number of features might be exported. This can cause performance issues. For large numbers of features it is recommended to use GeoServer to render the map.")
+          val response = readLine("Do you want to continue? [y/N]")
+          if (Option(response).getOrElse("n").substring(0, 1).matches("^[nN]")) {
+            sys.exit(1)
+          }
+        }
     }
 
     val GEOMESA_HOME = SystemProperty("geomesa.home")

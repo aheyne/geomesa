@@ -110,11 +110,12 @@ else
       GEOMESA_OPTS="$GEOMESA_OPTS $GEOMESA_DEBUG_OPTS"
       shift 1
     fi
+    cmd="java ${CUSTOM_JAVA_OPTS} ${GEOMESA_OPTS} -cp ${CLASSPATH} org.locationtech.geomesa.fs.tools.FsRunner ${@}"
     if [[ $1 == export-leaflet ]]; then
-      res=$(java ${CUSTOM_JAVA_OPTS} ${GEOMESA_OPTS} -cp ${CLASSPATH} org.locationtech.geomesa.fs.tools.FsRunner "$@")
-      [[ $? == 0 ]] && launchLeafletMap $res
+      res=$(eval $cmd)
+      [[ $? == 0 ]] && launchLeafletMap $res || echo "${res}"
     else
-      java ${CUSTOM_JAVA_OPTS} ${GEOMESA_OPTS} -cp ${CLASSPATH} org.locationtech.geomesa.fs.tools.FsRunner "$@"
+      eval $cmd
     fi
   fi
 fi
