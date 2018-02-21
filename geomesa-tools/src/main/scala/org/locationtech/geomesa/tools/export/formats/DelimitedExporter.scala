@@ -15,7 +15,7 @@ import java.util.Date
 import com.typesafe.scalalogging.LazyLogging
 import com.vividsolutions.jts.geom.Geometry
 import org.apache.commons.csv.{CSVFormat, QuoteMode}
-import org.locationtech.geomesa.tools.export.ExportCommandInterface.ExportAttributes
+import org.locationtech.geomesa.tools.export.ExportCommand.ExportAttributes
 import org.locationtech.geomesa.tools.utils.DataFormats
 import org.locationtech.geomesa.tools.utils.DataFormats._
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes

@@ -16,9 +16,6 @@ fi
 # Load common functions and setup
 . "${%%gmtools.dist.name%%_HOME}"/bin/common-functions.sh
 
-# Add home directory now that GEOMESA_OPTS is configured
-GEOMESA_OPTS="${GEOMESA_OPTS} -Dgeomesa.home=${%%gmtools.dist.name%%_HOME}"
-
 # HADOOP paths, user can hard set these in geomesa-env, or rely on this script to find set them via HADOOP_HOME
 if [[ -n "$HADOOP_HOME" ]]; then
   if [[ -z "$HADOOP_CONF_DIR" && -d "${HADOOP_HOME}/etc/hadoop" ]]; then

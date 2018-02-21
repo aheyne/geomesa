@@ -26,8 +26,6 @@ object GeoMesaSystemProperties extends LazyLogging {
       case None => fromSysProps.getOrElse(default)
     }
 
-    def getOrElse[B >: String](default: => B): B = option.getOrElse(default)
-
     def option: Option[String] = Option(get)
 
     def toDuration: Option[Duration] = option.flatMap { value =>

@@ -21,10 +21,10 @@ import util.matching.Regex
 import scala.util.control.NonFatal
 import scala.io.StdIn.readLine
 
-trait LeafletExportCommand[DS <: DataStore] extends ExportCommandInterface[DS] {
+trait LeafletExportCommand[DS <: DataStore] extends ExportCommand[DS] {
 
   import LeafletExportCommand._
-  import org.locationtech.geomesa.tools.export.ExportCommandInterface._
+  import org.locationtech.geomesa.tools.export.ExportCommand._
   import Command.user
 
   override val name = "export-leaflet"
@@ -33,7 +33,8 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommandInterface[DS] {
   override def execute(): Unit = {
     profile(withDataStore(export)) { (count, time) =>
       Command.user.info(s"Leaflet export completed in ${time}ms${count.map(" for " + _ + " features").getOrElse("")}")
-      if (count.getOrElse(0) < 1) user.warn("No features were exported. This will cause the map to fail to render correctly.")
+      if (count.getOrElse(0) < 1) user.warn("No features were exported. " +
+        "This will cause the map to fail to render correctly.")
     }
   }
 
@@ -42,15 +43,15 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommandInterface[DS] {
     val (query, _) = createQuery(getSchema(ds), None, params)
 
     val features = try { getFeatures(ds, query) } catch {
-      case NonFatal(e) =>
-        throw new RuntimeException("Could not execute export query. Please ensure " +
-            "that all arguments are correct", e)
+      case NonFatal(e) => throw new RuntimeException("Could not execute export query. Please ensure that all arguments are correct", e)
     }
 
     Option(params.maxFeatures) match {
       case Some(limit) =>
         if (limit > 10000) {
-          user.warn("A large number of features might be exported. This can cause performance issues. For large numbers of features it is recommended to use GeoServer to render the map.")
+          user.warn("A large number of features might be exported. This can cause performance " +
+            "issues. For large numbers of features it is recommended to use GeoServer to render " +
+            "the map.")
           val response = readLine("Do you want to continue? [y/N]")
           if (Option(response).getOrElse("n").substring(0, 1).matches("^[nN]")) {
             sys.exit(1)
@@ -58,13 +59,12 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommandInterface[DS] {
         }
     }
 
-    val GEOMESA_HOME = SystemProperty("geomesa.home")
-    val root = new File(GEOMESA_HOME.getOrElse("/tmp"))
+    val GEOMESA_HOME = SystemProperty("geomesa.home", "/tmp")
+    val root = new File(GEOMESA_HOME.get)
 
     val dest: File = Option(params.file) match {
       case Some(file) => checkDestination(file)
-      case None =>
-        checkDestination(new File(root, "leaflet"))
+      case None       => checkDestination(new File(root, "leaflet"))
     }
     val indexFile: File = new File(dest, "index.html")
     val exporter = new LeafletExporter(indexFile)
@@ -74,8 +74,7 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommandInterface[DS] {
       exporter.start(features.getSchema)
       val res = export(exporter, features)
 
-      // Use println to ensure we write the destination to stdout
-      // so the bash wrapper can pick it up.
+      // Use println to ensure we write the destination to stdout so the bash wrapper can pick it up.
       System.out.println("Successfully wrote Leaflet html to: " + indexFile.toString)
 
       res

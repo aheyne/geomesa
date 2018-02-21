@@ -13,7 +13,7 @@ import java.io._
 import com.typesafe.scalalogging.LazyLogging
 import org.geotools.geojson.feature.FeatureJSON
 import org.locationtech.geomesa.tools.Command.user
-import org.locationtech.geomesa.tools.export.ExportCommandInterface
+import org.locationtech.geomesa.tools.export.ExportCommand
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
 import scala.collection.JavaConversions._
@@ -38,7 +38,7 @@ class LeafletExporter(indexFile: File) extends FeatureExporter with LazyLogging 
     }
   }
 
-  val indexWriter: Writer = ExportCommandInterface.getWriter(indexFile, null)
+  val indexWriter: Writer = ExportCommand.getWriter(indexFile, null)
 
   override def start(sft: SimpleFeatureType): Unit = {
     indexWriter.write(indexHead)
@@ -72,7 +72,7 @@ class LeafletExporter(indexFile: File) extends FeatureExporter with LazyLogging 
     val str: StringBuilder = new StringBuilder()
     str.append("    function onEachFeature(feature, layer) {\n")
     Option(sft) match {
-      case None => str.append("    }").toString
+      case None    => str.append("    }").toString
       case Some(_) =>
         str.append("""        layer.bindPopup("ID: " + feature.id + "<br>" + """)
         str.append(""""GEOM: " + feature.geometry.type + "[" + feature.geometry.coordinates + "]<br>" + """)

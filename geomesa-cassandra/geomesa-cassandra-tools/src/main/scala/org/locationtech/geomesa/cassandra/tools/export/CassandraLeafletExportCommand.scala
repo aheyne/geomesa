@@ -18,6 +18,6 @@ class CassandraLeafletExportCommand extends LeafletExportCommand[CassandraDataSt
   override val params = new CassandraLeafletExportParams
 }
 
-@Parameters(commandDescription = "Export features from a GeoMesa data store")
+@Parameters(commandDescription = "Export features from a GeoMesa data store and render them in Leaflet")
 class CassandraLeafletExportParams extends LeafletExportParams with CassandraConnectionParams
     with CatalogParam with RequiredTypeNameParam with OptionalIndexParam

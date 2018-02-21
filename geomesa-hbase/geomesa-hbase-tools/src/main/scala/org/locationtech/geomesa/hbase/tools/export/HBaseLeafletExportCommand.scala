@@ -21,7 +21,7 @@ class HBaseLeafletExportCommand extends LeafletExportCommand[HBaseDataStore] wit
 }
 
 object HBaseLeafletExportCommand {
-  @Parameters(commandDescription = "Export features from a GeoMesa data store")
+  @Parameters(commandDescription = "Export features from a GeoMesa data store and render them in Leaflet")
   class HBaseLeafletExportParams extends LeafletExportParams with CatalogParam with RequiredTypeNameParam
       with OptionalIndexParam with ToggleRemoteFilterParam
 }

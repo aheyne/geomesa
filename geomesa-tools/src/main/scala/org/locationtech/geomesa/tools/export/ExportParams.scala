@@ -21,9 +21,16 @@ trait AttributeParam {
   var attributes: java.util.List[String] = _
 }
 
-trait ExportQueryParams extends AttributeParam with OptionalCqlFilterParam with QueryHintsParams
+// This provides evidence for ExportQueryParams that this variable will exist.
+// We override this through inheritance in FileExportParams and directly in
+// LeafletExportCommands so we can provided different defaults and messages.
+trait MaxFeaturesParam {
+  var maxFeatures: Integer = _
+}
 
-trait FileExportParams extends OptionalCqlFilterParam with QueryHintsParams {
+trait ExportQueryParams extends AttributeParam with OptionalCqlFilterParam with QueryHintsParams with MaxFeaturesParam
+
+trait FilePropertyParams extends OptionalCqlFilterParam with QueryHintsParams {
   @Parameter(names = Array("-o", "--output"), description = "Output to a file instead of std out")
   var file: File = _
 
@@ -40,12 +47,12 @@ trait FileExportParams extends OptionalCqlFilterParam with QueryHintsParams {
   var maxFeatures: Integer = _
 }
 
-trait ExportParams extends FileExportParams with ExportQueryParams
+trait FileExportParams extends FilePropertyParams with ExportQueryParams
 
 trait LeafletExportParams extends ExportQueryParams {
   @Parameter(names = Array("-o", "--output"), description = "(Optional) Output directory to store files.")
   var file: File = _
 
   @Parameter(names = Array("-m", "--max-features"), description = "Maximum number of features to return. A high limit will cause performance issues, use this parameter with caution. default: 10000")
-  var maxFeatures: Integer = 10000
+  override var maxFeatures: Integer = 10000
 }
