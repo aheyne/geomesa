@@ -58,7 +58,7 @@ trait FileExportCommand[DS <: DataStore] extends ExportCommand[DS] {
       case Arrow          => new ArrowExporter(query.getHints, createOutputStream(params.file, params.gzip), ArrowExporter.queryDictionaries(ds, query))
       case Bin            => new BinExporter(query.getHints, createOutputStream(params.file, params.gzip))
       case Null           => NullExporter
-      // shouldn't happen unless someone adds a new format and doesn't implement it here
+      // Shouldn't happen unless someone adds a new format and doesn't implement it here
       case _              => throw new UnsupportedOperationException(s"Format ${params.outputFormat} can't be exported")
     }
 

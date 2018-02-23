@@ -12,14 +12,13 @@ import java.io._
 
 import com.typesafe.scalalogging.LazyLogging
 import org.geotools.geojson.feature.FeatureJSON
-import org.locationtech.geomesa.tools.Command.user
 import org.locationtech.geomesa.tools.export.ExportCommand
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
 import scala.collection.JavaConversions._
 import scala.io.Source
 
-class LeafletExporter(indexFile: File) extends FeatureExporter with LazyLogging {
+class LeafletMapExporter(indexFile: File) extends FeatureExporter with LazyLogging {
 
   private val json = new FeatureJSON()
 
@@ -27,7 +26,7 @@ class LeafletExporter(indexFile: File) extends FeatureExporter with LazyLogging 
   private var sft: SimpleFeatureType = _
 
   val (indexHead, indexTail): (String, String) = {
-    val indexStream: InputStream = getClass.getClassLoader.getResourceAsStream("leaflet/index.html")
+    val indexStream: InputStream = getClass.getClassLoader.getResourceAsStream("leaflet/featuresIndex.html")
     try {
       val indexString: String = Source.fromInputStream(indexStream).mkString
       val indexArray: Array[String] = indexString.split("\\|data\\|")
