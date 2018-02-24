@@ -137,6 +137,8 @@ Argument                 Description
 
 This command is similar to the :ref:`cli_export` command, however, this command draws the features on a leaflet map and, if possible, opens the map in your browser. This allows you to view data stored in GeoMesa without requiring the use of GeoServer or other 3rd party mapping tools.
 
+The generated map provides both a feature and heatmap. The feature map provides the ability to click a point in order to view the attributes of that feature.
+
 .. warning::
 
     This command requires the use of an online browser in order to access online resources.
