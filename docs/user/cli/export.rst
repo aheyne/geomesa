@@ -123,7 +123,7 @@ Export features to a leaflet map.
 
 .. note::
 
-    This command is intended for testing and small scala data exploration and visualization only. For production map generation it is highly recommended to use GeoServer.
+    This command is intended for testing and small scale data exploration and visualization only. For production map generation it is highly recommended to use GeoServer.
 
 ======================== =========================================================
 Argument                 Description
@@ -141,7 +141,7 @@ Argument                 Description
 
 This command is similar to the :ref:`cli_export` command, however, this command draws the features on a leaflet map and, if possible, opens the map in your browser. This allows you to view data stored in GeoMesa without requiring the use of GeoServer or other 3rd party mapping tools.
 
-The generated map provides both a feature and heatmap. The feature map provides the ability to click a point in order to view the attributes of that feature.
+The generated map provides both a feature and heat map. The feature map provides the ability to click a point in order to view the attributes of that feature.
 
 .. warning::
 
