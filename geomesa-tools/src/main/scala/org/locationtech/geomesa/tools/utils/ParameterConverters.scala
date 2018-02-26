@@ -12,7 +12,6 @@ import com.beust.jcommander.ParameterException
 import com.beust.jcommander.converters.BaseConverter
 import org.geotools.filter.text.ecql.ECQL
 import org.locationtech.geomesa.tools.utils.DataFormats.DataFormat
-import org.locationtech.geomesa.tools.utils.MapFormats.MapFormat
 import org.opengis.filter.Filter
 
 import scala.concurrent.duration.Duration
@@ -61,19 +60,6 @@ object ParameterConverters {
         DataFormats.values.find(_.toString.equalsIgnoreCase(value)).getOrElse {
           throw new ParameterException(s"Invalid format '$value'. Valid values are " +
               DataFormats.values.map(_.toString.toLowerCase).mkString("'", "', '", "'"))
-        }
-      } catch {
-        case NonFatal(e) => throw new ParameterException(getErrorString(value, s"format: $e"))
-      }
-    }
-  }
-
-  class MapFormatConverter(name: String) extends BaseConverter[MapFormat](name) {
-    override def convert(value: String): MapFormat = {
-      try {
-        MapFormats.values.find(_.toString.equalsIgnoreCase(value)).getOrElse {
-          throw new ParameterException(s"Invalid format '$value'. Valid values are " +
-            MapFormats.values.map(_.toString.toLowerCase).mkString("'", "', '", "'"))
         }
       } catch {
         case NonFatal(e) => throw new ParameterException(getErrorString(value, s"format: $e"))

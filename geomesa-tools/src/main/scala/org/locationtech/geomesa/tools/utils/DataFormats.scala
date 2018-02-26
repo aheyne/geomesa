@@ -41,9 +41,3 @@ object DataFormats extends Enumeration {
     }
   }
 }
-
-object MapFormats extends Enumeration {
-
-  type MapFormat = Value
-  val Feature, Heatmap = Value
-}

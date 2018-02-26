@@ -56,7 +56,4 @@ trait LeafletExportParams extends ExportQueryParams {
 
   @Parameter(names = Array("-m", "--max-features"), description = "Maximum number of features to return. A high limit will cause performance issues, use this parameter with caution. default: 10000")
   override var maxFeatures: Integer = 10000
-
-  @Parameter(names = Array("--type"), description = "Type of map to render (feature|heatmap). default: feature", converter = classOf[MapFormatConverter])
-  var mapType: MapFormat = MapFormats.Feature
 }

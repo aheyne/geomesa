@@ -13,7 +13,7 @@ import java.util.regex.Pattern
 
 import org.geotools.data.DataStore
 import org.locationtech.geomesa.tools.Command
-import org.locationtech.geomesa.tools.export.formats.{LeafletHeatmapExporter, LeafletMapExporter}
+import org.locationtech.geomesa.tools.export.formats.LeafletMapExporter
 import org.locationtech.geomesa.utils.conf.GeoMesaSystemProperties.SystemProperty
 import org.locationtech.geomesa.utils.io.CloseWithLogging
 
@@ -39,8 +39,6 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommand[DS] {
   }
 
   protected def export(ds: DS): Option[Long] = {
-
-    import org.locationtech.geomesa.tools.utils.MapFormats._
 
     val (query, _) = createQuery(getSchema(ds), None, params)
 
@@ -70,12 +68,7 @@ trait LeafletExportCommand[DS <: DataStore] extends ExportCommand[DS] {
     }
     val indexFile: File = new File(dest, "index.html")
 
-    val exporter = params.mapType match {
-      case Feature => new LeafletMapExporter(indexFile)
-      case Heatmap => new LeafletHeatmapExporter(indexFile)
-      // Shouldn't happen unless someone adds a new format and doesn't implement it here
-      case _       => throw new UnsupportedOperationException(s"Format ${params.mapType} can't be created.")
-    }
+    val exporter = new LeafletMapExporter(indexFile)
 
     try {
       user.info("Writing output to " + indexFile.toString)

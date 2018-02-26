@@ -29,6 +29,7 @@
     // Marker used to split file in order to inject data and generated code.
     |codegen|
 
+    // Create a custom points marker since the default pin is expensive to render
     var geojsonMarkerOptions = {
         radius: 8,
         fillColor: "#ff7800",
@@ -38,6 +39,7 @@
         fillOpacity: 0.8
     }
 
+    // Load the data we wrote out in |codegen| into a geojsonLayer
     var geojsonLayer = L.geoJSON(points, {
         pointToLayer: function (feature, latlng) {
             return L.circleMarker(latlng, geojsonMarkerOptions);
@@ -45,22 +47,32 @@
         onEachFeature: onEachFeature
     });
 
+    // Separate the points and heatmap into different layer groups so they can be
+    // toggled on and off.
     var pointsLG = L.layerGroup([geojsonLayer]);
     var heatLG = L.layerGroup([heat]);
 
+    // Base maps
     var greyscale = new L.TileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
         subdomains: 'abcd',
         maxZoom: 19
     });
 
+    var osm = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+
+    // Create the map and set the default layers.
     var geomesaMap = L.map('mapid', {
         layers: [greyscale, pointsLG]
     });
     geomesaMap.fitBounds(geojsonLayer.getBounds());
 
+    Create the control groups for the layers
     var baseMaps = {
-        "Greyscale": greyscale
+        "Greyscale": greyscale,
+        "OSM": osm
     }
 
     var overlayMaps = {
@@ -68,6 +80,7 @@
         "Heatmap": heatLG
     }
 
+    // Add controls to the map
     L.control.layers(baseMaps, overlayMaps).addTo(geomesaMap);
     L.control.scale().addTo(geomesaMap);
 
