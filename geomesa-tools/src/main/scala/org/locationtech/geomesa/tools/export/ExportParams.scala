@@ -11,11 +11,10 @@ package org.locationtech.geomesa.tools.export
 import java.io.File
 
 import com.beust.jcommander.Parameter
-import org.locationtech.geomesa.tools.utils.{DataFormats, MapFormats}
+import org.locationtech.geomesa.tools.utils.DataFormats
 import org.locationtech.geomesa.tools.utils.DataFormats.DataFormat
-import org.locationtech.geomesa.tools.utils.MapFormats.MapFormat
-import org.locationtech.geomesa.tools.utils.ParameterConverters.{DataFormatConverter, MapFormatConverter}
-import org.locationtech.geomesa.tools.{OptionalCqlFilterParam, OptionalIndexParam, QueryHintsParams}
+import org.locationtech.geomesa.tools.utils.ParameterConverters.DataFormatConverter
+import org.locationtech.geomesa.tools.{OptionalCqlFilterParam, QueryHintsParams}
 
 trait AttributeParam {
   @Parameter(names = Array("-a", "--attributes"), description = "Attributes from feature to export (comma-separated)...Comma-separated expressions with each in the format attribute[=filter_function_expression]|derived-attribute=filter_function_expression|'id'. 'id' will export the feature ID, filter_function_expression is an expression of filter function applied to attributes, literals and filter functions, i.e. can be nested")

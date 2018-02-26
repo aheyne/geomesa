@@ -9,7 +9,6 @@
 package org.locationtech.geomesa.tools.export
 
 import java.io._
-import java.util.regex.Pattern
 
 import org.geotools.data.DataStore
 import org.locationtech.geomesa.tools.Command
@@ -17,15 +16,14 @@ import org.locationtech.geomesa.tools.export.formats.LeafletMapExporter
 import org.locationtech.geomesa.utils.conf.GeoMesaSystemProperties.SystemProperty
 import org.locationtech.geomesa.utils.io.CloseWithLogging
 
-import util.matching.Regex
-import scala.util.control.NonFatal
 import scala.io.StdIn.readLine
+import scala.util.control.NonFatal
 
 trait LeafletExportCommand[DS <: DataStore] extends ExportCommand[DS] {
 
+  import Command.user
   import LeafletExportCommand._
   import org.locationtech.geomesa.tools.export.ExportCommand._
-  import Command.user
 
   override val name = "export-leaflet"
   override def params: LeafletExportParams

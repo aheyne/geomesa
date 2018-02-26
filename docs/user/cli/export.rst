@@ -121,6 +121,10 @@ as a number between 1-9. Higher numbers indicate more compression, lower numbers
 
 Export features to a leaflet map.
 
+.. note::
+
+    This command is intended for testing and small scala data exploration and visualization only. For production map generation it is highly recommended to use GeoServer.
+
 ======================== =========================================================
 Argument                 Description
 ======================== =========================================================
