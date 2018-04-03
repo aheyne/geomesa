@@ -19,27 +19,18 @@ object ConfigManager extends LazyLogging {
   private val EmbeddedConfigFile = "org/locationtech/geomesa/geomesa-site.xml.template"
 
   lazy val GeoMesaConfig: Configuration = {
-    new Configuration()
+    val conf = new Configuration()
     val file = Option(System.getProperty(GEOMESA_CONFIG_FILE_PROP)).getOrElse(GEOMESA_CONFIG_FILE_NAME)
     // load defaults first then overwrite with user values (if any)
-    loadConfig(EmbeddedConfigFile)
-    loadConfig(file)
-    GeoMesaConfig
+    conf.addResource(EmbeddedConfigFile)
+    conf.addResource(file)
+    logger.trace(s"Loaded ${conf.toString}")
+    conf
   }
 
   def getProperty(name: String): (String, Boolean) = {
     val finals = GeoMesaConfig.getFinalParameters
     (GeoMesaConfig.get(name), finals.contains(name))
-  }
-
-  def loadConfig(path: String): Unit = {
-    GeoMesaConfig.addResource(path)
-    logger.trace(s"Loaded ${GeoMesaConfig.toString}")
-  }
-
-  def loadConfig(config: Configuration): Unit = {
-    GeoMesaConfig.addResource(config)
-    logger.trace(s"Loaded ${GeoMesaConfig.toString}")
   }
 
   /**
@@ -48,7 +39,7 @@ object ConfigManager extends LazyLogging {
    * configuration so it is passed around.
    */
   def augment(base: Configuration): Configuration = {
-    loadConfig(base)
+    GeoMesaConfig.addResource(base)
     GeoMesaConfig
   }
 
@@ -61,7 +52,7 @@ object ConfigManager extends LazyLogging {
   }
 
   def augment(base: Configuration, paths: Option[String]): Configuration = {
-    augment(paths)
     augment(base)
+    augment(paths)
   }
 }
