@@ -28,9 +28,11 @@ object ConfigManager extends LazyLogging {
     conf
   }
 
-  def getProperty(name: String): (String, Boolean) = {
+  def getProperty(name: String): Option[(String, Boolean)] = {
     val finals = GeoMesaConfig.getFinalParameters
-    (GeoMesaConfig.get(name), finals.contains(name))
+    Option(GeoMesaConfig.get(name)).flatMap( value =>
+      Some((value, finals.contains(name)))
+    )
   }
 
   /**
