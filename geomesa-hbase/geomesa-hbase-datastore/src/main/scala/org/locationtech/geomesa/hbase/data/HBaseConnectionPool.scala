@@ -44,13 +44,10 @@ object HBaseConnectionPool extends LazyLogging {
     }
   )
   private val confConfigCache = Caffeine.newBuilder().build(
-    new CacheLoader[(Option[Configuration], Option[String]), Configuration] {
-      override def load(key: (Option[Configuration], Option[String])): Configuration = {
+    new CacheLoader[(Configuration, Option[String]), Configuration] {
+      override def load(key: (Configuration, Option[String])): Configuration = {
         val (configuration, paths) = key
-        val config: Configuration = configuration match {
-          case Some(c) => withPaths(HBaseConfiguration.create(c), HBaseDataStoreFactory.ConfigPathProperty.option)
-          case None => withPaths(HBaseConfiguration.create(), HBaseDataStoreFactory.ConfigPathProperty.option)
-        }
+        val config = withPaths(HBaseConfiguration.create(configuration), HBaseDataStoreFactory.ConfigPathProperty.option)
         withPaths(config, paths)
         configureSecurity(config)
         config
@@ -89,7 +86,7 @@ object HBaseConnectionPool extends LazyLogging {
     if (ConnectionParam.exists(params)) {
       ConnectionParam.lookup(params)
     } else if (params.containsKey("hadoop.configuration")) {
-      val conf = Some(params.get("hadoop.configuration").asInstanceOf[Configuration])
+      val conf = params.get("hadoop.configuration").asInstanceOf[Configuration]
       val paths = ConfigPathsParam.lookupOpt(params)
       connectionCache.get((confConfigCache.get((conf, paths)), validate))
     } else {
