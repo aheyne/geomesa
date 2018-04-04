@@ -31,7 +31,8 @@ abstract class AbstractIngestJob(dsParams: Map[String, String],
                                  typeName: String,
                                  paths: Seq[String],
                                  libjarsFile: String,
-                                 libjarsPaths: Iterator[() => Seq[File]]) extends JobWithLibJars {
+                                 libjarsPaths: Iterator[() => Seq[File]],
+                                 configuration: Option[Configuration] = None) extends JobWithLibJars {
 
   def inputFormatClass: Class[_ <: FileInputFormat[_, SimpleFeature]]
   def written(job: Job): Long
@@ -39,12 +40,7 @@ abstract class AbstractIngestJob(dsParams: Map[String, String],
 
   def run(statusCallback: StatusCallback): (Long, Long) = {
 
-    val config = configuration.getOrElse(new Configuration)
-    Option(config.get("hbase.zookeeper.quorum")) match {
-      case Some(value) => config.set("hbase.zookeepers", value)
-      case None => // NoOp
-    }
-    val job = Job.getInstance(config, "GeoMesa Tools Ingest")
+    val job = Job.getInstance(configuration.getOrElse(new Configuration), "GeoMesa Tools Ingest")
 
     setLibJars(job, libjarsFile, libjarsPaths)
 
