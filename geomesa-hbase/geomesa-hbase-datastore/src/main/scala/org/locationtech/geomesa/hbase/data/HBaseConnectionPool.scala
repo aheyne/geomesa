@@ -27,21 +27,29 @@ object HBaseConnectionPool extends LazyLogging {
 
   private var userCheck: Option[User] = _
 
-  // add common resources from system property
-  private val configuration = withPaths(HBaseConfiguration.create(), HBaseDataStoreFactory.ConfigPathProperty.option)
-
   private val configCache = Caffeine.newBuilder().build(
-    new CacheLoader[(Option[String], Option[String]), Configuration] {
-      override def load(key: (Option[String], Option[String])): Configuration = {
-        val (zookeepers, paths) = key
-        val conf = withPaths(configuration, paths)
-        zookeepers.foreach(zk => conf.set(HConstants.ZOOKEEPER_QUORUM, zk))
-        if (zookeepers.isEmpty && conf.get(HConstants.ZOOKEEPER_QUORUM) == "localhost") {
-          logger.warn("HBase connection is set to localhost - " +
-              "this may indicate that 'hbase-site.xml' is not on the classpath")
+    new CacheLoader[(Either[Option[String], Option[Configuration]], Option[String]), Configuration] {
+      override def load(key: (Either[Option[String], Option[Configuration]], Option[String])): Configuration = {
+        val (zkOrConf, paths) = key
+        val config = zkOrConf match {
+          case Left(zookeepers) =>
+            val configuration: Configuration = withPaths(HBaseConfiguration.create(), HBaseDataStoreFactory.ConfigPathProperty.option)
+            val newConf = withPaths(configuration, paths)
+            zookeepers.foreach(zk => newConf.set(HConstants.ZOOKEEPER_QUORUM, zk))
+            if (zookeepers.isEmpty && newConf.get(HConstants.ZOOKEEPER_QUORUM) == "localhost") {
+              logger.warn("HBase connection is set to localhost - " +
+                "this may indicate that 'hbase-site.xml' is not on the classpath")
+            }
+            newConf
+          case Right(conf) =>
+            val configuration: Configuration = conf match {
+              case Some(c) => withPaths(HBaseConfiguration.create(c), HBaseDataStoreFactory.ConfigPathProperty.option)
+              case None => withPaths(HBaseConfiguration.create(), HBaseDataStoreFactory.ConfigPathProperty.option)
+            }
+            withPaths(configuration, paths)
         }
-        configureSecurity(conf)
-        conf
+        configureSecurity(config)
+        config
       }
     }
   )
@@ -76,10 +84,14 @@ object HBaseConnectionPool extends LazyLogging {
   def getConnection(params: java.util.Map[String, Serializable], validate: Boolean): Connection = {
     if (ConnectionParam.exists(params)) {
       ConnectionParam.lookup(params)
+    } else if (params.containsKey("hadoop.configuration")) {
+      val conf = Some(params.get("hadoop.configuration").asInstanceOf[Configuration])
+      val paths = ConfigPathsParam.lookupOpt(params)
+      connectionCache.get((configCache.get((Right(conf), paths)), validate))
     } else {
       val zk = ZookeeperParam.lookupOpt(params)
       val paths = ConfigPathsParam.lookupOpt(params)
-      connectionCache.get((configCache.get((zk, paths)), validate))
+      connectionCache.get((configCache.get((Left(zk), paths)), validate))
     }
   }
 

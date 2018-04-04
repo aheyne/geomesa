@@ -39,7 +39,12 @@ abstract class AbstractIngestJob(dsParams: Map[String, String],
 
   def run(statusCallback: StatusCallback): (Long, Long) = {
 
-    val job = Job.getInstance(new Configuration, "GeoMesa Tools Ingest")
+    val config = configuration.getOrElse(new Configuration)
+    Option(config.get("hbase.zookeeper.quorum")) match {
+      case Some(value) => config.set("hbase.zookeepers", value)
+      case None => // NoOp
+    }
+    val job = Job.getInstance(config, "GeoMesa Tools Ingest")
 
     setLibJars(job, libjarsFile, libjarsPaths)
 
