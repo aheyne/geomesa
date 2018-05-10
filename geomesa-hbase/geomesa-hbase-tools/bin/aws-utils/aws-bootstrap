@@ -394,7 +394,7 @@ if [[ $confirm =~ ^(yes|y) ]]; then
   aws ${AWS_PROFILE} s3 cp "${tarball}" "${CONTAINER}" || error=1
   aws ${AWS_PROFILE} s3 cp "${%%gmtools.dist.name%%_HOME}/bin/aws-utils/.aws-bootstrap-actions.sh" "${CONTAINER}" || error=1
   if [[ error == 1 ]]; then
-    echo "Failed to upload tools package" && exit 1
+    echo "Failed to upload bootstrap resources. Check write permissions to container." && exit 1
   fi
 
   # Create the cluster

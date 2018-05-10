@@ -37,7 +37,7 @@ fi
 
 log "Bootstrapping GeoMesa-HBase with version ${projectVersion} installed at ${GEOMESA_HBASE_HOME}"
 
-pip install --upgrade awscli
+/usr/local/bin/pip install --upgrade awscli
 
 if [[ ! -d "/opt" ]]; then
   log "Unable to find /opt"
@@ -85,8 +85,14 @@ echo "# Auto-registration for geomesa coprocessors ${NL}export CUSTOM_JAVA_OPTS=
 
 # Deploy the GeoMesa HBase distributed runtime to the HBase root directory
 if [[ "$ROOTDIR" = s3* ]]; then
-  aws s3 cp /opt/geomesa/dist/hbase/$DISTRIBUTED_JAR_NAME ${ROOTDIR}lib/ && \
-  log "Installed GeoMesa distributed runtime to ${ROOTDIR}lib/"
+  # check if we're readonly
+  READONLY=`cat /usr/lib/hbase/conf/hbase-site.xml 2> /dev/null | tr '\n' ' ' | sed 's/ //g' | grep -o -P "<name>hbase.global.readonly.enabled</name><value>.+?</value>" | sed 's/<name>hbase.global.readonly.enabled<\/name><value>//' | sed 's/<\/value>//'`
+  if [[ "${READONLY}" == "true" ]]; then
+    log "Readonly detected; skipping GeoMesa distributed runtime installation."
+  else
+    aws s3 cp /opt/geomesa/dist/hbase/$DISTRIBUTED_JAR_NAME ${ROOTDIR}lib/ && \
+    log "Installed GeoMesa distributed runtime to ${ROOTDIR}lib/"
+  fi
 elif [[ "$ROOTDIR" = hdfs* ]]; then
   local libdir="${ROOTDIR}lib"
   (sudo -u $GMUSER hadoop fs -test -d $libdir || sudo -u $GMUSER hadoop fs -mkdir $libdir) && \
@@ -112,5 +118,8 @@ EOF
 
 # Add hbase-site to conf dir for gmtools
 sudo -u $GMUSER cp /etc/hbase/conf/hbase-site.xml ${GEOMESA_HBASE_HOME}/conf/
+
+# Make sure everyone can write to the log
+sudo chown 777 ${GEOMESA_HBASE_HOME}/logs/geomesa.log
 
 log "GeoMesa-HBase Bootstrap complete...log out and re-login to complete process"

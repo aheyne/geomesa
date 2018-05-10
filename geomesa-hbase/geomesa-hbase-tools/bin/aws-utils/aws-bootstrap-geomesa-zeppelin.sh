@@ -22,6 +22,12 @@ function log() {
   echo "${timeStamp}| ${@}" | tee -a /tmp/bootstrap.log
 }
 
+# Verify that we are running in sudo mode
+if [[ "$EUID" -ne 0 ]]; then
+  log "ERROR: Please run in sudo mode"
+  exit 1
+fi
+
 sudo ${GM_TOOLS_HOME}/bin/aws-utils/aws-bootstrap-geomesa-python.sh
 
 # We need to install jupyter get ipython in zeppelin through the %python.ipython magic
@@ -294,5 +300,5 @@ sudo bash -c "echo 'export ZEPPELIN_NOTEBOOK_DIR=${notebookDir}' >> ${zeppelin_e
 sudo chown -R zeppelin:zeppelin $notebookDir
 
 sudo chown -R zeppelin:zeppelin /etc/zeppelin/conf/*
-sudo chmod -R 777 ${GM_TOOLS_HOME}/logs/
+sudo chown 777 ${GM_TOOLS_HOME}/logs/geomesa.log
 sudo start zeppelin

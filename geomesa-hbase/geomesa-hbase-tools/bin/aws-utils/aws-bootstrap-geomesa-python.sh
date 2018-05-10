@@ -27,7 +27,7 @@ if [[ "$EUID" -ne 0 ]]; then
 fi
 
 log "Installing Python 3.6"
-sudo yum install -q -y python36 gcc* python-devel python36-devel
+sudo yum install -q -y python36 python36-devel
 sudo python36 -m pip install --upgrade pip
 
 # Check if geomesa_pyspark is available and should be installed

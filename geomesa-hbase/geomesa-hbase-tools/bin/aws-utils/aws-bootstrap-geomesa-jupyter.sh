@@ -71,5 +71,9 @@ c.NotebookApp.password = u'${password}'
 c.NotebookApp.port = 8888
 EOF
 
+# Make sure everyone can write to the log
+sudo chown 777 ${GM_TOOLS_HOME}/logs/geomesa.log
+
 sudo -H -u ${user} nohup /usr/bin/python36 /usr/local/bin/jupyter-notebook &>/tmp/jupyter.log &
+
 log "Jupyter ready"
