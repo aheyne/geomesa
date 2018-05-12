@@ -71,7 +71,7 @@ sudo cat > ${notebookConf} <<EOF
         "spark.yarn.jar": "",
         "master": "yarn-client",
         "spark.dynamicAllocation.enabled\t": "true",
-        "zeppelin.spark.maxResult": "1000",
+        "zeppelin.spark.maxResult": "10000",
         "zeppelin.dep.localrepo": "/usr/lib/zeppelin/local-repo",
         "spark.shuffle.service.enabled\t": "true",
         "spark.app.name": "Zeppelin",
