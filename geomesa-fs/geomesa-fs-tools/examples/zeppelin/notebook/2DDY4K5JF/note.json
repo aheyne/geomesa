@@ -1,0 +1,1106 @@
+{
+  "paragraphs": [
+    {
+      "title": "Setup FSDS Connection",
+      "text": "import org.locationtech.geomesa.spark._\n\nval dataFrame \u003d spark.read\n  .format(\"geomesa\")\n  .option(\"fs.encoding\",\"parquet\")\n  .option(\"fs.path\",\"s3a://optix-fsds/\")\n  .option(\"geomesa.feature\", \"exactAIS\")\n  .load()\ndataFrame.createOrReplaceTempView(\"fsdsAIS\")",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 10:17:57 PM",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820677_-890951170",
+      "id": "20180118-201904_1298096910",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 10:17:57 PM",
+      "dateFinished": "May 12, 2018 10:18:41 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Create a Temporary View for data in the Gulf of Mexico around the dates of Harvey",
+      "text": "%sql\n\nCREATE OR REPLACE TEMP VIEW harvey as (\n    select \n        * \n    from  \n        fsdsAIS \n    where \n        /* Harvey formed on Aug 17 */ \n        dtg \u003e cast(\u00272017-07-17\u0027 as timestamp) \n        and \n        /* Harvey dissapated on Sept 2 */\n        dtg \u003c cast(\u00272017-10-3\u0027 as timestamp) \n        and \n        st_intersects(st_makeBBOX(-100.3051, 15.5020, -73.6962, 33.8272), position)\n)",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 10:18:11 PM",
+      "config": {
+        "tableHide": true,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": false,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820684_-893644413",
+      "id": "20180118-223121_220859814",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 10:18:11 PM",
+      "dateFinished": "May 12, 2018 10:18:41 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Cache the Harvey Temp View",
+      "text": "%sql\n\ncache table harvey",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 10:18:13 PM",
+      "config": {
+        "tableHide": true,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820685_-894029162",
+      "id": "20180512-193212_2053679360",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 10:18:41 PM",
+      "dateFinished": "May 12, 2018 10:21:43 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Number of Tankers in Gulf for month over Harvey",
+      "text": "%sql\n\nselect \n    count(distinct mmsi),\n    vessel_type_sub,\n    dtg\nfrom (\n    select \n        mmsi,\n        date_sub(dtg, 0) as dtg,\n        vessel_type_sub \n    from \n        harvey\n    where \n        vessel_type like \"Tanker\"\n        and \n        dtg \u003e cast(\u00272017-07-17\u0027 as timestamp)\n        and\n        dtg \u003c cast(\u00272017-10-3\u0027 as timestamp)\n)\ngroup by \n    dtg,\n    vessel_type_sub\norder by\n    dtg",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 9:57:25 PM",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "lineChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "lineChart": {}
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "dtg",
+                  "index": 2.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [
+                {
+                  "name": "vessel_type_sub",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ],
+              "values": [
+                {
+                  "name": "count(DISTINCT mmsi)",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820685_-894029162",
+      "id": "20180512-192857_587073608",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 9:57:25 PM",
+      "dateFinished": "May 12, 2018 9:57:31 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Number of Tankers around Houston for month over Harvey",
+      "text": "%sql\n\nselect \n    count(distinct mmsi),\n    vessel_type_sub,\n    dtg\nfrom (\n    select \n        mmsi,\n        date_sub(dtg, 0) as dtg,\n        vessel_type_sub \n    from \n        harvey\n    where\n        st_contains(st_bufferPoint(st_makePoint(-94.867089, 29.580314), 50000), position) \n) \nwhere \n    vessel_type like \"Tanker\"\ngroup by \n    dtg,\n    vessel_type_sub\norder by\n    dtg",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 9:57:35 PM",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": false,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "lineChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "lineChart": {
+                  "forceY": true
+                },
+                "multiBarChart": {
+                  "stacked": false
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "dtg",
+                  "index": 2.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [
+                {
+                  "name": "vessel_type_sub",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ],
+              "values": [
+                {
+                  "name": "count(DISTINCT mmsi)",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820687_-893259664",
+      "id": "20180118-222140_1805474141",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 9:57:35 PM",
+      "dateFinished": "May 12, 2018 9:57:54 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Gasoline Prices from EIA.gov (https://www.eia.gov/dnav/pet/xls/PET_PRI_SPT_S1_D.xls)",
+      "text": "%sh\naws s3 cp s3://optix-fsds/gasoline_spotprice_daily.csv /tmp/gasoline_spotprice_daily.csv\nhdfs dfs -put /tmp/gasoline_spotprice_daily.csv /tmp/",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 9:57:38 PM",
+      "config": {
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sh",
+        "editorHide": false,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820688_-882871443",
+      "id": "20180512-184319_344330002",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 9:57:38 PM",
+      "dateFinished": "May 12, 2018 9:57:42 PM",
+      "status": "ERROR",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Pull in gas price data for US",
+      "text": "val gasPrices \u003d sqlContext.read\n    .format(\"csv\")\n    .option(\"header\", \"true\")\n    .option(\"treatEmptyValuesAsNulls\", \"true\")\n    .option(\"inferSchema\", \"true\")\n    .option(\"mode\",\"DROPMALFORMED\")\n    .option(\"timestampFormat\", \"MM/dd/yyyy\")\n    .load(\"/tmp/gasoline_spotprice_daily.csv\")\ngasPrices.createOrReplaceTempView(\"gasPrices\")",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 10:18:29 PM",
+      "config": {
+        "tableHide": true,
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820689_-883256192",
+      "id": "20180118-201913_1738520310",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 10:18:41 PM",
+      "dateFinished": "May 12, 2018 10:21:47 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nselect * from gasPrices limit 10",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 10:18:31 PM",
+      "config": {
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "results": {},
+        "enabled": true,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820690_-882101946",
+      "id": "20180512-185255_1633993265",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 10:21:44 PM",
+      "dateFinished": "May 12, 2018 10:21:48 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Historical gas prices in Gulf Coast and NY Harbor 2000-2017 averaged by week",
+      "text": "%sql \n\nselect \n    first(date_sub(dtg, 0)) as dtg, \n    avg(nyh), \n    avg(usgc) \nfrom \n    gasPrices \nwhere \n    dtg \u003e cast(\u00272000-01-01\u0027 as timestamp) \n    and \n    dtg \u003c cast(\u00272018-01-01\u0027 as timestamp) \ngroup by \n    year(dtg), \n    weekofyear(dtg) \norder by \n    year(dtg), \n    weekofyear(dtg)",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 9:57:50 PM",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": false,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "lineChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "lineChart": {
+                  "forceY": true
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "dtg",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "avg(nyh)",
+                  "index": 1.0,
+                  "aggr": "sum"
+                },
+                {
+                  "name": "avg(usgc)",
+                  "index": 2.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820690_-882486695",
+      "id": "20180118-202135_816333976",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 9:57:58 PM",
+      "dateFinished": "May 12, 2018 9:58:01 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Year of gas prices around Harvey",
+      "text": "%sql\n\nselect \n    date_sub(dtg, 0) as dtg,\n    nyh,\n    usgc\nfrom gasPrices \nwhere \n    dtg \u003e cast(\u00272016-08-17\u0027 as timestamp) \n    and \n    dtg \u003c cast(\u00272018-9-3\u0027 as timestamp)  ",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 9:58:04 PM",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": false,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "lineChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "lineChart": {
+                  "forceY": true
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "dtg",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "nyh",
+                  "index": 1.0,
+                  "aggr": "sum"
+                },
+                {
+                  "name": "usgc",
+                  "index": 2.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820693_-884795188",
+      "id": "20180118-223113_728412612",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 9:58:04 PM",
+      "dateFinished": "May 12, 2018 9:58:05 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Derivative of Gas prices over year surrounding Harvey",
+      "text": "%sql \n\nselect \n    date_sub(dtg, 0) as dtg, \n    lead(nyh, 1) over (order by dtg) - nyh as nyh_rate,\n    lead(usgc, 1) over (order by dtg) - usgc as usgc_rate\nfrom \n    gasPrices\nwhere \n    dtg \u003e cast(\u00272016-08-17\u0027 as timestamp) \n    and \n    dtg \u003c cast(\u00272018-9-3\u0027 as timestamp) \n    ",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 9:58:08 PM",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": false,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "lineChart": {
+                  "forceY": false,
+                  "lineWithFocus": false
+                },
+                "multiBarChart": {
+                  "stacked": false
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "dtg",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "usgc_rate",
+                  "index": 2.0,
+                  "aggr": "sum"
+                },
+                {
+                  "name": "nyh_rate",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820694_-883640941",
+      "id": "20180118-221119_1596654290",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 9:58:08 PM",
+      "dateFinished": "May 12, 2018 9:58:09 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Save gas prices of interest as temp view",
+      "text": "%sql\n\nCREATE OR REPLACE TEMP VIEW gas as (\n    select \n        date_sub(dtg, 0) as dtg,\n        nyh as nyh_value,\n        usgc as usgc_value\n    from \n        gasPrices \n    where \n        dtg \u003e cast(\u00272017-07-10\u0027 as timestamp) \n        and \n        dtg \u003c cast(\u00272017-11-03\u0027 as timestamp)\n)",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 10:21:48 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "editorMode": "ace/mode/sql",
+        "title": true,
+        "tableHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526158835159_-147534217",
+      "id": "20180512-210035_267071197",
+      "dateCreated": "May 12, 2018 9:00:35 PM",
+      "dateStarted": "May 12, 2018 10:21:48 PM",
+      "dateFinished": "May 12, 2018 10:21:48 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Save number of ships around Houston as temp view",
+      "text": "%sql\n\nCREATE OR REPLACE TEMP VIEW houston as (\n    select \n        count(distinct mmsi) as num_ships,\n        vessel_type_sub,\n        dtg\n    from (\n        select \n            mmsi,\n            date_sub(dtg, 0) as dtg,\n            vessel_type_sub \n        from \n            harvey\n        where\n            st_contains(st_bufferPoint(st_makePoint(-94.867089, 29.580314), 50000), position) \n    ) \n    where \n        vessel_type like \"Tanker\"\n    group by \n        dtg,\n        vessel_type_sub\n    order by\n        dtg\n)",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 10:45:28 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "editorMode": "ace/mode/sql",
+        "title": true,
+        "tableHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526158588358_307286600",
+      "id": "20180512-205628_1059549834",
+      "dateCreated": "May 12, 2018 8:56:28 PM",
+      "dateStarted": "May 12, 2018 10:45:28 PM",
+      "dateFinished": "May 12, 2018 10:45:28 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Min/Max Normalized number of tankers and fuel prices for month around Harvey",
+      "text": "%sql\n\nselect \n    /* Calculate min/max normalized values */\n    dtg,\n    ((nyh - min_nyh) / (max_nyh - min_nyh)) as nyh_norm, \n    ((usgc - min_usgc) / (max_usgc - min_usgc)) as usgc_norm,\n    ((num_ships - min_num_ships) / (max_num_ships - min_num_ships)) as ships\nfrom (\n    select\n        /* Prepare for min/max normalization */\n        dtg,\n        nyh,\n        min(nyh) over () as min_nyh,\n        max(nyh) over () as max_nyh,\n        usgc,\n        min(usgc) over () as min_usgc,\n        max(usgc) over () as max_usgc,\n        num_ships,\n        min(num_ships) over () as min_num_ships,\n        max(num_ships) over () as max_num_ships\n    from (\n        /* Get from the JOIN */\n        select \n            /* Fill null values with last value to make graph continuous */\n            ifnull(gas.nyh_value, last(gas.nyh_value,true) over (order by ships.dtg)) as nyh,\n            ifnull(gas.usgc_value, last(gas.usgc_value,true) over (order by ships.dtg)) as usgc,\n            num_ships,\n            ships.dtg as dtg\n        from \n            houston as ships LEFT JOIN gas\n        on \n            ships.dtg \u003d gas.dtg\n    )\n)\nwhere \n    /* Cut off lead dates that have null fuel values */\n    dtg \u003e cast(\u00272017-07-17\u0027 as timestamp) \n    and \n    dtg \u003c cast(\u00272017-11-3\u0027 as timestamp)\norder by \n    dtg",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 10:18:47 PM",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": false,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "lineChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "lineChart": {
+                  "forceY": true,
+                  "lineWithFocus": false
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "dtg",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "usgc_norm",
+                  "index": 2.0,
+                  "aggr": "max"
+                },
+                {
+                  "name": "nyh_norm",
+                  "index": 1.0,
+                  "aggr": "max"
+                },
+                {
+                  "name": "ships",
+                  "index": 3.0,
+                  "aggr": "max"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820695_-884025690",
+      "id": "20180119-195118_388070096",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 10:21:49 PM",
+      "dateFinished": "May 12, 2018 10:22:11 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Tankers Temp View",
+      "text": "%sql\n\nCREATE OR REPLACE TEMP VIEW tankers as (\n    select \n        mmsi,\n        /* convert to 00:00:00 */\n        date_sub(dtg, 0) as dtg,\n        first(vessel_type_sub)\n    from \n        harvey\n    where\n        st_contains(st_bufferPoint(st_makePoint(-94.867089, 29.580314), 50000), position) /* Houston */\n        and\n        vessel_type like \"Tanker\"\n    group by \n        dtg,\n        mmsi\n)",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 10:52:27 PM",
+      "config": {
+        "tableHide": true,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": false,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820708_-902878386",
+      "id": "20180123-193527_279998464",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 10:48:20 PM",
+      "dateFinished": "May 12, 2018 10:48:20 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Buy Gauge",
+      "text": "%sql\n\nselect \n    /* Calculate buy recommendataion */\n    1 - sum(crude_tankers) over (order by dtg rows between 2 preceding and current row) as buy_guage,\n    dtg,\n    nyh_norm,\n    usgc_norm\nfrom (\n    select \n        /* Calculate min/max normalized values */\n        dtg,\n        ((nyh - min_nyh) / (max_nyh - min_nyh)) as nyh_norm, \n        ((usgc - min_usgc) / (max_usgc - min_usgc)) as usgc_norm,\n        ((avg_num_ships - min_avg_num_ships) / (max_avg_num_ships - min_avg_num_ships)) as crude_tankers\n    from (\n        select\n            /* Prepare for min/max normalization */\n            dtg,\n            nyh,\n            min(nyh) over () as min_nyh,\n            max(nyh) over () as max_nyh,\n            usgc,\n            min(usgc) over () as min_usgc,\n            max(usgc) over () as max_usgc,\n            avg_num_ships,\n            min(avg_num_ships) over () as min_avg_num_ships,\n            max(avg_num_ships) over () as max_avg_num_ships\n        from (\n            /* Get from the JOIN */\n            select \n                /* Fill null values with last value to make graph continuous */\n                ifnull(gas.nyh_value, last(gas.nyh_value,true) over (order by ships.dtg)) as nyh,\n                ifnull(gas.usgc_value, last(gas.usgc_value,true) over (order by ships.dtg)) as usgc,\n                avg_num_ships,\n                ships.dtg as dtg\n            from (\n                /* 3 day moving average of number of ships arriving at houston */\n               select\n                    dtg,\n                    avg(count) over (order by dtg rows between 3 preceding and current row) as avg_num_ships\n                from (\n                    select\n                        cur.dtg as dtg,\n                        count(distinct cur.mmsi) as count\n                    from \n                        tankers as cur\n                    left join \n                        tankers as prev\n                    on \n                        cur.dtg \u003d date_add(prev.dtg, 1)\n                        and cur.mmsi \u003d prev.mmsi\n                    where \n                        isnull(prev.mmsi)\n                    group by \n                        cur.dtg\n                ) \n            ) as ships \n            LEFT JOIN (\n            /* Select the Gas prices by day */\n                select \n                    date_sub(dtg, 0) as dtg_sub,\n                    nyh as nyh_value,\n                    usgc as usgc_value\n                from \n                    gasPrices \n                where \n                    dtg \u003e cast(\u00272017-07-10T00:00:00.000Z\u0027 as timestamp) \n                    and \n                    dtg \u003c cast(\u00272017-11-03T00:00:00.000Z\u0027 as timestamp)\n            ) as gas \n            on \n                ships.dtg \u003d gas.dtg_sub\n        )\n    )\n    where \n        /* Cut off lead dates that have null fuel values */\n        dtg \u003e cast(\u00272017-07-17T00:00:00.000Z\u0027 as timestamp) \n        and \n        dtg \u003c cast(\u00272017-11-3T00:00:00.000Z\u0027 as timestamp)\n    order by \n        dtg\n)",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 10:49:16 PM",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": false,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "lineChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "lineChart": {
+                  "forceY": false
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "dtg",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "buy_guage",
+                  "index": 0.0,
+                  "aggr": "sum"
+                },
+                {
+                  "name": "nyh_norm",
+                  "index": 2.0,
+                  "aggr": "sum"
+                },
+                {
+                  "name": "usgc_norm",
+                  "index": 3.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820708_-902878386",
+      "id": "20180123-202600_1311976303",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 10:49:05 PM",
+      "dateFinished": "May 12, 2018 10:49:22 PM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n\n### Use ship MMSI to get arrival and departure rates for Houston",
+      "user": "anonymous",
+      "dateUpdated": "May 12, 2018 11:00:45 PM",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003ch3\u003eUse ship MMSI to get arrival and departure rates for Houston\u003c/h3\u003e\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820699_-885564686",
+      "id": "20180122-192451_1876999279",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "dateStarted": "May 12, 2018 11:00:45 PM",
+      "dateFinished": "May 12, 2018 11:00:47 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Moving average of the number of tankers arriving at Houston by day",
+      "text": "%sql\n\nselect \n    dtg,\n    avg\nfrom (\n    select\n        dtg,\n        avg(count) over (order by dtg rows between 3 preceding and current row) as avg\n    from (\n        select\n            cur.dtg as dtg,\n            count(distinct cur.mmsi) as count\n        from \n            houston_ships as cur\n        left join \n            houston_ships as prev\n        on \n            cur.dtg \u003d date_add(prev.dtg, 1)\n            and cur.mmsi \u003d prev.mmsi\n        where \n            isnull(prev.mmsi)\n        group by \n            cur.dtg\n    ) \n)\nwhere\n    /* Cut out extra data so we only have 1 month */\n    dtg \u003e cast(\u00272017-07-17T00:00:00.000Z\u0027 as timestamp) \norder by \n    dtg",
+      "dateUpdated": "May 12, 2018 8:27:00 PM",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": false,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "lineChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "lineChart": {
+                  "forceY": true
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "dtg",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "avg",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "dtg\tavg\n2017-07-18\t22.25\n2017-07-19\t22.0\n2017-07-20\t21.5\n2017-07-21\t23.25\n2017-07-22\t23.25\n2017-07-23\t24.0\n2017-07-24\t23.25\n2017-07-25\t23.75\n2017-07-26\t22.25\n2017-07-27\t18.25\n2017-07-28\t17.25\n2017-07-29\t14.25\n2017-07-30\t13.5\n2017-07-31\t16.5\n2017-08-01\t18.25\n2017-08-02\t18.0\n2017-08-03\t19.25\n2017-08-04\t22.0\n2017-08-05\t19.25\n2017-08-06\t19.0\n2017-08-07\t17.0\n2017-08-08\t11.75\n2017-08-09\t12.25\n2017-08-10\t13.0\n2017-08-11\t14.5\n2017-08-12\t14.75\n2017-08-13\t14.5\n2017-08-14\t15.25\n2017-08-15\t14.75\n2017-08-16\t15.0\n2017-08-17\t16.25\n2017-08-18\t15.75\n2017-08-19\t15.0\n2017-08-20\t14.25\n2017-08-21\t13.5\n2017-08-22\t10.75\n2017-08-23\t13.0\n2017-08-24\t13.5\n2017-08-25\t11.25\n2017-08-26\t10.25\n2017-08-27\t7.75\n2017-08-28\t6.0\n2017-08-29\t5.25\n2017-08-30\t8.0\n2017-08-31\t12.5\n2017-09-01\t16.25\n2017-09-02\t18.25\n2017-09-03\t20.25\n2017-09-04\t15.0\n2017-09-05\t14.0\n2017-09-06\t17.0\n2017-09-07\t14.0\n2017-09-08\t15.5\n2017-09-09\t15.0\n2017-09-10\t15.0\n2017-09-11\t17.0\n2017-09-12\t17.75\n2017-09-13\t16.75\n2017-09-14\t17.0\n2017-09-15\t17.75\n2017-09-16\t17.5\n2017-09-17\t17.25\n2017-09-18\t14.75\n2017-09-19\t13.5\n2017-09-20\t13.5\n2017-09-21\t19.0\n2017-09-22\t22.75\n2017-09-23\t26.25\n2017-09-24\t26.5\n2017-09-25\t24.0\n2017-09-26\t21.25\n2017-09-27\t18.0\n2017-09-28\t16.0\n2017-09-29\t19.75\n2017-09-30\t21.5\n2017-10-01\t23.5\n2017-10-02\t28.0\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820700_-887488430",
+      "id": "20180122-193047_1346511485",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Moving average of the number of tankers that departed from Houston by day",
+      "text": "%sql\n\nselect \n    dtg,\n    avg\nfrom (\n    select\n        dtg,\n        avg(count) over (order by dtg rows between 3 preceding and current row) as avg\n    from (\n        select\n            prev.dtg as dtg,\n            count(distinct prev.mmsi) as count\n        from \n            houston_ships as cur\n        right join \n            houston_ships as prev\n        on \n            cur.dtg \u003d date_add(prev.dtg, 1)\n            and cur.mmsi \u003d prev.mmsi\n        where \n            isnull(cur.mmsi)\n        group by \n            prev.dtg\n    ) \n)\nwhere\n    /* Cut out extra data so we only have 1 month */\n    dtg \u003e cast(\u00272017-07-17T00:00:00.000Z\u0027 as timestamp) \norder by \n    dtg",
+      "dateUpdated": "May 12, 2018 8:27:00 PM",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": true,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "lineChart",
+              "height": 300.0,
+              "optionOpen": false
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "dtg\tavg\n2017-07-18\t22.25\n2017-07-19\t24.5\n2017-07-20\t22.25\n2017-07-21\t22.5\n2017-07-22\t22.5\n2017-07-23\t23.25\n2017-07-24\t22.5\n2017-07-25\t19.75\n2017-07-26\t16.0\n2017-07-27\t13.0\n2017-07-28\t12.5\n2017-07-29\t12.25\n2017-07-30\t14.5\n2017-07-31\t14.0\n2017-08-01\t17.75\n2017-08-02\t19.75\n2017-08-03\t19.0\n2017-08-04\t19.5\n2017-08-05\t17.5\n2017-08-06\t16.0\n2017-08-07\t14.5\n2017-08-08\t15.75\n2017-08-09\t13.75\n2017-08-10\t13.5\n2017-08-11\t16.0\n2017-08-12\t14.0\n2017-08-13\t14.75\n2017-08-14\t15.5\n2017-08-15\t13.75\n2017-08-16\t14.25\n2017-08-17\t14.0\n2017-08-18\t14.0\n2017-08-19\t15.0\n2017-08-20\t14.25\n2017-08-21\t13.5\n2017-08-22\t11.5\n2017-08-23\t12.0\n2017-08-24\t15.5\n2017-08-25\t25.0\n2017-08-27\t23.5\n2017-08-28\t21.25\n2017-08-29\t15.0\n2017-08-30\t4.0\n2017-08-31\t4.5\n2017-09-01\t5.25\n2017-09-02\t5.5\n2017-09-03\t8.25\n2017-09-04\t10.0\n2017-09-05\t8.5\n2017-09-06\t14.5\n2017-09-07\t14.75\n2017-09-08\t15.75\n2017-09-09\t19.0\n2017-09-10\t16.5\n2017-09-11\t18.25\n2017-09-12\t19.25\n2017-09-13\t18.0\n2017-09-14\t18.5\n2017-09-15\t17.25\n2017-09-16\t15.5\n2017-09-17\t15.75\n2017-09-18\t16.75\n2017-09-19\t20.25\n2017-09-20\t22.25\n2017-09-21\t24.75\n2017-09-22\t24.25\n2017-09-23\t21.25\n2017-09-24\t21.25\n2017-09-25\t19.75\n2017-09-26\t19.5\n2017-09-27\t22.5\n2017-09-28\t23.75\n2017-09-29\t24.75\n2017-09-30\t26.5\n2017-10-01\t25.25\n2017-10-02\t34.25\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820701_-887873179",
+      "id": "20180122-200121_1705763298",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Arrivals - Departures: Net change in number of tankers per day.",
+      "text": "%sql\n\nselect \n    arrivals.dtg as dtg,\n    arr_count - dep_count as net_count\nfrom (\n    /* Arrivals */\n    select\n        dtg,\n        count as arr_count\n    from (\n        select\n            cur.dtg as dtg,\n            count(distinct cur.mmsi) as count\n        from \n            houston_ships as cur\n        left join \n            houston_ships as prev\n        on \n            cur.dtg \u003d date_add(prev.dtg, 1)\n            and cur.mmsi \u003d prev.mmsi\n        where \n            isnull(prev.mmsi)\n        group by \n            cur.dtg\n    ) \n    where\n        /* Cut out extra data so we only have 1 month */\n        dtg \u003e cast(\u00272017-07-17T00:00:00.000Z\u0027 as timestamp) \n    order by \n        cur.dtg\n) as arrivals \nleft join (\n    /* Departures */\n    select \n        dtg,\n        count as dep_count\n    from (\n        select\n            prev.dtg as dtg,\n            count(distinct prev.mmsi) as count\n        from \n            houston_ships as cur\n        right join \n            houston_ships as prev\n        on \n            cur.dtg \u003d date_add(prev.dtg, 1)\n            and cur.mmsi \u003d prev.mmsi\n        where \n            isnull(cur.mmsi)\n        group by \n            prev.dtg\n    )\n    where\n        /* Cut out extra data so we only have 1 month */\n        dtg \u003e cast(\u00272017-07-17T00:00:00.000Z\u0027 as timestamp) \n    order by \n        prev.dtg\n) as departures\non arrivals.dtg \u003d departures.dtg\norder by\n    dtg\n",
+      "dateUpdated": "May 12, 2018 10:22:34 PM",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": true,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "lineChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "lineChart": {
+                  "forceY": false
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "dtg",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "net_count",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "dtg\tnet_count\n2017-07-18\t-1\n2017-07-19\t-3\n2017-07-20\t6\n2017-07-21\t1\n2017-07-22\t-1\n2017-07-23\t-3\n2017-07-24\t6\n2017-07-25\t14\n2017-07-26\t8\n2017-07-27\t-7\n2017-07-28\t4\n2017-07-29\t3\n2017-07-30\t-4\n2017-07-31\t7\n2017-08-01\t-4\n2017-08-02\t-6\n2017-08-03\t4\n2017-08-04\t16\n2017-08-05\t-7\n2017-08-06\t-1\n2017-08-07\t2\n2017-08-08\t-10\n2017-08-09\t3\n2017-08-10\t3\n2017-08-11\t-2\n2017-08-12\t-1\n2017-08-13\t-1\n2017-08-14\t3\n2017-08-15\t3\n2017-08-16\t-2\n2017-08-17\t5\n2017-08-18\t1\n2017-08-19\t-4\n2017-08-20\t-2\n2017-08-21\t5\n2017-08-22\t-2\n2017-08-23\t3\n2017-08-24\t-14\n2017-08-25\t-42\n2017-08-26\tnull\n2017-08-27\t10\n2017-08-28\t-5\n2017-08-29\t1\n2017-08-30\t10\n2017-08-31\t26\n2017-09-01\t7\n2017-09-02\t8\n2017-09-03\t7\n2017-09-04\t-2\n2017-09-05\t9\n2017-09-06\t-4\n2017-09-07\t-6\n2017-09-08\t0\n2017-09-09\t-6\n2017-09-10\t6\n2017-09-11\t-5\n2017-09-12\t-1\n2017-09-13\t-5\n2017-09-14\t5\n2017-09-15\t3\n2017-09-16\t5\n2017-09-17\t-7\n2017-09-18\t-9\n2017-09-19\t-16\n2017-09-20\t-3\n2017-09-21\t5\n2017-09-22\t8\n2017-09-23\t10\n2017-09-24\t-2\n2017-09-25\t1\n2017-09-26\t-2\n2017-09-27\t-15\n2017-09-28\t-15\n2017-09-29\t12\n2017-09-30\t-2\n2017-10-01\t-2\n2017-10-02\t-33\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820702_-886718932",
+      "id": "20180122-203445_508413983",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Temp View for tankers around Houston over harvey",
+      "text": "%sql\n\ncreate or replace temp view houston_ships as \nselect \n    mmsi,\n    /* convert to 00:00:00 */\n    date_sub(dtg, 0) as dtg,\n    first(vessel_type_sub)\nfrom (\n    select \n        * \n    from  \n        fsdsAIS \n    where \n        /* We need to over shoot the beginning by about a week so we don\u0027t have artifacts in the moving averages from null */\n        dtg \u003e cast(\u00272017-01-01T00:00:00.000Z\u0027 as timestamp) \n        and \n        dtg \u003c cast(\u00272017-12-26T00:00:00.000Z\u0027 as timestamp)\n        and \n        st_intersects(st_makeBBOX(-100.3051, 15.5020, -73.6962, 33.8272), position) /* Gulf */\n)\nwhere\n    st_contains(st_bufferPoint(st_makePoint(-94.867089, 29.580314), 50000), position) /* Houston */\n    and\n    vessel_type like \"Tanker\"\ngroup by \n    dtg,\n    mmsi",
+      "dateUpdated": "May 12, 2018 10:58:41 PM",
+      "config": {
+        "tableHide": true,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": true,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": ""
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820699_-885564686",
+      "id": "20180122-173535_728623966",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Min/Max Normalized Net change in tankers and fuel prices",
+      "text": "%sql\n\nselect \n    /* Calculate min/max normalized values */\n    dtg,\n    ((nyh - min_nyh) / (max_nyh - min_nyh)) as nyh_norm, \n    ((usgc - min_usgc) / (max_usgc - min_usgc)) as usgc_norm,\n    ((net_count - min_net_count) / (max_net_count - min_net_count)) as net_ships\nfrom (\n    select\n        /* Prepare for min/max normalization */\n        dtg,\n        nyh,\n        min(nyh) over () as min_nyh,\n        max(nyh) over () as max_nyh,\n        usgc,\n        min(usgc) over () as min_usgc,\n        max(usgc) over () as max_usgc,\n        net_count,\n        min(net_count) over () as min_net_count,\n        max(net_count) over () as max_net_count\n    from (\n        /* Get from the JOIN */\n        select \n            /* Fill null values with last value to make graph continuous */\n            ifnull(gas.nyh_value, last(gas.nyh_value,true) over (order by ships.dtg)) as nyh,\n            ifnull(gas.usgc_value, last(gas.usgc_value,true) over (order by ships.dtg)) as usgc,\n            net_count,\n            ships.dtg as dtg\n        from (\n            select \n                arrivals.dtg as dtg,\n                arr_count - dep_count as net_count\n            from (\n                /* Arrivals */\n                select\n                    dtg,\n                    count as arr_count\n                from (\n                    select\n                        cur.dtg as dtg,\n                        count(distinct cur.mmsi) as count\n                    from \n                        houston_ships as cur\n                    left join \n                        houston_ships as prev\n                    on \n                        cur.dtg \u003d date_add(prev.dtg, 1)\n                        and cur.mmsi \u003d prev.mmsi\n                    where \n                        isnull(prev.mmsi)\n                    group by \n                        cur.dtg\n                ) \n                where\n                    /* Cut out extra data so we only have 1 month */\n                    dtg \u003e cast(\u00272017-07-17T00:00:00.000Z\u0027 as timestamp) \n                order by \n                    cur.dtg\n            ) as arrivals \n            left join (\n                /* Departures */\n                select \n                    dtg,\n                    count as dep_count\n                from (\n                    select\n                        prev.dtg as dtg,\n                        count(distinct prev.mmsi) as count\n                    from \n                        houston_ships as cur\n                    right join \n                        houston_ships as prev\n                    on \n                        cur.dtg \u003d date_add(prev.dtg, 1)\n                        and cur.mmsi \u003d prev.mmsi\n                    where \n                        isnull(cur.mmsi)\n                    group by \n                        prev.dtg\n                )\n                where\n                    /* Cut out extra data so we only have 1 month */\n                    dtg \u003e cast(\u00272017-07-17T00:00:00.000Z\u0027 as timestamp) \n                order by \n                    prev.dtg\n            ) as departures\n            on arrivals.dtg \u003d departures.dtg\n            order by\n                dtg\n        ) as ships \n        LEFT JOIN (\n        /* Select the Gas prices by day */\n            select \n                date_sub(dtg, 0) as dtg_sub,\n                nyh as nyh_value,\n                usgc as usgc_value\n            from \n                gasPrices \n            where \n                dtg \u003e cast(\u00272017-07-10T00:00:00.000Z\u0027 as timestamp) \n                and \n                dtg \u003c cast(\u00272017-11-3T00:00:00.000Z\u0027 as timestamp)\n        ) as gas \n        on \n            ships.dtg \u003d gas.dtg_sub\n    )\n)\nwhere \n    /* Cut off lead dates that have null fuel values */\n    dtg \u003e cast(\u00272017-07-17T00:00:00.000Z\u0027 as timestamp) \n    and \n    dtg \u003c cast(\u00272017-11-3T00:00:00.000Z\u0027 as timestamp)\norder by \n    dtg",
+      "dateUpdated": "May 12, 2018 10:58:40 PM",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": true,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "lineChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "lineChart": {
+                  "forceY": true
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "dtg",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "nyh_norm",
+                  "index": 1.0,
+                  "aggr": "sum"
+                },
+                {
+                  "name": "usgc_norm",
+                  "index": 2.0,
+                  "aggr": "sum"
+                },
+                {
+                  "name": "net_ships",
+                  "index": 3.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "dtg\tnyh_norm\tusgc_norm\tnet_ships\n2017-07-18\t0.03600654664484455\t0.04753521126760547\t0.6029411764705882\n2017-07-19\t0.11129296235679224\t0.10739436619718298\t0.5735294117647058\n2017-07-20\t0.09819967266775786\t0.09330985915492945\t0.7058823529411765\n2017-07-21\t0.016366612111292977\t0.0\t0.6323529411764706\n2017-07-22\t0.016366612111292977\t0.0\t0.6029411764705882\n2017-07-23\t0.016366612111292977\t0.0\t0.5735294117647058\n2017-07-24\t0.0\t0.007042253521126375\t0.7058823529411765\n2017-07-25\t0.0720130932896891\t0.07746478873239404\t0.8235294117647058\n2017-07-26\t0.06873977086743051\t0.11091549295774637\t0.7352941176470589\n2017-07-27\t0.10965630114566277\t0.1478873239436617\t0.5147058823529411\n2017-07-28\t0.1620294599018003\t0.19366197183098569\t0.6764705882352942\n2017-07-29\t0.1620294599018003\t0.19366197183098569\t0.6617647058823529\n2017-07-30\t0.1620294599018003\t0.19366197183098569\t0.5588235294117647\n2017-07-31\t0.20785597381342064\t0.24647887323943643\t0.7205882352941176\n2017-08-01\t0.19476268412438624\t0.2323943661971829\t0.5588235294117647\n2017-08-02\t0.1587561374795417\t0.1919014084507042\t0.5294117647058824\n2017-08-03\t0.1407528641571196\t0.21830985915492937\t0.6764705882352942\n2017-08-04\t0.1554828150572831\t0.2341549295774644\t0.8529411764705882\n2017-08-05\t0.1554828150572831\t0.2341549295774644\t0.5147058823529411\n2017-08-06\t0.1554828150572831\t0.2341549295774644\t0.6029411764705882\n2017-08-07\t0.1472995090016368\t0.21302816901408447\t0.6470588235294118\n2017-08-08\t0.12274959083469715\t0.17957746478873216\t0.47058823529411764\n2017-08-09\t0.13747954173486102\t0.1866197183098589\t0.6617647058823529\n2017-08-10\t0.09328968903437015\t0.14260563380281682\t0.6617647058823529\n2017-08-11\t0.11947626841243855\t0.17605633802816875\t0.5882352941176471\n2017-08-12\t0.11947626841243855\t0.17605633802816875\t0.6029411764705882\n2017-08-13\t0.11947626841243855\t0.17605633802816875\t0.6029411764705882\n2017-08-14\t0.0638297872340428\t0.11267605633802787\t0.6617647058823529\n2017-08-15\t0.07037643207855998\t0.10211267605633771\t0.6617647058823529\n2017-08-16\t0.040916530278232624\t0.07570422535211253\t0.5882352941176471\n2017-08-17\t0.08837970540098208\t0.10739436619718298\t0.6911764705882353\n2017-08-18\t0.14238952536824873\t0.17077464788732388\t0.6323529411764706\n2017-08-19\t0.14238952536824873\t0.17077464788732388\t0.5588235294117647\n2017-08-20\t0.14238952536824873\t0.17077464788732388\t0.5882352941176471\n2017-08-21\t0.08674304418985296\t0.09507042253521095\t0.6911764705882353\n2017-08-22\t0.09819967266775786\t0.10739436619718298\t0.5882352941176471\n2017-08-23\t0.1407528641571196\t0.16021126760563373\t0.6617647058823529\n2017-08-24\t0.24222585924713605\t0.2728873239436616\t0.4117647058823529\n2017-08-25\t0.23731587561374798\t0.27992957746478836\t0.0\n2017-08-26\t0.23731587561374798\t0.27992957746478836\tnull\n2017-08-27\t0.23731587561374798\t0.27992957746478836\t0.7647058823529411\n2017-08-28\t0.31096563011456657\t0.34507042253521114\t0.5441176470588235\n2017-08-29\t0.44189852700491\t0.4401408450704225\t0.6323529411764706\n2017-08-30\t0.6072013093289689\t0.5985915492957743\t0.7647058823529411\n2017-08-31\t1.0\t1.0\t1.0\n2017-09-01\t0.8428805237315874\t0.8926056338028162\t0.7205882352941176\n2017-09-02\t0.8428805237315874\t0.8926056338028162\t0.7352941176470589\n2017-09-03\t0.8428805237315874\t0.8926056338028162\t0.7205882352941176\n2017-09-04\t0.8428805237315874\t0.8926056338028162\t0.5882352941176471\n2017-09-05\t0.7184942716857612\t0.7253521126760561\t0.75\n2017-09-06\t0.833060556464812\t0.6408450704225349\t0.5588235294117647\n2017-09-07\t0.8085106382978724\t0.5176056338028165\t0.5294117647058824\n2017-09-08\t0.795417348608838\t0.577464788732394\t0.6176470588235294\n2017-09-09\t0.795417348608838\t0.577464788732394\t0.5294117647058824\n2017-09-10\t0.795417348608838\t0.577464788732394\t0.7058823529411765\n2017-09-11\t0.6792144026186581\t0.4788732394366193\t0.5441176470588235\n2017-09-12\t0.716857610474632\t0.5211267605633799\t0.6029411764705882\n2017-09-13\t0.43371522094926374\t0.4137323943661969\t0.5441176470588235\n2017-09-14\t0.40589198036006546\t0.2869718309859151\t0.6911764705882353\n2017-09-15\t0.4648117839607202\t0.30985915492957733\t0.6617647058823529\n2017-09-16\t0.4648117839607202\t0.30985915492957733\t0.6911764705882353\n2017-09-17\t0.4648117839607202\t0.30985915492957733\t0.5147058823529411\n2017-09-18\t0.4271685761047465\t0.33978873239436586\t0.4852941176470588\n2017-09-19\t0.3682487725040918\t0.334507042253521\t0.38235294117647056\n2017-09-20\t0.2978723404255322\t0.2940140845070419\t0.5735294117647058\n2017-09-21\t0.2929623567921441\t0.288732394366197\t0.6911764705882353\n2017-09-22\t0.307692307692308\t0.3186619718309856\t0.7352941176470589\n2017-09-23\t0.307692307692308\t0.3186619718309856\t0.7647058823529411\n2017-09-24\t0.307692307692308\t0.3186619718309856\t0.5882352941176471\n2017-09-25\t0.4386252045826514\t0.3767605633802816\t0.6323529411764706\n2017-09-26\t0.374795417348609\t0.3485915492957745\t0.5882352941176471\n2017-09-27\t0.253682487725041\t0.2940140845070419\t0.39705882352941174\n2017-09-28\t0.17348608837970556\t0.30457746478873204\t0.39705882352941174\n2017-09-29\t0.12765957446808524\t0.21654929577464785\t0.7941176470588235\n2017-09-30\t0.12765957446808524\t0.21654929577464785\t0.5882352941176471\n2017-10-01\t0.12765957446808524\t0.21654929577464785\t0.5882352941176471\n2017-10-02\t0.09656301145662875\t0.1267605633802814\t0.1323529411764706\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1526156820703_-887103681",
+      "id": "20180122-204738_2063578718",
+      "dateCreated": "May 12, 2018 8:27:00 PM",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "Hurrican Harvey Fuel Price Impact Analysis",
+  "id": "2DDY4K5JF",
+  "angularObjects": {
+    "2ANGGHHMQ::2DDY4K5JF": [],
+    "2BRWU4WXC:shared_process": [],
+    "2AM1YV5CU:shared_process": [],
+    "2AJXGMUUJ:shared_process": [],
+    "2AKK3QQXU:shared_process": []
+  },
+  "config": {},
+  "info": {}
+}
