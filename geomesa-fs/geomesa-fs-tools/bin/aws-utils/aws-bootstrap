@@ -21,18 +21,16 @@ usage="usage: ./aws-bootstrap [-c s3_container_path <options>] | [-h|--help]"
 
 function printHelp() {
   echo ""
-  echo "Easily start up an Amazon EMR cluster preconfigured with GeoMesa, Spark, Hbase and optionally a Zeppelin"
+  echo "Easily start up an Amazon EMR cluster preconfigured with GeoMesa, Spark and optionally a Zeppelin"
   echo "or Jupyter notebook server pre-loaded with GeoMesa and examples."
   echo ""
   echo "Note: Depending on your AWS region some defaults may not work out of the box because the resources are not"
   echo "      available in that AWS region."
   echo ""
   echo "Required:"
-  echo "  -c,--container        S3 Bucket URL to use as the HBase root and bootstrap working directory"
+  echo "  -c,--container        S3 Bucket URL to use as the FSDS root and bootstrap working directory"
   echo ""
   echo "Options:"
-  echo "  -r, --read-only       Start HBase in read only mode. This will not permit ingest of data but"
-  echo "                        allows multiple HBase clusters to read from the same S3 root directory."
   echo "  -j,--jupyter          Specifying this parameter will install and configure a Jupyter notebook on the cluster"
   echo "                        master. Additionally, you can specify a password to use for the Jupyter server by"
   echo "                        providing a value to this parameter. e.g. -j=password or --jupyter=password"
@@ -84,11 +82,6 @@ else
           shift
           CONTAINER="${1}"
         fi
-        shift
-        ;;
-      # Optional Params
-      -r|--read-only)
-        HBASE_READ_ONLY=',"hbase.emr.readreplica.enabled":"true"'
         shift
         ;;
       -z|--zeppelin)
@@ -322,92 +315,8 @@ pushd ${%%gmtools.dist.name%%_HOME}/..
 tar -czf "${tarball}" %%gmtools.assembly.name%%/*
 popd
 
-# Setup hbase config
-hbase_conf=${WORKING_DIR}/hbase_conf.json
-echo "Writing HBase configuration to: ${hbase_conf}"
-cat > ${hbase_conf} <<EOF
-[
-  {
-    "Classification": "hbase-site",
-    "Properties": {
-      "fs.s3.consistent.retryPeriodSeconds": "10",
-      "hbase.regionserver.global.memstore.size": "0.4",
-      "hbase.regionserver.logroll.period": "600000",
-      "fs.s3.consistent.retryPolicyType": "fixed",
-      "hbase.hstore.blockingStoreFiles": "200",
-      "hbase.rootdir": "${CONTAINER}",
-      "fs.s3.consistent.throwExceptionOnInconsistency": "false",
-      "hbase.hregion.memstore.mslab.enabled": "false",
-      "hbase.bucketcache.size": "27000",
-      "hbase.regionserver.handler.count": "30",
-      "hbase.bucketcache.combinedcache.enabled": "true",
-      "hbase.hregion.memstore.flush.size": "134217728",
-      "hbase.hstore.flusher.count": "10",
-      "hbase.hregion.max.filesize": "10737418240",
-      "hbase.hregion.memstore.block.multiplier": "10",
-      "hbase.bucketcache.ioengine": "offheap",
-      "hbase.regionserver.regionSplitLimit": "10000",
-      "fs.s3.consistent.metadata.tableName": "OptixHBase20180402-2"
-    },
-    "Configurations": [
-
-    ]
-  },
-  {
-    "Classification": "hbase",
-    "Properties": {
-      "hbase.emr.storageMode": "s3"${HBASE_READ_ONLY}
-    },
-    "Configurations": [
-
-    ]
-  },
-  {
-    "Classification": "hbase-env",
-    "Properties": {
-
-    },
-    "Configurations": [
-      {
-        "Classification": "export",
-        "Properties": {
-          "HBASE_REGIONSERVER_OPTS": "\"-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=10102 -Dcom.sun.management.jmxremote.ssl=false -Xmx28G -XX:MaxDirectMemorySize=28G\"",
-          "HBASE_MASTER_OPTS": "\"-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=10101 -Dcom.sun.management.jmxremote.ssl=false -Xmx28G -XX:MaxDirectMemorySize=28G\""
-        },
-        "Configurations": [
-
-        ]
-      }
-    ]
-  },
-  {
-    "Classification": "hbase-metrics",
-    "Properties": {
-      "rpc.period": "60",
-      "hbase.period": "60",
-      "rpc.class": "org.apache.hadoop.metrics.spi.NullContextWithUpdateThread",
-      "hbase.class": "org.apache.hadoop.metrics.spi.NullContextWithUpdateThread",
-      "jvm.class": "org.apache.hadoop.metrics.spi.NullContextWithUpdateThread",
-      "jvm.period": "60"
-    },
-    "Configurations": [
-
-    ]
-  },
-  {
-    "Classification": "emrfs-site",
-    "Properties": {
-      "fs.s3.consistent": "true"
-    },
-    "Configurations": [
-
-    ]
-  }
-]
-EOF
-
 # Create cluster name
-name="GeoMesa HBase on S3"
+name="GeoMesa FSDS on S3"
 if [[ -n "${JUPYTER}" && -z "${ZEPPELIN}" ]]; then
   name="${name} with Jupyter"
 elif [[ -z "${JUPYTER}" && -n "${ZEPPELIN}" ]]; then
@@ -434,13 +343,12 @@ cmd="
     --release-label emr-5.10.0                                                      \
     --output text                                                                   \
     --use-default-roles                                                             \
-    --applications Name=Hadoop Name=Zookeeper Name=Spark Name=HBase ${ZEPPELIN_APP} \
+    --applications Name=Hadoop Name=Zookeeper Name=Spark ${ZEPPELIN_APP}            \
     ${EC2_ATTRIBUTES}                                                               \
     --instance-groups                                                               \
-      Name=Master,InstanceCount=1,InstanceGroupType=MASTER,${MasterType}    \
-      ${WorkerGroup} \
-      ${TaskGroup}
-    --configurations file://${hbase_conf}                                           \
+      Name=Master,InstanceCount=1,InstanceGroupType=MASTER,${MasterType}            \
+      ${WorkerGroup}                                                                \
+      ${TaskGroup}                                                                  \
     --bootstrap-actions Name=BootstrapGeoMesa,Path=${CONTAINER}.aws-bootstrap-actions.sh,Args=[${BootstrapArgs}]
 "
 echo ""
@@ -510,7 +418,6 @@ else
   echo "Master public DNS name: ${address}"
   echo "Resource Manager: ${address}:8088"
   echo "Spark History Server: ${address}:18080"
-  echo "HBase Master: ${address}:16010/master-status"
   echo "HDFS Name Node: ${address}:50070"
   if [[ -n "${JUPYTER}" ]]; then
     echo "Jupyter Server: ${address}:8888"
