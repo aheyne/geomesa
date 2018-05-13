@@ -136,6 +136,9 @@ else
     log "Jupyter Installed"
   fi
 
+  # Make sure everyone can write to the log
+  sudo chown 777 ${GM_TOOLS_HOME}/logs/geomesa.log
+
   log "Bootstrap Complete"
   updateStatus "Done"
 fi
