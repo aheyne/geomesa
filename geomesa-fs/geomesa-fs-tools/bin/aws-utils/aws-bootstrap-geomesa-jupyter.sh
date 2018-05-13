@@ -49,9 +49,9 @@ sudo ${GM_TOOLS_HOME}/bin/aws-utils/aws-bootstrap-geomesa-python.sh
 log "Installing Jupyter"
 sudo python36 -m pip install jupyter pandas folium matplotlib geopandas
 
-# Prepare runtime (gm-hbase bootstrap may not have run)
-runtimeJar="geomesa-hbase-spark-runtime_${scalaBinVersion}-${projectVersion}.jar"
-linkFile="/opt/geomesa/dist/spark/geomesa-hbase-spark-runtime.jar"
+# Prepare runtime (gm-fs bootstrap may not have run)
+runtimeJar="geomesa-fs-spark-runtime_${scalaBinVersion}-${projectVersion}.jar"
+linkFile="/opt/geomesa/dist/spark/geomesa-fs-spark-runtime.jar"
 [[ ! -h $linkFile ]] && sudo ln -s $runtimeJar $linkFile
 
 log "Generating Jupyter Notebook Config"
