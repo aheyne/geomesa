@@ -73,6 +73,6 @@ export GEOMESA_HADOOP_CLASSPATH=$(hadoop classpath)
 EOF
 
 # Make sure everyone can write to the log
-sudo chown 777 ${%%gmtools.dist.name%%_HOME}/logs/geomesa.log
+sudo chmod 777 ${%%gmtools.dist.name%%_HOME}/logs/geomesa.log
 
 log "GeoMesa-HBase Bootstrap complete...log out and re-login to complete process"

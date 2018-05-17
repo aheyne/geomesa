@@ -309,7 +309,7 @@ sudo chown -R zeppelin:zeppelin $notebookDir
 
 log "Updating Permssions"
 sudo chown -R zeppelin:zeppelin /etc/zeppelin/conf/*
-sudo chown 777 ${GM_TOOLS_HOME}/logs/geomesa.log
+sudo chmod 777 ${GM_TOOLS_HOME}/logs/geomesa.log
 
 log "Starting Zeppelin"
 sudo start zeppelin
