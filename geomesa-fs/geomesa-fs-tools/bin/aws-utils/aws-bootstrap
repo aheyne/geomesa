@@ -70,6 +70,7 @@ WorkerType="InstanceType=m1.large"
 WorkerCount="InstanceCount=1"
 TaskType="InstanceType=m1.large"
 TaskCount="InstanceCount=0"
+NO_UPLOAD="false"
 
 if [[ $# -eq 0 ]]; then
   printHelp
@@ -82,6 +83,10 @@ else
           shift
           CONTAINER="${1}"
         fi
+        shift
+        ;;
+      -n|--no-upload)
+        NO_UPLOAD="true"
         shift
         ;;
       -z|--zeppelin)
@@ -362,10 +367,12 @@ if [[ $confirm =~ ^(yes|y) ]]; then
   echo ""
   # Upload tools resources
   error=0
-  aws ${AWS_PROFILE} s3 cp "${tarball}" "${CONTAINER}" || error=1
-  aws ${AWS_PROFILE} s3 cp "${%%gmtools.dist.name%%_HOME}/bin/aws-utils/.aws-bootstrap-actions.sh" "${CONTAINER}" || error=1
-  if [[ error == 1 ]]; then
-    echo "Failed to upload bootstrap resources. Check write permissions to container." && exit 1
+  if [[ "${NO_UPLOAD}" != "true" ]]; then
+    aws ${AWS_PROFILE} s3 cp "${tarball}" "${CONTAINER}" || error=1
+    aws ${AWS_PROFILE} s3 cp "${%%gmtools.dist.name%%_HOME}/bin/aws-utils/.aws-bootstrap-actions.sh" "${CONTAINER}" || error=1
+    if [[ error == 1 ]]; then
+      echo "Failed to upload bootstrap resources. Check write permissions to container." && exit 1
+    fi
   fi
 
   # Create the cluster
