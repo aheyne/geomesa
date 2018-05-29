@@ -93,6 +93,8 @@ class ConverterIngest(sft: SimpleFeatureType,
   }
 }
 
+
+
 class LocalIngestConverterImpl(sft: SimpleFeatureType, path: String, converters: ObjectPool[SimpleFeatureConverter[_]], failures: AtomicLong)
     extends LocalIngestConverter {
 

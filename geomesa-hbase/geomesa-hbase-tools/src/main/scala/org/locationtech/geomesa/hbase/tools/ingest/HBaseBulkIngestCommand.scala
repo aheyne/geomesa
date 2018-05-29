@@ -47,10 +47,8 @@ class HBaseBulkIngestCommand extends HBaseIngestCommand {
         val job = Option(params.mode) match {
           case Some(RunModes.DistributedCombine) =>
             converterCombineIngestJob(dsParams, sft, converterConfig, inputs, params.maxSplitSize, index)
-
           case Some(RunModes.Distributed) =>
             converterIngestJob(dsParams, sft, converterConfig, inputs, index)
-
           case _ =>
             converterIngestJob(dsParams, sft, converterConfig, inputs, index)
         }
