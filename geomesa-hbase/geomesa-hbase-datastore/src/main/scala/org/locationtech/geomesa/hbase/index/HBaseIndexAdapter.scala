@@ -8,6 +8,7 @@
 
 package org.locationtech.geomesa.hbase.index
 
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.filter.{Filter => HFilter}
@@ -24,12 +25,13 @@ import org.locationtech.geomesa.hbase.{HBaseFeatureIndexType, HBaseFilterStrateg
 import org.locationtech.geomesa.index.index.ClientSideFiltering.RowAndValue
 import org.locationtech.geomesa.index.index.{ClientSideFiltering, IndexAdapter}
 import org.locationtech.geomesa.index.iterators.StatsScan
+import org.locationtech.geomesa.utils.conf.GeoMesaSystemProperties.SystemProperty
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 import org.opengis.filter.Filter
 
 trait HBaseIndexAdapter extends HBaseFeatureIndexType
-    with IndexAdapter[HBaseDataStore, HBaseFeature, Mutation, Query, ScanConfig] with ClientSideFiltering[Result] {
+    with IndexAdapter[HBaseDataStore, HBaseFeature, Mutation, Query, ScanConfig] with ClientSideFiltering[Result] with LazyLogging {
 
   import HBaseFeatureIndex.{DataColumnFamily, DataColumnQualifier}
 
@@ -42,7 +44,15 @@ trait HBaseIndexAdapter extends HBaseFeatureIndexType
   override protected def createInsert(row: Array[Byte], feature: HBaseFeature): Mutation = {
     val put = new Put(row).addImmutable(feature.fullValue.cf, feature.fullValue.cq, feature.fullValue.value)
     feature.fullValue.vis.foreach(put.setCellVisibility)
-    put
+    SystemProperty("geomesa.hbase.wal.durability").option match {
+      case Some(value) =>
+        val durability = Durability.values.find(_.toString.equalsIgnoreCase(value)).getOrElse{
+          logger.error(s"Invalid HBase WAL Durability setting: ${value}. Falling back to default Durability.")
+          Durability.USE_DEFAULT
+        }
+        put.setDurability(durability)
+      case None => put
+    }
   }
 
   override protected def createDelete(row: Array[Byte], feature: HBaseFeature): Mutation = {
