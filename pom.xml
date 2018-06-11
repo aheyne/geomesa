@@ -86,9 +86,9 @@
         <accumulo.version>1.8.1</accumulo.version>
         <zookeeper.version>3.4.10</zookeeper.version>
         <thrift.version>0.9.3</thrift.version>
-        <hadoop.version>2.6.4</hadoop.version>
+        <hadoop.version>2.8.3</hadoop.version>
         <spark.version>2.2.0</spark.version>
-        <hbase.version>1.3.1</hbase.version>
+        <hbase.version>1.4.2</hbase.version>
         <hbase.guava.version>12.0.1</hbase.guava.version>
         <cassandra.version>3.0.0</cassandra.version>
         <cassandra.guava.version>18.0</cassandra.guava.version>
@@ -101,9 +101,9 @@
 
         <!-- Recommended installation versions -->
         <!-- These take into account bugfixes and should be used in documentation -->
-        <accumulo.version.recommended>1.8.1</accumulo.version.recommended>
+        <accumulo.version.recommended>1.9.1</accumulo.version.recommended>
         <hbase.version.recommended>1.3.1</hbase.version.recommended>
-        <hadoop.version.recommended>2.7.4</hadoop.version.recommended>
+        <hadoop.version.recommended>2.8.4</hadoop.version.recommended>
         <zookeeper.version.recommended>3.4.10</zookeeper.version.recommended>
 
         <!-- Minimum installation versions -->
@@ -2671,6 +2671,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.21.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.surefire</groupId>
+                            <artifactId>surefire-junit4</artifactId>
+                            <version>2.21.0</version>
+                        </dependency>
+                    </dependencies>
                     <configuration>
                         <forkCount>${test.fork.count}</forkCount>
                         <reuseForks>${test.fork.reuse}</reuseForks>
