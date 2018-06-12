@@ -22,16 +22,18 @@ import org.locationtech.geomesa.tools.ingest.{ConverterCombineIngestJob, Convert
 import org.locationtech.geomesa.tools.{Command, OutputPathParam, RequiredIndexParam}
 import org.locationtech.geomesa.utils.index.IndexMode
 import org.opengis.feature.simple.SimpleFeatureType
+import java.util.{List => jList}
+
 
 class HBaseBulkIngestCommand extends HBaseIngestCommand {
 
   override val name = "bulk-ingest"
   override val params = new HBaseBulkIngestParams()
 
-  override protected def createConverterIngest(sft: SimpleFeatureType, converterConfig: Config): Runnable = {
+  override protected def createConverterIngest(sft: SimpleFeatureType, converterConfig: Config, ingestFiles: jList[String]): Runnable = {
     import scala.collection.JavaConverters._
 
-    new ConverterIngest(sft, connection, converterConfig, params.files.asScala, Option(params.mode),
+    new ConverterIngest(sft, connection, converterConfig, ingestFiles.asScala, Option(params.mode),
       libjarsFile, libjarsPaths, params.threads, params.maxSplitSize) {
 
       override def run(): Unit = {

@@ -121,6 +121,17 @@
     </property>
 
     <property>
+        <name>geomesa.mapreduce.input.path.group.size</name>
+        <value>100000</value>
+        <description>Set the number of paths per batch to add to the FileInputFormat job.
+            (average_path_length + 1) * group_size must be less than Integer.MAX_VALUE
+            Setting this number low can cause increased job start time but may be necessary
+            when there is an extremely large number of input files or file paths are very long.
+        </description>
+        <final>false</final>
+    </property>
+
+    <property>
         <name>geomesa.convert.config.urls</name>
         <value></value>
         <description></description>

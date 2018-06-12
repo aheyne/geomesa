@@ -22,6 +22,7 @@ import org.locationtech.geomesa.jobs.GeoMesaConfigurator
 import org.locationtech.geomesa.jobs.mapreduce.{GeoMesaOutputFormat, JobWithLibJars}
 import org.locationtech.geomesa.tools.Command
 import org.locationtech.geomesa.tools.ingest.AbstractIngest.StatusCallback
+import org.locationtech.geomesa.utils.conf.GeoMesaSystemProperties.SystemProperty
 import org.opengis.feature.simple.SimpleFeature
 
 /**
@@ -79,7 +80,9 @@ abstract class AbstractIngestJob(dsParams: Map[String, String],
     job.getConfiguration.set("mapred.reduce.tasks.speculative.execution", "false")
     job.getConfiguration.set("mapreduce.job.user.classpath.first", "true")
 
-    FileInputFormat.setInputPaths(job, paths.mkString(","))
+    val groupSize = Integer.parseInt(SystemProperty("geomesa.mapreduce.input.path.group.size", "100000").get)
+    paths.grouped(groupSize).foreach(group => FileInputFormat.addInputPaths(job, group.mkString(",")))
+//    FileInputFormat.setInputPaths(job, paths.mkString(","))
 
     GeoMesaConfigurator.setFeatureTypeOut(job.getConfiguration, typeName)
     GeoMesaOutputFormat.configureDataStore(job, dsParams)
