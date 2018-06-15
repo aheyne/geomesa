@@ -21,16 +21,14 @@ User Manual
    lambda/index
    filesystem/index
    geoserver
-   blobstore
-   convert/index
-   geojson
-   metrics
-   native_api
-   nifi
-   process
    spark/index
+   convert/index
+   process
+   geojson
+   nifi
+   blobstore
+   native_api
    stream
-   web_data
    upgrade
 
 Appendix
@@ -40,3 +38,6 @@ Appendix
    :maxdepth: 2
 
    appendix/utils
+   appendix/memory
+   appendix/metrics
+   appendix/web_data
