@@ -34,7 +34,6 @@ import org.opengis.filter.Filter
  * via the record reader.
  */
 class ConverterInputFormat extends FileStreamInputFormat {
-//  lazy val recordReader: FileStreamRecordReader =
   override def createRecordReader(): FileStreamRecordReader = new ConverterRecordReader
 }
 

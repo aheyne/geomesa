@@ -35,8 +35,7 @@ class HBaseTestRunnerTest extends Specification with LazyLogging {
     new HBaseDataStoreTest,
     new HBaseDensityFilterTest,
     new HBaseStatsAggregatorTest
-// TODO: reenable viz test after testing
-//    new HBaseVisibilityTest
+    new HBaseVisibilityTest
   )
 
   step {

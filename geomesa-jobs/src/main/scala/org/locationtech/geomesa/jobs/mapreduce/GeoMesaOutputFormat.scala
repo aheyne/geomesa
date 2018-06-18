@@ -58,7 +58,6 @@ class GeoMesaOutputFormat extends OutputFormat[Text, SimpleFeature] with LazyLog
   override def getRecordWriter(context: TaskAttemptContext): RecordWriter[Text, SimpleFeature] = {
     val params  = GeoMesaConfigurator.getDataStoreOutParams(context.getConfiguration)
     val indices = GeoMesaConfigurator.getIndicesOut(context.getConfiguration)
-    logger.info("new gm record writer")
     new GeoMesaRecordWriter(params, indices, context)
   }
 
