@@ -10,14 +10,17 @@ package org.locationtech.geomesa.hbase.tools.ingest
 
 import java.io.File
 
-import com.beust.jcommander.Parameters
-import org.apache.hadoop.hbase.client.Connection
+import com.beust.jcommander.converters.BaseConverter
+import com.beust.jcommander.{Parameter, ParameterException, Parameters}
+import org.apache.hadoop.hbase.client.{Connection, Durability}
 import org.locationtech.geomesa.hbase.data.HBaseDataStore
 import org.locationtech.geomesa.hbase.tools.HBaseDataStoreCommand
 import org.locationtech.geomesa.hbase.tools.HBaseDataStoreCommand.{HBaseParams, ToggleRemoteFilterParam}
 import org.locationtech.geomesa.hbase.tools.ingest.HBaseIngestCommand.HBaseIngestParams
 import org.locationtech.geomesa.tools.ingest.{IngestCommand, IngestParams}
 import org.locationtech.geomesa.utils.classpath.ClassPathUtils
+
+import scala.util.control.NonFatal
 
 class HBaseIngestCommand extends IngestCommand[HBaseDataStore] with HBaseDataStoreCommand {
 

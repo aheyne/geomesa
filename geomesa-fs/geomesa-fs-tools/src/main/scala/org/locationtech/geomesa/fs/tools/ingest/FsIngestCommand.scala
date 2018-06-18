@@ -9,6 +9,7 @@
 package org.locationtech.geomesa.fs.tools.ingest
 
 import java.io.File
+import java.util.{List => jList}
 
 import com.beust.jcommander.{Parameter, ParameterException, Parameters}
 import com.typesafe.config.Config
@@ -58,7 +59,7 @@ class FsIngestCommand extends IngestCommand[FileSystemDataStore] with FsDataStor
     super.execute()
   }
 
-  override protected def createConverterIngest(sft: SimpleFeatureType, converterConfig: Config): Runnable = {
+  override protected def createConverterIngest(sft: SimpleFeatureType, converterConfig: Config, ingestFiles: jList[String]): Runnable = {
     FsCreateSchemaCommand.setOptions(sft, params)
     new FileSystemConverterIngest(sft,
         connection,
@@ -70,7 +71,8 @@ class FsIngestCommand extends IngestCommand[FileSystemDataStore] with FsDataStor
         libjarsPaths,
         params.threads,
         Option(params.tempDir).map(new Path(_)),
-        Option(params.reducers))
+        Option(params.reducers),
+        params.maxSplitSize)
   }
 }
 
@@ -97,8 +99,9 @@ object FsIngestCommand {
                                   libjarsPaths: Iterator[() => Seq[File]],
                                   numLocalThreads: Int,
                                   tempPath: Option[Path],
-                                  reducers: Option[java.lang.Integer])
-      extends ConverterIngest(sft, dsParams, converterConfig, inputs, mode, libjarsFile, libjarsPaths, numLocalThreads) {
+                                  reducers: Option[java.lang.Integer],
+                                  maxSplitSize: Int)
+      extends ConverterIngest(sft, dsParams, converterConfig, inputs, mode, libjarsFile, libjarsPaths, numLocalThreads, maxSplitSize) {
 
     override def runDistributedJob(statusCallback: StatusCallback): (Long, Long) = {
       if (reducers.isEmpty) {

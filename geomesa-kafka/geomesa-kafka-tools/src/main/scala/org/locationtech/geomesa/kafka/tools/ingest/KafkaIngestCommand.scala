@@ -10,6 +10,7 @@ package org.locationtech.geomesa.kafka.tools.ingest
 
 import java.io.{File, InputStream}
 import java.util.concurrent.atomic.AtomicLong
+import java.util.{List => jList}
 
 import com.beust.jcommander.{Parameter, Parameters}
 import com.typesafe.config.Config
@@ -24,6 +25,7 @@ import org.locationtech.geomesa.utils.classpath.ClassPathUtils
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
 import scala.concurrent.duration.Duration
+import scala.io.Source
 
 class KafkaIngestCommand extends IngestCommand[KafkaDataStore] with KafkaDataStoreCommand {
 
@@ -39,13 +41,19 @@ class KafkaIngestCommand extends IngestCommand[KafkaDataStore] with KafkaDataSto
   )
 
   // override to add delay in writing messages
-  override protected def createConverterIngest(sft: SimpleFeatureType, converterConfig: Config): Runnable = {
+  override protected def createConverterIngest(sft: SimpleFeatureType, converterConfig: Config, ingestFiles: jList[String]): Runnable = {
     import scala.collection.JavaConversions._
 
+    val ingestFiles: jList[String] = if (params.srcList) {
+      params.files.flatMap(Source.fromFile(_).getLines().toList)
+    } else {
+      params.files
+    }
+
     val delay = params.delay.toMillis
-    if (delay <= 0) { super.createConverterIngest(sft, converterConfig) } else {
+    if (delay <= 0) { super.createConverterIngest(sft, converterConfig, ingestFiles) } else {
       Command.user.info(s"Inserting delay of ${params.delay}")
-      new ConverterIngest(sft, connection, converterConfig, params.files, Option(params.mode), libjarsFile, libjarsPaths, params.threads) {
+      new ConverterIngest(sft, connection, converterConfig, params.files, Option(params.mode), libjarsFile, libjarsPaths, params.threads, params.maxSplitSize) {
         override def createLocalConverter(path: String, failures: AtomicLong): LocalIngestConverter = {
           new LocalIngestConverterImpl(sft, path, converters, failures) {
             override def convert(is: InputStream): (SimpleFeatureType, Iterator[SimpleFeature]) = {

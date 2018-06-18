@@ -9,6 +9,7 @@
 package org.locationtech.geomesa.tools.ingest
 
 import java.io.File
+import java.util.{List => jList}
 
 import com.beust.jcommander.{Parameter, ParameterException}
 import com.typesafe.config.Config
@@ -18,6 +19,7 @@ import org.locationtech.geomesa.tools.utils.{CLArgResolver, DataFormats}
 import org.locationtech.geomesa.utils.io.PathUtils
 import org.opengis.feature.simple.SimpleFeatureType
 
+import scala.io.Source
 import scala.util.Try
 
 trait IngestCommand[DS <: DataStore] extends DataStoreCommand[DS] {
@@ -34,6 +36,12 @@ trait IngestCommand[DS <: DataStore] extends DataStoreCommand[DS] {
     import DataFormats.{Avro, Csv, Shp, Tsv}
 
     ensureSameFs(PathUtils.RemotePrefixes)
+
+    val ingestFiles: jList[String] = if (params.srcList) {
+      params.files.flatMap(Source.fromFile(_).getLines().toList)
+    } else {
+      params.files
+    }
 
     val ingest = if (params.fmt == Shp) {
       createShpIngest()
@@ -64,15 +72,15 @@ trait IngestCommand[DS <: DataStore] extends DataStoreCommand[DS] {
         throw new ParameterException("SimpleFeatureType name and/or specification argument is required")
       }
 
-      createConverterIngest(sft, converterConfig)
+      createConverterIngest(sft, converterConfig, ingestFiles)
     }
 
     ingest.run()
   }
 
-  protected def createConverterIngest(sft: SimpleFeatureType, converterConfig: Config): Runnable = {
-    new ConverterIngest(sft, connection, converterConfig, params.files, Option(params.mode),
-      libjarsFile, libjarsPaths, params.threads)
+  protected def createConverterIngest(sft: SimpleFeatureType, converterConfig: Config, ingestFiles: jList[String]): Runnable = {
+    new ConverterIngest(sft, connection, converterConfig, ingestFiles, Option(params.mode),
+      libjarsFile, libjarsPaths, params.threads, params.maxSplitSize)
   }
 
   protected def createAutoIngest(): Runnable = {
@@ -99,4 +107,10 @@ trait IngestParams extends OptionalTypeNameParam with OptionalFeatureSpecParam
     with OptionalConverterConfigParam with OptionalInputFormatParam with DistributedRunParam {
   @Parameter(names = Array("-t", "--threads"), description = "Number of threads if using local ingest")
   var threads: Integer = 1
+
+  @Parameter(names = Array("--split-max-size"), description = "Maximum size of a split in bytes")
+  var maxSplitSize: Integer = -1
+
+  @Parameter(names = Array("--src-list"), description = "Input files are text files with lists of files, one per line, to ingest.")
+  var srcList: Boolean = false
 }

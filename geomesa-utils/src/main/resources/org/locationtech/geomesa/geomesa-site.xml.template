@@ -121,6 +121,17 @@
     </property>
 
     <property>
+        <name>geomesa.mapreduce.input.path.group.size</name>
+        <value>100000</value>
+        <description>Set the number of paths per batch to add to the FileInputFormat job.
+            (average_path_length + 1) * group_size must be less than Integer.MAX_VALUE
+            Setting this number low can cause increased job start time but may be necessary
+            when there is an extremely large number of input files or file paths are very long.
+        </description>
+        <final>false</final>
+    </property>
+
+    <property>
         <name>geomesa.convert.config.urls</name>
         <value></value>
         <description></description>
@@ -311,6 +322,20 @@
         <value></value>
         <description>HDFS or local path to GeoMesa-HBase Coprocessor JAR. If a local path is provided it must be the same for
             all region server. A path provided through the DataStore parameters will always override this property.
+        </description>
+        <final>false</final>
+    </property>
+
+    <property>
+        <name>geomesa.hbase.wal.durability</name>
+        <value>USE_DEFAULT</value>
+        <description>HBase WAL durability setting. Available settings are:
+            ASYNC_WAL: Write the Mutation to the WAL asynchronously
+            FSYNC_WAL: Write the Mutation to the WAL synchronously and force the entries to disk.
+            SKIP_WAL: Do not write the Mutation to the WAL
+            SYNC_WAL: Write the Mutation to the WAL synchronously.
+            USE_DEFAULT: If this is for tables durability, use HBase's global default value (SYNC_WAL).
+            For addtional information see HBase docs. https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/client/Durability.htm
         </description>
         <final>false</final>
     </property>

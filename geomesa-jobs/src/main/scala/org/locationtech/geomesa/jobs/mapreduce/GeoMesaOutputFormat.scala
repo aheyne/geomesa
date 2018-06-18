@@ -53,11 +53,12 @@ object GeoMesaOutputFormat {
   * Output format that writes simple features using GeoMesaDataStore's FeatureWriterAppend. Can write only
   * specific indices if desired
   */
-class GeoMesaOutputFormat extends OutputFormat[Text, SimpleFeature] {
+class GeoMesaOutputFormat extends OutputFormat[Text, SimpleFeature] with LazyLogging {
 
   override def getRecordWriter(context: TaskAttemptContext): RecordWriter[Text, SimpleFeature] = {
     val params  = GeoMesaConfigurator.getDataStoreOutParams(context.getConfiguration)
     val indices = GeoMesaConfigurator.getIndicesOut(context.getConfiguration)
+    logger.info("new gm record writer")
     new GeoMesaRecordWriter(params, indices, context)
   }
 
