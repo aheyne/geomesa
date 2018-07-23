@@ -44,6 +44,7 @@ trait HBaseIndexAdapter extends HBaseFeatureIndexType
   override protected def createInsert(row: Array[Byte], feature: HBaseFeature): Mutation = {
     val put = new Put(row).addImmutable(feature.fullValue.cf, feature.fullValue.cq, feature.fullValue.value)
     feature.fullValue.vis.foreach(put.setCellVisibility)
+    put.setDurability(Durability.SKIP_WAL)
     SystemProperty("geomesa.hbase.wal.durability").option match {
       case Some(value) =>
         val durability = Durability.values.find(_.toString.equalsIgnoreCase(value)).getOrElse{
