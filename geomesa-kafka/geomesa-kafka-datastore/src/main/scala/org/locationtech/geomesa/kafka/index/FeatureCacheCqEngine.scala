@@ -9,7 +9,7 @@
 package org.locationtech.geomesa.kafka.index
 
 import com.github.benmanes.caffeine.cache._
-import com.typesafe.scalalogging.LazyLogging
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.locationtech.geomesa.kafka.index.KafkaFeatureCache.AbstractKafkaFeatureCache
 import org.locationtech.geomesa.memory.cqengine.GeoCQEngine
 import org.locationtech.geomesa.utils.geotools.Conversions._

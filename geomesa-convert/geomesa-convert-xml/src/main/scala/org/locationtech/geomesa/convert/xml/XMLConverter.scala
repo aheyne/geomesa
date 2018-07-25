@@ -18,7 +18,7 @@ import javax.xml.validation.SchemaFactory
 import javax.xml.xpath.{XPath, XPathConstants, XPathExpression, XPathFactory}
 
 import com.typesafe.config.Config
-import com.typesafe.scalalogging.LazyLogging
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.apache.commons.io.IOUtils
 import org.apache.commons.io.input.BOMInputStream
 import org.locationtech.geomesa.convert.LineMode.LineMode

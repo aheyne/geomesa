@@ -11,7 +11,7 @@ package org.locationtech.geomesa.web.core
 import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse}
 
-import com.typesafe.scalalogging.LazyLogging
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.locationtech.geomesa.accumulo.data.{AccumuloDataStoreFactory, AccumuloDataStoreParams}
 import org.scalatra.servlet.RichServletContext

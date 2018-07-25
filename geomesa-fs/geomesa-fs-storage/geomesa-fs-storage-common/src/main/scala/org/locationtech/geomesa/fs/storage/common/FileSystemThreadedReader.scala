@@ -10,7 +10,7 @@ package org.locationtech.geomesa.fs.storage.common
 
 import java.util.concurrent.{Executors, LinkedBlockingQueue, TimeUnit}
 
-import com.typesafe.scalalogging.LazyLogging
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.apache.hadoop.fs.Path
 import org.locationtech.geomesa.fs.storage.api.FileSystemReader
 import org.locationtech.geomesa.utils.collection.CloseableIterator

@@ -12,7 +12,7 @@ import java.io.Closeable
 import java.util.concurrent.{Executors, TimeUnit}
 
 import com.github.benmanes.caffeine.cache._
-import com.typesafe.scalalogging.LazyLogging
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.opengis.feature.simple.SimpleFeature
 import org.opengis.filter.Filter
 

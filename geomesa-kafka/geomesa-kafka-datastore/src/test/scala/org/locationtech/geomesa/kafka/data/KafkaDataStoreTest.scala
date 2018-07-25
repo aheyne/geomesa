@@ -13,7 +13,7 @@ import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
 import java.{io, util}
 
-import com.typesafe.scalalogging.LazyLogging
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import com.vividsolutions.jts.geom.Point
 import kafka.admin.AdminUtils
 import org.apache.curator.framework.CuratorFrameworkFactory

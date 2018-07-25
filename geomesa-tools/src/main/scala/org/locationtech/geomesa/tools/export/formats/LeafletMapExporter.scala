@@ -10,7 +10,7 @@ package org.locationtech.geomesa.tools.export.formats
 
 import java.io._
 
-import com.typesafe.scalalogging.LazyLogging
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import com.vividsolutions.jts.geom.{Coordinate, Geometry}
 import org.geotools.geojson.feature.FeatureJSON
 import org.locationtech.geomesa.tools.Command.user

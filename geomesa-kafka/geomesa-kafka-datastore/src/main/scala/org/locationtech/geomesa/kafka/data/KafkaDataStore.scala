@@ -12,7 +12,7 @@ import java.io.IOException
 import java.util.{Properties, UUID}
 
 import com.github.benmanes.caffeine.cache.{CacheLoader, Caffeine, Ticker}
-import com.typesafe.scalalogging.LazyLogging
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import kafka.admin.AdminUtils
 import kafka.utils.ZkUtils
 import org.apache.kafka.clients.consumer.{Consumer, KafkaConsumer}
