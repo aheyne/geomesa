@@ -50,7 +50,6 @@ class GeoMesaHBaseInputFormat extends InputFormat[Text, SimpleFeature] with Lazy
     import scala.collection.JavaConversions._
     init(context.getConfiguration)
     val splits = delegate.getSplits(context)
-    splits.map(_.)
     logger.debug(s"Got ${splits.size()} splits")
     splits
   }
