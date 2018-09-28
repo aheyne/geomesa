@@ -2048,11 +2048,13 @@
                         <artifactId>jol-core</artifactId>
                     </exclusion>
                 </exclusions>
+                <classifier>nohive</classifier>
             </dependency>
             <dependency>
                 <groupId>org.apache.orc</groupId>
                 <artifactId>orc-mapreduce</artifactId>
                 <version>${orc.version}</version>
+                <classifier>nohive</classifier>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
@@ -2348,6 +2350,18 @@
                 <artifactId>hadoop-yarn-common</artifactId>
                 <version>${hadoop.version}</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-mapreduce-client-common</artifactId>
+                <version>${hadoop.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-minicluster</artifactId>
+                <version>${hadoop.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>

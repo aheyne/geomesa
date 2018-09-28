@@ -107,9 +107,9 @@ stricter configuration parsing.
 Distributed Runtime Version Checks
 ----------------------------------
 
-To prevent unexpected bugs due to JAR version mismatches, GeoMesa will now throw an exception if it detects
-incompatible versions on the distributed classpath. This behavior may be disbled by setting the system properties
-``geomesa.distributed.version.check=false`` and/or ``geomesa.distributed.version.skip=true``.
+To prevent unexpected bugs due to JAR version mismatches, GeoMesa can scan the distributed classpath to
+verify compatible versions on the distributed classpath. This behavior may be enabled by setting the system
+property ``geomesa.distributed.version.check=true``.
 
 Shapefile Ingestion
 -------------------
@@ -125,6 +125,19 @@ GeoMesa previously supported auto ingest of specially formatted delimited CSV an
 has been replaced with standard ingest type inference, which works similarly but may create different results.
 Generally, the previous behavior can be replicated by using type inference to create a converter definition,
 then modifying the converter to set the feature ID to the first column (``$1``).
+
+FileSystem Storage API Changes
+------------------------------
+
+The FileSystem Storage API is still considered beta-level software, and has been updated in this release. The
+DataStore API has not changed, however the internal class interfaces have changed in this release, potentially
+requiring changes in user code.
+
+In addition, the format used to store metadata files has been updated, so older versions of GeoMesa will not be
+able to read metadata created with this version. When accessing older metadata for the first time, GeoMesa will
+update the files to the new format, potentially breaking any old clients still being used.
+
+Finally, the ``update-metadata`` tools command has been replaced with ``manage-metadata``.
 
 Spark Version Update
 --------------------

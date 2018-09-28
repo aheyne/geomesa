@@ -10,7 +10,7 @@ package org.locationtech.geomesa.fs.storage.orc
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
-import org.apache.hadoop.hive.ql.io.sarg.SearchArgument
+import org.apache.orc.storage.ql.io.sarg.SearchArgument
 import org.apache.orc.{OrcFile, Reader}
 import org.geotools.process.vector.TransformProcess
 import org.locationtech.geomesa.features.serialization.ObjectType
@@ -48,6 +48,7 @@ class OrcFileSystemReader(sft: SimpleFeatureType,
       sf.setFeature(feature)
       sf
     }
+    private val result = transformed.getOrElse(feature)
 
     private val reader = OrcFile.createReader(file, OrcFile.readerOptions(config))
     private val rows = reader.rows(options)
@@ -70,8 +71,12 @@ class OrcFileSystemReader(sft: SimpleFeatureType,
       * @return
       */
     override def next(): SimpleFeature = {
-      staged = false
-      transformed.getOrElse(feature)
+      if (staged || hasNext) {
+        staged = false
+        result
+      } else {
+        Iterator.empty.next
+      }
     }
 
     override def close(): Unit = rows.close()
