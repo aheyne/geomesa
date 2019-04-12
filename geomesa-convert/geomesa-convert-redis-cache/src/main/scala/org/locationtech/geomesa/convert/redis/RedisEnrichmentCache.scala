@@ -49,7 +49,7 @@ class RedisEnrichmentCache(jedisPool: RedisConnectionBuilder,
           try {
             conn.hgetAll(k)
           } finally {
-            // Note: for a JedisPool this only returns it to the pool instead of actionally
+            // Note: for a JedisPool this only returns it to the pool instead of actually
             // closing the connection (so it's safe to call close() on the conn)
             conn.close()
           }
@@ -57,7 +57,11 @@ class RedisEnrichmentCache(jedisPool: RedisConnectionBuilder,
       })
 
   override def get(args: Array[String]): Any = cache.get(args(0)).get(args(1))
-  override def put(args: Array[String], value: Any): Unit = ???
+  override def put(args: Array[String], value: Any): Unit = {
+    val kv = cache.get(args(0))
+    kv.put(args(1), value.asInstanceOf[String])
+    cache.put(args(0), kv)
+  }
   override def clear(): Unit = ???
   override def close(): Unit = jedisPool.close()
 }

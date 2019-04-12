@@ -13,12 +13,25 @@ import org.locationtech.geomesa.convert2.transforms.TransformerFunction.NamedTra
 
 class EnrichmentCacheFunctionFactory extends TransformerFunctionFactory {
 
-  override def functions: Seq[TransformerFunction] = Seq(cacheLookup)
+  override def functions: Seq[TransformerFunction] = Seq(cacheLookup, cachePutOrLookup)
 
   private val cacheLookup = new NamedTransformerFunction(Seq("cacheLookup")) {
     override def eval(args: Array[Any])(implicit ctx: EvaluationContext): Any = {
       val cache = ctx.getCache(args(0).asInstanceOf[String])
       cache.get(Array(args(1).asInstanceOf[String], args(2).asInstanceOf[String]))
+    }
+  }
+
+  private val cachePutOrLookup = new NamedTransformerFunction(Seq("cachePutOrLookup")) {
+    override def eval(args: Array[Any])(implicit ctx: EvaluationContext): Any = {
+      val cache = ctx.getCache(args(0).asInstanceOf[String])
+      val value = args(3).asInstanceOf[String]
+      if (value != null && value.nonEmpty) {
+        cache.put(Array(args(1).asInstanceOf[String], args(2).asInstanceOf[String]), args(3).asInstanceOf[String])
+        value
+      } else {
+        cache.get(Array(args(1).asInstanceOf[String], args(2).asInstanceOf[String]))
+      }
     }
   }
 }
