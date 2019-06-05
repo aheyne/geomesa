@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -68,7 +68,28 @@ class TablePartitionTest extends Specification {
       val partitionOption = TablePartition(ds, sft)
       partitionOption must beSome
       val partition = partitionOption.get
-      partition.partitions(filter).map(_.toShort) must containTheSameElementsAs(Seq.range(min, max + 1).map(_.toShort))
+      val partitionsOption = partition.partitions(filter)
+      partitionsOption must beSome
+      partitionsOption.get.map(_.toShort) must containTheSameElementsAs(Seq.range(min, max + 1).map(_.toShort))
+    }
+
+    "extract partitions from disjoint filters" in {
+      val filter = ECQL.toFilter("dtg < '2018-01-01T00:00:00.000Z' AND dtg > '2018-02-01T00:00:00.000Z'")
+      val partitionOption = TablePartition(ds, sft)
+      partitionOption must beSome
+      val partition = partitionOption.get
+      val partitionsOption = partition.partitions(filter)
+      partitionsOption must beSome
+      partitionsOption.get must beEmpty
+    }
+
+    "extract nothing from non-selective filters" in {
+      val filter = ECQL.toFilter("bbox(geom,-10,-10,10,10)")
+      val partitionOption = TablePartition(ds, sft)
+      partitionOption must beSome
+      val partition = partitionOption.get
+      val partitionsOption = partition.partitions(filter)
+      partitionsOption must beNone
     }
   }
 }

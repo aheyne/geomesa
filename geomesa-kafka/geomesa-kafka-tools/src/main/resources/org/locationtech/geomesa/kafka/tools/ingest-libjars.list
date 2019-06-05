@@ -5,6 +5,7 @@ commons-lang3
 commons-pool
 commons-text
 config
+core
 curator-client
 curator-framework
 curator-recipes
@@ -33,6 +34,10 @@ scala
 scalap
 sfcurve
 spatial4j
+si-quantity
+si-units
 stream
+unit-api
+uom
 zk
 zookeeper

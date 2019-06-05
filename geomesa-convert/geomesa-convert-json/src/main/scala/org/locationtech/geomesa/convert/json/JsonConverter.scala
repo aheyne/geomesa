@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -9,6 +9,7 @@
 package org.locationtech.geomesa.convert.json
 
 import java.io._
+import java.nio.charset.Charset
 
 import com.google.gson._
 import com.google.gson.stream.{JsonReader, JsonToken}
@@ -16,71 +17,61 @@ import com.jayway.jsonpath.spi.json.GsonJsonProvider
 import com.jayway.jsonpath.{Configuration, JsonPath, PathNotFoundException}
 import com.typesafe.config.Config
 import org.locationtech.geomesa.convert._
-import org.locationtech.geomesa.convert.json.JsonConverter.{JsonConfig, JsonField}
+import org.locationtech.geomesa.convert.json.JsonConverter._
 import org.locationtech.geomesa.convert2.AbstractConverter.BasicOptions
 import org.locationtech.geomesa.convert2.transforms.Expression
 import org.locationtech.geomesa.convert2.{AbstractConverter, ConverterConfig, Field}
 import org.locationtech.geomesa.utils.collection.CloseableIterator
 import org.opengis.feature.simple.SimpleFeatureType
 
-import scala.collection.JavaConversions._
+class JsonConverter(sft: SimpleFeatureType, config: JsonConfig, fields: Seq[JsonField], options: BasicOptions)
+    extends AbstractConverter[JsonElement, JsonConfig, JsonField, BasicOptions](sft, config, fields, options) {
 
-class JsonConverter(targetSft: SimpleFeatureType, config: JsonConfig, fields: Seq[JsonField], options: BasicOptions)
-    extends AbstractConverter(targetSft, config, fields, options) {
+  import scala.collection.JavaConverters._
 
-  private val parser = new JsonParser
   private val featurePath = config.featurePath.map(JsonPath.compile(_))
 
-  override protected def read(is: InputStream, ec: EvaluationContext): CloseableIterator[Array[Any]] = {
-    val reader = new JsonReader(new InputStreamReader(is, options.encoding))
-    reader.setLenient(true)
+  override protected def parse(is: InputStream, ec: EvaluationContext): CloseableIterator[JsonElement] =
+    new JsonIterator(is, options.encoding, ec)
 
-    val elements = new Iterator[JsonElement] {
-      override def hasNext: Boolean = reader.peek() != JsonToken.END_DOCUMENT
-      override def next(): JsonElement = {
-        val res = parser.parse(reader)
-        // extract the line number, only accessible from reader.toString
-        JsonConverter.lineRegex.findFirstMatchIn(reader.toString).foreach { m =>
-          ec.counter.setLineCount(m.group(1).toLong)
-        }
-        res
-      }
-    }
-
-    // NB:  Currently the JSON support for Converters parses the entire JSON document into memory.
-    //  In the event that we wish to build SimpleFeatures from a 'feature' path and the 'root' path, we have a small issue.
-    //  This solution involves handing a pointer to the feature path and the entire document.
-    //  In the converter config, use 'root-path' to defined paths which reference the entire document.
-
-    val records = featurePath match {
+  override protected def values(parsed: CloseableIterator[JsonElement],
+                                ec: EvaluationContext): CloseableIterator[Array[Any]] = {
+    val array = Array.ofDim[Any](2)
+    featurePath match {
       case None =>
-        elements.map(Array[Any](_))
-
+        parsed.map { element =>
+          array(0) = element
+          array
+        }
       case Some(path) =>
-        elements.flatMap { element =>
-          path.read[JsonArray](element, JsonConverter.jsonConfiguration).map(o => Array[Any](o, element)).iterator
+        parsed.flatMap { element =>
+          array(1) = element
+          path.read[JsonArray](element, JsonConfiguration).iterator.asScala.map { e =>
+            array(0) = e
+            array
+          }
         }
     }
-
-    CloseableIterator(records, reader.close())
   }
 }
 
 object JsonConverter extends GeoJsonParsing {
 
-  private val jsonConfiguration =
+  private [json] val JsonConfiguration =
     Configuration.builder()
         .jsonProvider(new GsonJsonProvider)
         .options(com.jayway.jsonpath.Option.DEFAULT_PATH_LEAF_TO_NULL)
         .build()
 
-  private val lineRegex = """JsonReader at line (\d+)""".r
+  private val LineRegex = """JsonReader at line (\d+)""".r
 
-  case class JsonConfig(`type`: String,
-                        featurePath: Option[String],
-                        idField: Option[Expression],
-                        caches: Map[String, Config],
-                        userData: Map[String, Expression]) extends ConverterConfig
+  case class JsonConfig(
+      `type`: String,
+      featurePath: Option[String],
+      idField: Option[Expression],
+      caches: Map[String, Config],
+      userData: Map[String, Expression]
+    ) extends ConverterConfig
 
   sealed trait JsonField extends Field
 
@@ -99,7 +90,7 @@ object JsonConverter extends GeoJsonParsing {
     protected def unwrap(elem: JsonElement): AnyRef
 
     override def eval(args: Array[Any])(implicit ec: EvaluationContext): Any = {
-      val e = try { jsonPath.read[JsonElement](args(i), jsonConfiguration) } catch {
+      val e = try { jsonPath.read[JsonElement](args(i), JsonConfiguration) } catch {
         case _: PathNotFoundException => JsonNull.INSTANCE
       }
       mutableArray(0) = if (e.isJsonNull) { null } else { unwrap(e) }
@@ -150,5 +141,30 @@ object JsonConverter extends GeoJsonParsing {
   class ObjectJsonField(name: String, path: String, pathIsRoot: Boolean, transforms: Option[Expression])
       extends TypedJsonField(name, "object", path, pathIsRoot, transforms) {
     override def unwrap(elem: JsonElement): AnyRef = elem.getAsJsonObject
+  }
+
+  /**
+    * Parses an input stream into json elements
+    *
+    * @param is input
+    * @param encoding encoding
+    * @param ec context
+    */
+  class JsonIterator private [json] (is: InputStream, encoding: Charset, ec: EvaluationContext)
+      extends CloseableIterator[JsonElement] {
+
+    private val parser = new JsonParser()
+    private val reader = new JsonReader(new InputStreamReader(is, encoding))
+    reader.setLenient(true)
+
+    override def hasNext: Boolean = reader.peek() != JsonToken.END_DOCUMENT
+    override def next(): JsonElement = {
+      val res = parser.parse(reader)
+      // extract the line number, only accessible from reader.toString
+      LineRegex.findFirstMatchIn(reader.toString).foreach(m => ec.line = m.group(1).toLong)
+      res
+    }
+
+    override def close(): Unit = reader.close()
   }
 }

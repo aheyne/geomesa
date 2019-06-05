@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -10,15 +10,15 @@ package org.locationtech.geomesa.index.iterators
 import java.awt.image.BufferedImage
 
 import com.typesafe.scalalogging.LazyLogging
-import com.vividsolutions.jts.geom._
+import org.locationtech.jts.geom._
 import org.geotools.factory.Hints
 import org.geotools.factory.Hints.ClassKey
 import org.geotools.filter.text.ecql.ECQL
-import org.geotools.util.Converters
 import org.locationtech.geomesa.features.kryo.impl.{KryoFeatureDeserialization, KryoFeatureSerialization}
 import org.locationtech.geomesa.filter.FilterHelper
 import org.locationtech.geomesa.index.api.GeoMesaFeatureIndex
 import org.locationtech.geomesa.index.iterators.DensityScan.DensityResult
+import org.locationtech.geomesa.utils.geotools.converters.FastConverter
 import org.locationtech.geomesa.utils.geotools.{GeometryUtils, GridSnap}
 import org.locationtech.geomesa.utils.interop.SimpleFeatureTypes
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
@@ -32,7 +32,7 @@ trait DensityScan extends AggregatingScan[DensityResult] {
 
   // we snap each point into a pixel and aggregate based on that
   protected var gridSnap: GridSnap = _
-  protected var getWeight: (SimpleFeature) => Double = _
+  protected var getWeight: SimpleFeature => Double = _
   protected var writeGeom: (SimpleFeature, Double, DensityResult) => Unit = _
 
   override protected def initResult(sft: SimpleFeatureType,
@@ -64,7 +64,7 @@ object DensityScan extends LazyLogging {
   import org.locationtech.geomesa.utils.geotools.RichSimpleFeatureType.RichSimpleFeatureType
 
   type DensityResult = scala.collection.mutable.Map[(Int, Int), Double]
-  type GridIterator  = (SimpleFeature) => Iterator[(Double, Double, Double)]
+  type GridIterator  = SimpleFeature => Iterator[(Double, Double, Double)]
 
   val DensitySft: SimpleFeatureType = SimpleFeatureTypes.createType("density", "*geom:Point:srid=4326")
   val DensityValueKey = new ClassKey(classOf[Array[Byte]])
@@ -77,7 +77,7 @@ object DensityScan extends LazyLogging {
   }
 
   def configure(sft: SimpleFeatureType,
-                index: GeoMesaFeatureIndex[_, _, _],
+                index: GeoMesaFeatureIndex[_, _],
                 filter: Option[Filter],
                 hints: Hints): Map[String, String] = {
     import AggregatingScan.{OptionToConfig, StringToConfig}
@@ -189,8 +189,8 @@ object DensityScan extends LazyLogging {
   private def getWeightFromNonNumber(i: Int)(sf: SimpleFeature): Double = {
     val d = sf.getAttribute(i)
     if (d == null) { 0.0 } else {
-      val converted = Converters.convert(d, classOf[java.lang.Double])
-      if (converted == null) 1.0 else converted
+      val converted = FastConverter.convert(d, classOf[java.lang.Double])
+      if (converted == null) { 1.0 } else { converted.doubleValue() }
     }
   }
 

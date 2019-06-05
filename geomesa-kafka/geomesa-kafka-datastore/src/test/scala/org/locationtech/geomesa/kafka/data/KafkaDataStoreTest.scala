@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -12,10 +12,8 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{ScheduledExecutorService, TimeUnit}
 import java.util.{Collections, Date}
-import java.{io, util}
 
 import com.typesafe.scalalogging.LazyLogging
-import com.vividsolutions.jts.geom.Point
 import kafka.admin.AdminUtils
 import org.apache.curator.framework.CuratorFrameworkFactory
 import org.apache.curator.retry.ExponentialBackoffRetry
@@ -37,6 +35,7 @@ import org.locationtech.geomesa.utils.collection.SelfClosingIterator
 import org.locationtech.geomesa.utils.geotools.{FeatureUtils, SimpleFeatureTypes}
 import org.locationtech.geomesa.utils.index.SizeSeparatedBucketIndex
 import org.locationtech.geomesa.utils.io.WithClose
+import org.locationtech.jts.geom.Point
 import org.mockito.ArgumentMatchers
 import org.opengis.feature.simple.SimpleFeatureType
 import org.opengis.filter.Filter
@@ -61,12 +60,12 @@ class KafkaDataStoreTest extends Specification with Mockito with LazyLogging {
   }
 
   lazy val baseParams = Map(
-//    "kafka.serialization.type"      -> "avro",
-    "kafka.brokers"                 -> kafka.brokers,
-    "kafka.zookeepers"              -> kafka.zookeepers,
-    "kafka.topic.partitions"        -> 1,
-    "kafka.topic.replication"       -> 1,
-    "kafka.consumer.from-beginning" -> true
+//    "kafka.serialization.type" -> "avro",
+    "kafka.brokers"            -> kafka.brokers,
+    "kafka.zookeepers"         -> kafka.zookeepers,
+    "kafka.topic.partitions"   -> 1,
+    "kafka.topic.replication"  -> 1,
+    "kafka.consumer.read-back" -> "Inf"
   )
 
   val gf = JTSFactoryFinder.getGeometryFactory
@@ -80,7 +79,7 @@ class KafkaDataStoreTest extends Specification with Mockito with LazyLogging {
   def createStorePair(name: String,
                       params: Map[String, AnyRef] = Map.empty): (KafkaDataStore, KafkaDataStore, SimpleFeatureType) = {
     // note: the topic gets set in the user data, so don't re-use the same sft instance
-    val sft = SimpleFeatureTypes.createType("kafka", "name:String:cq-index=unique,age:Int,dtg:Date,*geom:Point:srid=4326")
+    val sft = SimpleFeatureTypes.createType("kafka", "name:String,age:Int,dtg:Date,*geom:Point:srid=4326")
     val path = s"geomesa/$name/test/${paths.getAndIncrement()}"
     (getStore(path, 0, params), getStore(path, 1, params), sft)
   }
@@ -126,17 +125,22 @@ class KafkaDataStoreTest extends Specification with Mockito with LazyLogging {
     }
 
     "allow schemas to be created and deleted" >> {
-      foreach(Seq("true", "false")) { cqEngine =>
+      foreach(Seq(true, false)) { cqEngine =>
         CachedLazyMetadata.Expiry.threadLocalValue.set("10ms")
         val (producer, consumer, _) = try {
-          createStorePair("createdelete", Map("kafka.cache.cqengine" -> cqEngine))
+          val params = if (cqEngine) {
+            Map("kafka.index.cqengine" -> "geom:default,name:unique")
+          } else {
+            Map.empty[String, String]
+          }
+          createStorePair("createdelete", params)
         } finally {
           CachedLazyMetadata.Expiry.threadLocalValue.remove()
         }
         consumer must not(beNull)
         producer must not(beNull)
         try {
-          val sft = SimpleFeatureTypes.createType("kafka", "name:String,age:Int,dtg:Date,*geom:Point:srid=4326;geomesa.foo='bar'")
+          val sft = SimpleFeatureTypes.createImmutableType("kafka", "name:String,age:Int,dtg:Date,*geom:Point:srid=4326;geomesa.foo='bar'")
           val topic = s"${producer.config.catalog}-${sft.getTypeName}".replaceAll("/", "-")
           producer.createSchema(sft)
           foreach(Seq(producer, consumer)) { ds =>
@@ -166,8 +170,13 @@ class KafkaDataStoreTest extends Specification with Mockito with LazyLogging {
     }
 
     "write/update/read/delete features" >> {
-      foreach(Seq("true", "false")) { cqEngine =>
-        val (producer, consumer, sft) = createStorePair("writeupdatedelete", Map("kafka.cache.cqengine" -> cqEngine))
+      foreach(Seq(true, false)) { cqEngine =>
+        val params = if (cqEngine) {
+          Map("kafka.index.cqengine" -> "geom:default,name:unique")
+        } else {
+          Map.empty[String, String]
+        }
+        val (producer, consumer, sft) = createStorePair("writeupdatedelete", params)
         try {
           producer.createSchema(sft)
           val store = consumer.getFeatureSource(sft.getTypeName) // start the consumer polling
@@ -177,18 +186,14 @@ class KafkaDataStoreTest extends Specification with Mockito with LazyLogging {
 
           // initial write
           WithClose(producer.getFeatureWriterAppend(sft.getTypeName, Transaction.AUTO_COMMIT)) { writer =>
-            Seq(f0, f1).foreach { f =>
-              FeatureUtils.copyToWriter(writer, f, useProvidedFid = true)
-              writer.write()
-            }
+            Seq(f0, f1).foreach(FeatureUtils.write(writer, _, useProvidedFid = true))
           }
           eventually(40, 100.millis)(SelfClosingIterator(store.getFeatures.features).toSeq must containTheSameElementsAs(Seq(f0, f1)))
 
           // update
           val f2 = ScalaSimpleFeature.create(sft, "sm", "smith2", 32, "2017-01-01T00:00:02.000Z", "POINT (2 2)")
           WithClose(producer.getFeatureWriterAppend(sft.getTypeName, Transaction.AUTO_COMMIT)) { writer =>
-            FeatureUtils.copyToWriter(writer, f2, useProvidedFid = true)
-            writer.write()
+            FeatureUtils.write(writer, f2, useProvidedFid = true)
           }
           eventually(40, 100.millis)(SelfClosingIterator(store.getFeatures.features).toSeq must containTheSameElementsAs(Seq(f1, f2)))
 
@@ -227,16 +232,19 @@ class KafkaDataStoreTest extends Specification with Mockito with LazyLogging {
     "write/read with visibilities" >> {
       import org.locationtech.geomesa.security.AuthProviderParam
 
-      foreach(Seq("true", "false")) { cqEngine =>
+      foreach(Seq(true, false)) { cqEngine =>
         var auths: Set[String] = null
         val provider = new AuthorizationsProvider() {
           import scala.collection.JavaConversions._
           override def getAuthorizations: java.util.List[String] = auths.toList
-          override def configure(params: util.Map[String, io.Serializable]): Unit = {}
+          override def configure(params: java.util.Map[String, java.io.Serializable]): Unit = {}
         }
-
-        val (producer, consumer, sft) = createStorePair("vis",
-          Map("kafka.cache.cqengine" -> cqEngine, AuthProviderParam.key -> provider))
+        val params = if (cqEngine) {
+          Map("kafka.index.cqengine" -> "geom:default,name:unique")
+        } else {
+          Map.empty[String, String]
+        }
+        val (producer, consumer, sft) = createStorePair("vis", params + (AuthProviderParam.key -> provider))
         try {
           producer.createSchema(sft)
           val store = consumer.getFeatureSource(sft.getTypeName) // start the consumer polling
@@ -248,10 +256,7 @@ class KafkaDataStoreTest extends Specification with Mockito with LazyLogging {
 
           // initial write
           WithClose(producer.getFeatureWriterAppend(sft.getTypeName, Transaction.AUTO_COMMIT)) { writer =>
-            Seq(f0, f1).foreach { f =>
-              FeatureUtils.copyToWriter(writer, f, useProvidedFid = true)
-              writer.write()
-            }
+            Seq(f0, f1).foreach(FeatureUtils.write(writer, _, useProvidedFid = true))
           }
 
           // admin user
@@ -273,11 +278,16 @@ class KafkaDataStoreTest extends Specification with Mockito with LazyLogging {
     }
 
     "expire entries" >> {
-      foreach(Seq("true", "false")) { cqEngine =>
+      foreach(Seq(true, false)) { cqEngine =>
         val executor = mock[ScheduledExecutorService]
         val ticker = Ticker.mock(System.currentTimeMillis())
-        val params = Map("kafka.cache.cqengine" -> cqEngine, "kafka.cache.expiry" -> "100ms",
-          "kafka.cache.executor" -> (executor, ticker))
+        val params = if (cqEngine) {
+          Map("kafka.cache.expiry" -> "100ms",
+            "kafka.cache.executor" -> (executor, ticker),
+            "kafka.index.cqengine" -> "geom:default,name:unique")
+        } else {
+          Map("kafka.cache.expiry" -> "100ms", "kafka.cache.executor" -> (executor, ticker))
+        }
         val (producer, consumer, sft) = createStorePair("expire", params)
         try {
           producer.createSchema(sft)
@@ -298,10 +308,7 @@ class KafkaDataStoreTest extends Specification with Mockito with LazyLogging {
 
           // initial write
           WithClose(producer.getFeatureWriterAppend(sft.getTypeName, Transaction.AUTO_COMMIT)) { writer =>
-            Seq(f0, f1).foreach { f =>
-              FeatureUtils.copyToWriter(writer, f, useProvidedFid = true)
-              writer.write()
-            }
+            Seq(f0, f1).foreach(FeatureUtils.write(writer, _, useProvidedFid = true))
           }
           // check the cache directly
           eventually(40, 100.millis)(SelfClosingIterator(store.getFeatures.features).toSeq must
@@ -321,6 +328,40 @@ class KafkaDataStoreTest extends Specification with Mockito with LazyLogging {
           consumer.dispose()
           producer.dispose()
         }
+      }
+    }
+
+    "clear on startup" >> {
+      val params = Map("kafka.producer.clear" -> "true")
+      val (producer, consumer, sft) = createStorePair("clear-on-startup", params)
+      try {
+        producer.createSchema(sft)
+        val store = consumer.getFeatureSource(sft.getTypeName) // start the consumer polling
+
+        val f0 = ScalaSimpleFeature.create(sft, "sm", "smith", 30, "2017-01-01T00:00:00.000Z", "POINT (0 0)")
+        val f1 = ScalaSimpleFeature.create(sft, "jo", "jones", 20, "2017-01-02T00:00:00.000Z", "POINT (-10 -10)")
+        val f2 = ScalaSimpleFeature.create(sft, "do", "doe", 40, "2017-01-03T00:00:00.000Z", "POINT (10 10)")
+
+        // initial write
+        WithClose(producer.getFeatureWriterAppend(sft.getTypeName, Transaction.AUTO_COMMIT)) { writer =>
+          Seq(f0, f1).foreach(FeatureUtils.write(writer, _, useProvidedFid = true))
+        }
+        eventually(40, 100.millis)(SelfClosingIterator(store.getFeatures.features).toSeq must containTheSameElementsAs(Seq(f0, f1)))
+
+        // new producer - clears on startup
+        val producer2 = getStore(producer.config.catalog, 0, params)
+        try {
+          // write the third feature
+          WithClose(producer2.getFeatureWriterAppend(sft.getTypeName, Transaction.AUTO_COMMIT)) { writer =>
+            FeatureUtils.write(writer, f2, useProvidedFid = true)
+          }
+          eventually(40, 100.millis)(SelfClosingIterator(store.getFeatures.features).toSeq mustEqual Seq(f2))
+        } finally {
+          producer2.dispose()
+        }
+      } finally {
+        consumer.dispose()
+        producer.dispose()
       }
     }
 
@@ -418,6 +459,18 @@ class KafkaDataStoreTest extends Specification with Mockito with LazyLogging {
       KafkaDataStoreFactory.parseSsiTiers(Collections.singletonMap(key, "1:2")) mustEqual Seq((1d, 2d))
       KafkaDataStoreFactory.parseSsiTiers(Collections.singletonMap(key, "1:2,3:4")) mustEqual Seq((1d, 2d), (3d, 4d))
       KafkaDataStoreFactory.parseSsiTiers(Collections.singletonMap(key, "3:4,1:2")) mustEqual Seq((1d, 2d), (3d, 4d))
+    }
+  }
+
+  "KafkaFeatureSource" should {
+    "handle Query instances with null TypeName (GeoServer querylayer extension implementation nuance)" >> {
+      val (p, c, sft) = createStorePair("querylayer")
+      p.createSchema(sft)
+      val fs = c.getFeatureSource(sft.getTypeName)
+      val q = new Query(null, Filter.INCLUDE)
+      def check = fs.getFeatures(q).features().close()
+      // induce issue
+      check must not throwA[NullPointerException]()
     }
   }
 

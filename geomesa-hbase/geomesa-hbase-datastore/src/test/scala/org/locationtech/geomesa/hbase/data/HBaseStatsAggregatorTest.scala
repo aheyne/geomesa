@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -11,11 +11,10 @@ package org.locationtech.geomesa.hbase.data
 import com.typesafe.scalalogging.LazyLogging
 import org.geotools.data.collection.ListFeatureCollection
 import org.geotools.data.simple.SimpleFeatureStore
-import org.geotools.data.{DataStoreFinder, Query}
+import org.geotools.data.{DataStoreFinder, Query, Transaction}
 import org.geotools.factory.Hints
 import org.geotools.filter.text.ecql.ECQL
 import org.locationtech.geomesa.features.ScalaSimpleFeature
-import org.locationtech.geomesa.hbase.data.HBaseDataStoreParams._
 import org.locationtech.geomesa.index.conf.QueryHints
 import org.locationtech.geomesa.utils.collection.SelfClosingIterator
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes
@@ -30,7 +29,7 @@ class HBaseStatsAggregatorTest extends HBaseTest with LazyLogging {
 
   sequential
 
-  val TEST_FAMILY = "idt:java.lang.Integer:index=full,attr:java.lang.Long:index=join,dtg:Date,*geom:Point:srid=4326"
+  val TEST_FAMILY = "idt:java.lang.Integer:index=full,attr:java.lang.Long:index=true,dtg:Date,*geom:Point:srid=4326"
   val TEST_HINT = new Hints()
   val sftName = "test_sft"
   val typeName = "HBaseStatsAggregatorTest"
@@ -42,11 +41,11 @@ class HBaseStatsAggregatorTest extends HBaseTest with LazyLogging {
   }
 
   lazy val params = Map(
-    ConnectionParam.getName -> connection,
-    HBaseCatalogParam.getName -> sftName)
+    HBaseDataStoreParams.ConnectionParam.key   -> connection,
+    HBaseDataStoreParams.HBaseCatalogParam.key -> sftName
+  )
 
   lazy val ds = DataStoreFinder.getDataStore(params).asInstanceOf[HBaseDataStore]
-
 
   var sft: SimpleFeatureType = _
   var fs: SimpleFeatureStore = _
@@ -71,6 +70,20 @@ class HBaseStatsAggregatorTest extends HBaseTest with LazyLogging {
 
       val minMaxStat = decodeStat(sft)(sf.getAttribute(0).asInstanceOf[String]).asInstanceOf[MinMax[java.lang.Long]]
       minMaxStat.bounds mustEqual (0, 298)
+    }
+
+    "work with the MinMax stat for local queries" in {
+      val q = getQuery("MinMax(attr)")
+      val ds = DataStoreFinder.getDataStore(params + (HBaseDataStoreParams.RemoteFilteringParam.key -> "false"))
+      try {
+        val results = SelfClosingIterator(ds.getFeatureReader(q, Transaction.AUTO_COMMIT)).toList
+        results must haveLength(1)
+        val sf = results.head
+        val minMaxStat = decodeStat(sft)(sf.getAttribute(0).asInstanceOf[String]).asInstanceOf[MinMax[java.lang.Long]]
+        minMaxStat.bounds mustEqual (0, 298)
+      } finally {
+        ds.dispose()
+      }
     }
 
     "work with the IteratorStackCount stat" in {
@@ -166,7 +179,7 @@ class HBaseStatsAggregatorTest extends HBaseTest with LazyLogging {
       (0 until 5).map(rh.count).sum mustEqual 150
     }
 
-    "work with the stidx index" in {
+    "work with the z2 index" in {
       val q = getQuery("MinMax(attr)")
       q.setFilter(ECQL.toFilter("bbox(geom,-80,35,-75,40)"))
       val results = SelfClosingIterator(fs.getFeatures(q).features).toList
@@ -176,17 +189,7 @@ class HBaseStatsAggregatorTest extends HBaseTest with LazyLogging {
       minMaxStat.bounds mustEqual (0, 298)
     }
 
-    "work with the record index" in { 
-      val q = getQuery("MinMax(attr)")
-      q.setFilter(ECQL.toFilter("IN(0)"))
-      val results = SelfClosingIterator(fs.getFeatures(q).features).toList
-      val sf = results.head
-
-      val minMaxStat = decodeStat(sft)(sf.getAttribute(0).asInstanceOf[String]).asInstanceOf[MinMax[java.lang.Long]]
-      minMaxStat.bounds mustEqual (0, 0)
-    }
-
-    "work with the record index" in {
+    "work with the id index" in {
     val q = getQuery("MinMax(attr)")
       q.setFilter(ECQL.toFilter("IN('149', '100')"))
       val results = SelfClosingIterator(fs.getFeatures(q).features).toList
@@ -196,7 +199,7 @@ class HBaseStatsAggregatorTest extends HBaseTest with LazyLogging {
       minMaxStat.bounds mustEqual (200, 298)
     }
 
-    "work with the attribute partial index" in {
+    "work with the attribute index" in {
       val q = getQuery("MinMax(attr)")
       q.setFilter(ECQL.toFilter("attr > 10"))
       val results = SelfClosingIterator(fs.getFeatures(q).features).toList
@@ -206,7 +209,7 @@ class HBaseStatsAggregatorTest extends HBaseTest with LazyLogging {
       minMaxStat.bounds mustEqual (12, 298)
     }
 
-    "work with the attribute join index" in {
+    "work with the attribute index on other fields" in {
       val q = getQuery("MinMax(idt)")
       q.setFilter(ECQL.toFilter("attr > 10"))
       val results = SelfClosingIterator(fs.getFeatures(q).features).toList
@@ -216,7 +219,7 @@ class HBaseStatsAggregatorTest extends HBaseTest with LazyLogging {
       minMaxStat.bounds mustEqual (6, 149)
     }
 
-    "work with the attribute full index" in {
+    "work with the attribute index on flipped fields" in {
       val q = getQuery("MinMax(attr)")
       q.setFilter(ECQL.toFilter("idt > 10"))
       val results = SelfClosingIterator(fs.getFeatures(q).features).toList

@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -14,8 +14,10 @@ import com.typesafe.config.ConfigFactory
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder
 import org.junit.runner.RunWith
 import org.locationtech.geomesa.utils.geotools.RichAttributeDescriptors._
+import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes.AttributeOptions
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes.AttributeOptions._
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes.Configs._
+import org.locationtech.geomesa.utils.geotools.sft.SimpleFeatureSpecConfig
 import org.locationtech.geomesa.utils.stats.{Cardinality, IndexCoverage}
 import org.locationtech.geomesa.utils.text.KVPairParser
 import org.opengis.feature.simple.SimpleFeatureType
@@ -124,7 +126,7 @@ class SimpleFeatureTypesTest extends Specification {
 
     "handle no index attribute" >> {
       val sft = SimpleFeatureTypes.createType("testing", "id:Integer,*geom:Point:index=true")
-      sft.getDescriptor("id").getIndexCoverage() mustEqual(IndexCoverage.NONE)
+      sft.getDescriptor("id").getUserData.get(AttributeOptions.OPT_INDEX) must beNull
     }
 
     "handle no explicit geometry" >> {
@@ -139,8 +141,10 @@ class SimpleFeatureTypesTest extends Specification {
 
     "return the indexed attributes (not including the default geometry)" >> {
       val sft = SimpleFeatureTypes.createType("testing", "id:Integer:index=false,dtg:Date:index=true,*geom:Point:srid=4326:index=true")
-      val indexed = SimpleFeatureTypes.getSecondaryIndexedAttributes(sft)
-      indexed.map(_.getLocalName) must containTheSameElementsAs(List("dtg"))
+      val indexed = sft.getAttributeDescriptors.collect {
+        case d if java.lang.Boolean.valueOf(d.getUserData.get(AttributeOptions.OPT_INDEX).asInstanceOf[String]) => d.getLocalName
+      }
+      indexed mustEqual List("dtg")
     }
 
     "handle list types" >> {
@@ -238,17 +242,17 @@ class SimpleFeatureTypesTest extends Specification {
     }
 
     "handle enabled indexes" >> {
-      val spec = "name:String,dtg:Date,*geom:Point:srid=4326;geomesa.indices.enabled='st_idx,records,z3'"
+      val spec = "name:String,dtg:Date,*geom:Point:srid=4326;geomesa.indices.enabled='z2,id,z3'"
       val sft = SimpleFeatureTypes.createType("test", spec)
-      sft.getUserData.get(ENABLED_INDICES).toString.split(",").toList must be equalTo List("st_idx", "records", "z3")
+      sft.getUserData.get(ENABLED_INDICES).toString.split(",").toList must be equalTo List("z2", "id", "z3")
     }
 
     "handle splitter opts and enabled indexes" >> {
       import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes.Configs.{TABLE_SPLITTER, TABLE_SPLITTER_OPTS}
 
       val specs = List(
-        "name:String,dtg:Date,*geom:Point:srid=4326;table.splitter.class=org.locationtech.geomesa.core.data.DigitSplitter,table.splitter.options='fmt:%02d,min:0,max:99',geomesa.indices.enabled='st_idx,records,z3'",
-        "name:String,dtg:Date,*geom:Point:srid=4326;geomesa.indices.enabled='st_idx,records,z3',table.splitter.class=org.locationtech.geomesa.core.data.DigitSplitter,table.splitter.options='fmt:%02d,min:0,max:99'")
+        "name:String,dtg:Date,*geom:Point:srid=4326;table.splitter.class=org.locationtech.geomesa.core.data.DigitSplitter,table.splitter.options='fmt:%02d,min:0,max:99',geomesa.indices.enabled='z2,id,z3'",
+        "name:String,dtg:Date,*geom:Point:srid=4326;geomesa.indices.enabled='z2,id,z3',table.splitter.class=org.locationtech.geomesa.core.data.DigitSplitter,table.splitter.options='fmt:%02d,min:0,max:99'")
       specs.forall { spec =>
         val sft = SimpleFeatureTypes.createType("test", spec)
         sft.getUserData.get(TABLE_SPLITTER) must be equalTo "org.locationtech.geomesa.core.data.DigitSplitter"
@@ -257,7 +261,7 @@ class SimpleFeatureTypesTest extends Specification {
         opts.get("fmt") must beSome("%02d")
         opts.get("min") must beSome("0")
         opts.get("max") must beSome("99")
-        sft.getUserData.get(ENABLED_INDICES).toString.split(",").toList must be equalTo List("st_idx", "records", "z3")
+        sft.getUserData.get(ENABLED_INDICES).toString.split(",").toList must be equalTo List("z2", "id", "z3")
       }
     }
 
@@ -297,21 +301,18 @@ class SimpleFeatureTypesTest extends Specification {
       val spec = s"name:String:$OPT_INDEX=join,dtg:Date,*geom:Point:srid=4326"
       val sft = SimpleFeatureTypes.createType("test", spec)
       sft.getDescriptor("name").getUserData.get(OPT_INDEX) mustEqual("join")
-      sft.getDescriptor("name").getIndexCoverage() mustEqual(IndexCoverage.JOIN)
     }
 
     "allow specification of index attribute coverages regardless of case" >> {
       val spec = s"name:String:$OPT_INDEX=FULL,dtg:Date,*geom:Point:srid=4326"
       val sft = SimpleFeatureTypes.createType("test", spec)
       sft.getDescriptor("name").getUserData.get(OPT_INDEX) mustEqual("full")
-      sft.getDescriptor("name").getIndexCoverage() mustEqual(IndexCoverage.FULL)
     }.pendingUntilFixed("currently case sensitive")
 
     "allow specification of index attribute coverages as booleans" >> {
       val spec = s"name:String:$OPT_INDEX=true,dtg:Date,*geom:Point:srid=4326"
       val sft = SimpleFeatureTypes.createType("test", spec)
       sft.getDescriptor("name").getUserData.get(OPT_INDEX) mustEqual("true")
-      sft.getDescriptor("name").getIndexCoverage() mustEqual(IndexCoverage.JOIN)
     }
 
     "allow attribute options with quoted commas" >> {
@@ -484,6 +485,34 @@ class SimpleFeatureTypesTest extends Specification {
       sft.getUserData.get("mydatatwo") mustEqual "two"
     }
 
+    "allow quoted and unquoted keys in user data conf" >> {
+      val conf = ConfigFactory.parseString(
+        """
+          |{
+          |  type-name = "testconf"
+          |  fields = [
+          |    { name = "testStr",  type = "string"       , index = true  },
+          |    { name = "testCard", type = "string"       , index = true, cardinality = high },
+          |    { name = "testList", type = "List[String]" , index = false },
+          |    { name = "geom",     type = "Point"        , srid = 4326, default = true }
+          |  ]
+          |  user-data = {
+          |    "mydataone" = true
+          |    mydatatwo = "two"
+          |    "my.data.three" = "three"
+          |    my.data.four = "four"
+          |  }
+          |}
+        """.stripMargin)
+
+      val sft = SimpleFeatureTypes.createType(conf)
+      sft.getUserData.size() mustEqual 4
+      sft.getUserData.get("mydataone") mustEqual "true"
+      sft.getUserData.get("mydatatwo") mustEqual "two"
+      sft.getUserData.get("my.data.three") mustEqual "three"
+      sft.getUserData.get("my.data.four") mustEqual "four"
+    }
+
     "untyped lists and maps as a type" >> {
       val conf = ConfigFactory.parseString(
         """
@@ -577,14 +606,14 @@ class SimpleFeatureTypesTest extends Specification {
       import scala.collection.JavaConverters._
       val sft = SimpleFeatureTypes.createType("geolife",
         "userId:String,trackId:String,altitude:Double,dtg:Date,*geom:Point:srid=4326;" +
-            "geomesa.index.dtg='dtg',geomesa.table.sharing='true',geomesa.indices='z3:4:3,z2:3:3,records:2:3'," +
+            "geomesa.index.dtg='dtg',geomesa.table.sharing='true',geomesa.indices='z3:4:3,z2:3:3,id:2:3'," +
             "geomesa.table.sharing.prefix='\\u0001'")
       val config = SimpleFeatureTypes.toConfig(sft, includePrefix = false)
       config.hasPath(SimpleFeatureSpecConfig.UserDataPath) must beTrue
       val userData = config.getConfig(SimpleFeatureSpecConfig.UserDataPath)
       userData.root.unwrapped().asScala mustEqual Map(
         "geomesa.index.dtg" -> "dtg",
-        "geomesa.indices" -> "z3:4:3,z2:3:3,records:2:3",
+        "geomesa.indices" -> "z3:4:3,z2:3:3,id:2:3",
         "geomesa.table.sharing" -> "true",
         "geomesa.table.sharing.prefix" -> "\u0001"
       )

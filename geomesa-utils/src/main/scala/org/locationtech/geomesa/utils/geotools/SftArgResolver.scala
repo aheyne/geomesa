@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -50,7 +50,7 @@ object SftArgResolver extends ArgResolver[SimpleFeatureType, SftArgs] with LazyL
     }
   }
 
-  override val parseMethodList: Seq[(SftArgs) => ResEither] = Seq[SftArgs => ResEither](
+  override val parseMethodList: Seq[SftArgs => ResEither] = Seq[SftArgs => ResEither](
     getLoadedSft,
     parseSpecString,
     parseConfStr,
@@ -123,12 +123,17 @@ object SftArgResolver extends ArgResolver[SimpleFeatureType, SftArgs] with LazyL
   // parse spec conf file
   private [SftArgResolver] def parseConfFile(args: SftArgs): ResEither = {
     try {
-      val is = PathUtils.interpretPath(args.spec).headOption.map(_.open).getOrElse {
+      val handle = PathUtils.interpretPath(args.spec).headOption.getOrElse {
         throw new RuntimeException(s"Could not read file at ${args.spec}")
       }
-      WithClose(new InputStreamReader(is, StandardCharsets.UTF_8)) { reader =>
-        parseConf(reader, args.featureName).left.map { e =>
-          (s"Unable to parse sft spec from file '${args.spec}'.", e, PATH)
+      WithClose(handle.open) { streams =>
+        if (streams.hasNext) {
+          val reader = new InputStreamReader(streams.next._2, StandardCharsets.UTF_8)
+          parseConf(reader, args.featureName).left.map { e =>
+            (s"Unable to parse sft spec from file '${args.spec}'.", e, PATH)
+          }
+        } else {
+          throw new RuntimeException(s"Could not read file at ${args.spec}")
         }
       }
     } catch {

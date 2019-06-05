@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -16,7 +16,7 @@ import org.geotools.process.vector.TransformProcess
 import org.locationtech.geomesa.features.serialization.ObjectType
 import org.locationtech.geomesa.features.{ScalaSimpleFeature, TransformSimpleFeature}
 import org.locationtech.geomesa.filter.FilterHelper
-import org.locationtech.geomesa.fs.storage.common.FileSystemPathReader
+import org.locationtech.geomesa.fs.storage.common.AbstractFileSystemStorage.FileSystemPathReader
 import org.locationtech.geomesa.fs.storage.orc.utils.{OrcAttributeReader, OrcSearchArguments}
 import org.locationtech.geomesa.utils.collection.CloseableIterator
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
@@ -50,7 +50,7 @@ class OrcFileSystemReader(sft: SimpleFeatureType,
     }
     private val result = transformed.getOrElse(feature)
 
-    private val reader = OrcFile.createReader(file, OrcFile.readerOptions(config))
+    private val reader = OrcFile.createReader(file, OrcFile.readerOptions(config).useUTCTimestamp(true))
     private val rows = reader.rows(options)
     private val batch = reader.getSchema.createRowBatch()
     private val attributeReader = if (batch.cols.length > 0) { OrcAttributeReader(sft, batch, columns) } else { null }

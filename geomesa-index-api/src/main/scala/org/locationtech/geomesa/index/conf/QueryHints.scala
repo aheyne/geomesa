@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -8,7 +8,7 @@
 
 package org.locationtech.geomesa.index.conf
 
-import com.vividsolutions.jts.geom.Envelope
+import org.locationtech.jts.geom.Envelope
 import org.geotools.factory.Hints
 import org.geotools.factory.Hints.{ClassKey, IntegerKey}
 import org.geotools.geometry.jts.ReferencedEnvelope
@@ -68,6 +68,7 @@ object QueryHints {
     val TRANSFORMS       = new ClassKey(classOf[String])
     val TRANSFORM_SCHEMA = new ClassKey(classOf[SimpleFeatureType])
     val SORT_FIELDS      = new ClassKey(classOf[String])
+    val MAX_FEATURES     = new ClassKey(classOf[java.lang.Integer])
     val SKIP_REDUCE      = new ClassKey(classOf[java.lang.Boolean])
 
     def toSortHint(sortBy: Array[SortBy]): String = {
@@ -98,7 +99,7 @@ object QueryHints {
     def getCostEvaluation: CostEvaluation = {
       Option(hints.get(COST_EVALUATION).asInstanceOf[CostEvaluation])
           .orElse(QueryProperties.QueryCostType.option.flatMap(t => CostEvaluation.values.find(_.toString.equalsIgnoreCase(t))))
-          .getOrElse(CostEvaluation.Stats)
+          .getOrElse(CostEvaluation.Index)
     }
     def isSkipReduce: Boolean = Option(hints.get(Internal.SKIP_REDUCE).asInstanceOf[java.lang.Boolean]).exists(_.booleanValue())
     def isBinQuery: Boolean = hints.containsKey(BIN_TRACK)
@@ -157,6 +158,7 @@ object QueryHints {
       Option(hints.get(Internal.SORT_FIELDS).asInstanceOf[String]).map(Internal.fromSortHint).filterNot(_.isEmpty)
     def getSortReadableString: String =
       getSortFields.map(_.map { case (f, r) => s"$f ${if (r) "DESC" else "ASC" }"}.mkString(", ")).getOrElse("none")
+    def getMaxFeatures: Option[Int] = Option(hints.get(Internal.MAX_FEATURES).asInstanceOf[Integer]).map(_.intValue())
     def isExactCount: Option[Boolean] = Option(hints.get(EXACT_COUNT)).map(_.asInstanceOf[Boolean])
     def isLambdaQueryPersistent: Boolean =
       Option(hints.get(LAMBDA_QUERY_PERSISTENT).asInstanceOf[java.lang.Boolean]).forall(_.booleanValue)

@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -23,21 +23,19 @@ class FsGetFilesCommand extends FsDataStoreCommand {
   override val name: String = "get-files"
 
   override def execute(): Unit = withDataStore { ds =>
-    val metadata = ds.storage(params.featureName).getMetadata
-    val partitions = if (params.partitions.isEmpty) { metadata.getPartitions.asScala } else {
+    val metadata = ds.storage(params.featureName).metadata
+    val partitions = if (params.partitions.isEmpty) { metadata.getPartitions() } else {
       params.partitions.asScala.map { name =>
-        val partition = metadata.getPartition(name)
-        if (partition == null) {
+        metadata.getPartition(name).getOrElse {
           throw new ParameterException(s"Partition $name cannot be found in metadata")
         }
-        partition
       }
     }
 
     Command.user.info(s"Listing files for ${partitions.length} partitions")
     partitions.sortBy(_.name).foreach { partition =>
       Command.output.info(s"${partition.name}:")
-      partition.files.asScala.foreach(f => Command.output.info(s"\t$f"))
+      partition.files.foreach(f => Command.output.info(s"\t$f"))
     }
   }
 }

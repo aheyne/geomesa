@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -23,7 +23,7 @@ class JTSDocsTest extends Specification with TestEnvironment {
   "jts documentation example" should {
     sequential
 
-    import com.vividsolutions.jts.geom._
+    import org.locationtech.jts.geom._
     import org.apache.spark.sql.types._
     import org.locationtech.geomesa.spark.jts._
 

@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -9,7 +9,7 @@
 package org.locationtech.geomesa.convert2.composite
 
 import com.typesafe.config.Config
-import org.locationtech.geomesa.convert2.transforms.{Predicate, PredicateParser}
+import org.locationtech.geomesa.convert2.transforms.Predicate
 import org.locationtech.geomesa.convert2.{SimpleFeatureConverter, SimpleFeatureConverterFactory}
 import org.opengis.feature.simple.SimpleFeatureType
 
@@ -26,7 +26,7 @@ class CompositeConverterFactory extends SimpleFeatureConverterFactory {
           val converter = if (conf.hasPath(converterName)) {
             SimpleFeatureConverter(sft, conf.getConfig(converterName)) // load from local conf (within composite converter)
           } else {
-            SimpleFeatureConverter(sft, converterName) // load from a gobal named reference
+            SimpleFeatureConverter(sft, converterName) // load from a global named reference
           }
           (pred, converter)
         }

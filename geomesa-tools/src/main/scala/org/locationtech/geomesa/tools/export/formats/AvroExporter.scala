@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -14,7 +14,7 @@ import org.locationtech.geomesa.features.avro.AvroDataFileWriter
 import org.locationtech.geomesa.utils.io.CloseWithLogging
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
-class AvroExporter(os: OutputStream, compression: Int) extends FeatureExporter {
+class AvroExporter(compression: Int, os: OutputStream) extends FeatureExporter {
 
   private var writer: AvroDataFileWriter = _
 

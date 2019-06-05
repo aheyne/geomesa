@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -8,8 +8,8 @@
 
 package org.locationtech.geomesa.fs.storage.common.jobs
 
-import com.typesafe.config.ConfigFactory
 import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.Path
 import org.apache.hadoop.mapreduce.Job
 import org.locationtech.geomesa.fs.storage.common.utils.StorageUtils.FileType
 import org.locationtech.geomesa.fs.storage.common.utils.StorageUtils.FileType.FileType
@@ -26,28 +26,24 @@ object StorageConfiguration {
   }
 
   val PathKey       = "geomesa.fs.path"
-  val EncodingKey   = "geomesa.fs.encoding"
-  val SftConfKey    = "geomesa.fs.sft.config"
   val PartitionsKey = "geomesa.fs.partitions"
-  val ExtensionKey  = "geomesa.fs.output.file-extension"
   val FileTypeKey   = "geomesa.fs.output.file-type"
+  val SftNameKey    = "geomesa.fs.sft.name"
+  val SftSpecKey    = "geomesa.fs.sft.spec"
 
   def setSft(conf: Configuration, sft: SimpleFeatureType): Unit = {
-    // TODO verify that partition scheme is included?
-    // PartitionScheme.extractFromSft(sft)
-    // This must be serialized as conf due to the spec's inability to serialize user data completely
-    conf.set(SftConfKey,
-      SimpleFeatureTypes.toConfigString(sft, includeUserData = true, concise = true, includePrefix = false, json = true))
+    val name = Option(sft.getName.getNamespaceURI).map(ns => s"$ns:${sft.getTypeName}").getOrElse(sft.getTypeName)
+    conf.set(SftNameKey, name)
+    conf.set(SftSpecKey, SimpleFeatureTypes.encodeType(sft, includeUserData = true))
   }
-
   def getSft(conf: Configuration): SimpleFeatureType =
-    SimpleFeatureTypes.createType(ConfigFactory.parseString(conf.get(SftConfKey)))
+    SimpleFeatureTypes.createType(conf.get(SftNameKey), conf.get(SftSpecKey))
 
-  def setPath(conf: Configuration, path: String): Unit = conf.set(PathKey, path)
-  def getPath(conf: Configuration): String = conf.get(PathKey)
+  def getSftName(conf: Configuration): String = conf.get(SftNameKey)
+  def getSftSpec(conf: Configuration): String = conf.get(SftSpecKey)
 
-  def setEncoding(conf: Configuration, encoding: String): Unit = conf.set(EncodingKey, encoding)
-  def getEncoding(conf: Configuration): String = conf.get(EncodingKey)
+  def setRootPath(conf: Configuration, path: Path): Unit = conf.set(PathKey, path.toString)
+  def getRootPath(conf: Configuration): Path = new Path(conf.get(PathKey))
 
   def setPartitions(conf: Configuration, partitions: Array[String]): Unit =
     conf.setStrings(PartitionsKey, partitions: _*)
@@ -55,9 +51,6 @@ object StorageConfiguration {
 
   def setFileType(conf: Configuration, fileType: FileType): Unit = conf.set(FileTypeKey, fileType.toString)
   def getFileType(conf: Configuration): FileType = FileType.withName(conf.get(FileTypeKey))
-
-  def setFileExtension(conf: Configuration, extension: String): Unit = conf.set(ExtensionKey, extension)
-  def getFileExtension(conf: Configuration): String = conf.get(ExtensionKey)
 }
 
 trait StorageConfiguration {

@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -13,15 +13,15 @@ import java.nio.charset.{Charset, StandardCharsets}
 
 import com.typesafe.config.Config
 import org.apache.commons.io.IOUtils
-import org.locationtech.geomesa.convert.Modes.ErrorMode
-import org.locationtech.geomesa.convert.Modes.ParseMode
+import org.locationtech.geomesa.convert.EvaluationContext
+import org.locationtech.geomesa.convert.Modes.{ErrorMode, ParseMode}
 import org.locationtech.geomesa.convert.SimpleFeatureConverters.SimpleFeatureConverterWrapper
-import org.locationtech.geomesa.convert._
 import org.locationtech.geomesa.convert.text.DelimitedTextConverter._
 import org.locationtech.geomesa.convert.text.DelimitedTextConverterFactory.{DelimitedTextConfigConvert, DelimitedTextOptionsConvert}
 import org.locationtech.geomesa.convert2.AbstractConverter.BasicField
 import org.locationtech.geomesa.convert2.AbstractConverterFactory.{BasicFieldConvert, ConverterConfigConvert, ConverterOptionsConvert, FieldConvert, PrimitiveConvert}
 import org.locationtech.geomesa.convert2.transforms.Expression
+import org.locationtech.geomesa.convert2.validators.SimpleFeatureValidator
 import org.locationtech.geomesa.convert2.{AbstractConverterFactory, TypeInference}
 import org.locationtech.geomesa.features.serialization.ObjectType
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
@@ -34,13 +34,19 @@ class DelimitedTextConverterFactory
     extends AbstractConverterFactory[DelimitedTextConverter, DelimitedTextConfig, BasicField, DelimitedTextOptions]
       with org.locationtech.geomesa.convert.SimpleFeatureConverterFactory[String] {
 
-  override protected val typeToProcess = "delimited-text"
+  override protected val typeToProcess: String = DelimitedTextConverterFactory.TypeToProcess
 
   override protected implicit def configConvert: ConverterConfigConvert[DelimitedTextConfig] = DelimitedTextConfigConvert
   override protected implicit def fieldConvert: FieldConvert[BasicField] = BasicFieldConvert
   override protected implicit def optsConvert: ConverterOptionsConvert[DelimitedTextOptions] = DelimitedTextOptionsConvert
 
-  override def infer(is: InputStream, sft: Option[SimpleFeatureType]): Option[(SimpleFeatureType, Config)] = {
+  override def infer(is: InputStream, sft: Option[SimpleFeatureType]): Option[(SimpleFeatureType, Config)] =
+    infer(is, sft, None)
+
+  override def infer(
+      is: InputStream,
+      sft: Option[SimpleFeatureType],
+      path: Option[String]): Option[(SimpleFeatureType, Config)] = {
     import org.locationtech.geomesa.utils.conversions.ScalaImplicits.{RichIterator, RichTraversableLike}
 
     import scala.collection.JavaConverters._
@@ -81,8 +87,8 @@ class DelimitedTextConverterFactory
             BasicField(d.getLocalName, Some(Expression(types(i).transform(i + 1)))) // 0 is the whole record
           }
 
-          val options = DelimitedTextOptions(None, None, None, None, SimpleFeatureValidator.default,
-            ParseMode.Default, ErrorMode(), StandardCharsets.UTF_8, verbose = true)
+          val options = DelimitedTextOptions(None, CharNotSpecified, CharNotSpecified, None,
+            SimpleFeatureValidator.default, Map.empty, ParseMode.Default, ErrorMode(), StandardCharsets.UTF_8)
 
           val config = configConvert.to(converterConfig)
               .withFallback(fieldConvert.to(fields))
@@ -102,7 +108,9 @@ class DelimitedTextConverterFactory
   override def canProcess(conf: Config): Boolean =
     conf.hasPath("type") && conf.getString("type").equalsIgnoreCase(typeToProcess)
 
-  override def buildConverter(sft: SimpleFeatureType, conf: Config): SimpleFeatureConverter[String] = {
+  override def buildConverter(
+      sft: SimpleFeatureType,
+      conf: Config): org.locationtech.geomesa.convert.SimpleFeatureConverter[String] = {
     val converter = apply(sft, conf).orNull.asInstanceOf[DelimitedTextConverter]
     if (converter == null) {
       throw new IllegalStateException("Could not create converter - did you call canProcess()?")
@@ -125,44 +133,63 @@ class DelimitedTextConverterFactory
 
 object DelimitedTextConverterFactory {
 
+  val TypeToProcess = "delimited-text"
+
   object DelimitedTextConfigConvert extends ConverterConfigConvert[DelimitedTextConfig] {
 
-    override protected def decodeConfig(cur: ConfigObjectCursor,
-                                        typ: String,
-                                        idField: Option[Expression],
-                                        caches: Map[String, Config],
-                                        userData: Map[String, Expression]): Either[ConfigReaderFailures, DelimitedTextConfig] = {
+    override protected def decodeConfig(
+        cur: ConfigObjectCursor,
+        typ: String,
+        idField: Option[Expression],
+        caches: Map[String, Config],
+        userData: Map[String, Expression]): Either[ConfigReaderFailures, DelimitedTextConfig] = {
       for { format <- cur.atKey("format").right.flatMap(_.asString).right } yield {
         DelimitedTextConfig(typ, format, idField, caches, userData)
       }
     }
 
-    override protected def encodeConfig(config: DelimitedTextConfig,
-                                        base: java.util.Map[String, AnyRef]): Unit = {
+    override protected def encodeConfig(
+        config: DelimitedTextConfig,
+        base: java.util.Map[String, AnyRef]): Unit = {
       base.put("format", config.format)
     }
-
   }
 
   object DelimitedTextOptionsConvert extends ConverterOptionsConvert[DelimitedTextOptions] {
-    override protected def decodeOptions(cur: ConfigObjectCursor,
-                                         validators: SimpleFeatureValidator,
-                                         parseMode: ParseMode,
-                                         errorMode: ErrorMode,
-                                         encoding: Charset,
-                                         verbose: Boolean): Either[ConfigReaderFailures, DelimitedTextOptions] = {
+    override protected def decodeOptions(
+        cur: ConfigObjectCursor,
+        validators: Seq[String],
+        reporters: Map[String, Config],
+        parseMode: ParseMode,
+        errorMode: ErrorMode,
+        encoding: Charset): Either[ConfigReaderFailures, DelimitedTextOptions] = {
       def option[T](key: String, reader: ConfigReader[T]): Either[ConfigReaderFailures, Option[T]] = {
         val value = cur.atKeyOrUndefined(key)
         if (value.isUndefined) { Right(None) } else { reader.from(value).right.map(Option.apply) }
       }
 
+      def optionalChar(key: String): Either[ConfigReaderFailures, OptionalChar] = {
+        val value = cur.atKeyOrUndefined(key)
+        if (value.isUndefined) { Right(CharNotSpecified) } else {
+          PrimitiveConvert.charConfigReader.from(value) match {
+            case Right(c) => Right(CharEnabled(c))
+            case Left(failures) =>
+              if (PrimitiveConvert.stringConfigReader.from(value).right.exists(_.isEmpty)) {
+                Right(CharDisabled)
+              } else {
+                Left(failures)
+              }
+          }
+        }
+      }
+
       for {
         skipLines <- option("skip-lines", PrimitiveConvert.intConfigReader).right
-        quote     <- option("quote", PrimitiveConvert.charConfigReader).right
-        escape    <- option("escape", PrimitiveConvert.charConfigReader).right
+        quote     <- optionalChar("quote").right
+        escape    <- optionalChar("escape").right
         delimiter <- option("delimiter", PrimitiveConvert.charConfigReader).right
       } yield {
-        DelimitedTextOptions(skipLines, quote, escape, delimiter, validators, parseMode, errorMode, encoding, verbose)
+        DelimitedTextOptions(skipLines, quote, escape, delimiter, validators, reporters, parseMode, errorMode, encoding)
       }
     }
 

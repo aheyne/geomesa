@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -12,7 +12,7 @@ import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.util.{Date, UUID}
 
-import com.vividsolutions.jts.geom.{Coordinate, Geometry, Point}
+import org.locationtech.jts.geom.{Coordinate, Geometry, Point}
 import org.apache.kudu.ColumnSchema.ColumnSchemaBuilder
 import org.apache.kudu.client.KuduPredicate.ComparisonOp
 import org.apache.kudu.client.{KuduPredicate, PartialRow, RowResult}
@@ -79,7 +79,6 @@ object KuduColumnAdapter {
       case ObjectType.DATE     => DateColumnAdapter(name, config)
       case ObjectType.UUID     => UuidColumnAdapter(name, config)
       case ObjectType.BYTES    => BytesColumnAdapter(name, config)
-      case ObjectType.JSON     => StringColumnAdapter(name, config)
       case ObjectType.LIST     => KryoColumnAdapter(name, bindings, descriptor, config)
       case ObjectType.MAP      => KryoColumnAdapter(name, bindings, descriptor, config)
       case ObjectType.GEOMETRY =>

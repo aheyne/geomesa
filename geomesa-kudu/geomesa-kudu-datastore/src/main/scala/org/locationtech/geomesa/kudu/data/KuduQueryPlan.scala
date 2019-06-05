@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -9,17 +9,16 @@
 package org.locationtech.geomesa.kudu.data
 
 import org.apache.kudu.client.{KuduPredicate, PartialRow}
+import org.locationtech.geomesa.index.api.{FilterStrategy, QueryPlan}
 import org.locationtech.geomesa.index.utils.Explainer
 import org.locationtech.geomesa.kudu.result.KuduResultAdapter
 import org.locationtech.geomesa.kudu.result.KuduResultAdapter.EmptyAdapter
 import org.locationtech.geomesa.kudu.utils.KuduBatchScan
-import org.locationtech.geomesa.kudu.{KuduFilterStrategyType, KuduQueryPlanType}
 import org.locationtech.geomesa.utils.collection.CloseableIterator
 import org.opengis.feature.simple.SimpleFeature
 import org.opengis.filter.Filter
 
-sealed trait KuduQueryPlan extends KuduQueryPlanType {
-  def filter: KuduFilterStrategyType
+sealed trait KuduQueryPlan extends QueryPlan[KuduDataStore] {
   def tables: Seq[String]
   def ranges: Seq[(Option[PartialRow], Option[PartialRow])]
   def predicates: Seq[KuduPredicate]
@@ -46,7 +45,7 @@ object KuduQueryPlan {
   }
 
   // plan that will not actually scan anything
-  case class EmptyPlan(filter: KuduFilterStrategyType) extends KuduQueryPlan {
+  case class EmptyPlan(filter: FilterStrategy) extends KuduQueryPlan {
     override def tables: Seq[String] = Seq.empty
     override def ranges: Seq[(Option[PartialRow], Option[PartialRow])] = Seq.empty
     override def predicates: Seq[KuduPredicate] = Seq.empty
@@ -56,7 +55,7 @@ object KuduQueryPlan {
     override def scan(ds: KuduDataStore): CloseableIterator[SimpleFeature] = CloseableIterator.empty
   }
 
-  case class ScanPlan(filter: KuduFilterStrategyType,
+  case class ScanPlan(filter: FilterStrategy,
                       tables: Seq[String],
                       ranges: Seq[(Option[PartialRow], Option[PartialRow])],
                       predicates: Seq[KuduPredicate],
@@ -67,14 +66,12 @@ object KuduQueryPlan {
 
     import scala.collection.JavaConverters._
 
-    override val hasDuplicates: Boolean = false
-
     override def scan(ds: KuduDataStore): CloseableIterator[SimpleFeature] = {
       import org.locationtech.geomesa.kudu.utils.RichKuduClient.RichScanner
 
       if (numThreads > 1 || tables.lengthCompare(1) > 0) {
         CloseableIterator(tables.iterator).flatMap { table =>
-          val scan = new KuduBatchScan(ds.client, table, adapter.columns, ranges, predicates, numThreads, 1000)
+          val scan = KuduBatchScan(ds.client, table, adapter.columns, ranges, predicates, numThreads)
           adapter.adapt(scan.flatMap(_.iterator.asScala))
         }
       } else {

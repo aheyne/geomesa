@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -13,14 +13,14 @@ import java.util
 import java.util.Date
 
 import com.github.benmanes.caffeine.cache.{CacheLoader, Caffeine}
-import com.vividsolutions.jts.geom.Geometry
+import org.locationtech.jts.geom.Geometry
 import org.apache.hadoop.classification.InterfaceStability
 import org.geotools.data.Transaction
-import org.geotools.data.simple.SimpleFeatureWriter
 import org.geotools.factory.Hints
 import org.geotools.filter.identity.FeatureIdImpl
 import org.geotools.filter.text.ecql.ECQL
 import org.locationtech.geomesa.curve.TimePeriod
+import org.locationtech.geomesa.index.FlushableFeatureWriter
 import org.locationtech.geomesa.index.geotools.GeoMesaDataStore
 import org.locationtech.geomesa.security.SecurityUtils
 import org.locationtech.geomesa.utils.collection.SelfClosingIterator
@@ -31,7 +31,8 @@ import org.opengis.feature.simple.SimpleFeature
 import scala.collection.JavaConverters._
 
 @InterfaceStability.Unstable
-abstract class BaseBigTableIndex[T](protected val ds: GeoMesaDataStore[_,_,_],
+@deprecated("Will be removed without replacement")
+abstract class BaseBigTableIndex[T](protected val ds: GeoMesaDataStore[_],
                                     name: String,
                                     serde: ValueSerializer[T],
                                     view: SimpleFeatureView[T]) extends GeoMesaIndex[T] {
@@ -46,9 +47,9 @@ abstract class BaseBigTableIndex[T](protected val ds: GeoMesaDataStore[_,_,_],
 
   protected[this] val writers =
     Caffeine.newBuilder().build(
-      new CacheLoader[String, SimpleFeatureWriter] {
-        override def load(k: String): SimpleFeatureWriter = {
-          ds.getFeatureWriterAppend(k, Transaction.AUTO_COMMIT).asInstanceOf[SimpleFeatureWriter]
+      new CacheLoader[String, FlushableFeatureWriter] {
+        override def load(k: String): FlushableFeatureWriter = {
+          ds.getFeatureWriterAppend(k, Transaction.AUTO_COMMIT)
         }
       })
 

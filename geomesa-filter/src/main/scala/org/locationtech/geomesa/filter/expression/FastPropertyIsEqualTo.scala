@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -23,6 +23,18 @@ abstract class FastPropertyIsEqualTo(exp1: Expression, exp2: Literal) extends Pr
   override def getMatchAction: MatchAction = MatchAction.ANY
 
   override def toString: String = s"[ $exp1 = $exp2 ]"
+
+  def canEqual(other: Any): Boolean = other.isInstanceOf[FastPropertyIsEqualTo]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: FastPropertyIsEqualTo =>
+      (that canEqual this) && exp1 == that.getExpression1 && exp2 == that.getExpression2 &&
+          isMatchingCase == that.isMatchingCase
+    case _ => false
+  }
+
+  override def hashCode(): Int =
+    Seq(exp1, exp2, isMatchingCase).map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
 }
 
 object FastPropertyIsEqualTo {

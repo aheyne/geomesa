@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -8,18 +8,17 @@
 
 package org.locationtech.geomesa.features.kryo
 
-import java.util.{Collection => jCollection, List => jList, Map => jMap}
-
 import com.esotericsoftware.kryo.io.Input
-import com.vividsolutions.jts.geom.Geometry
 import org.geotools.geometry.jts.ReferencedEnvelope
 import org.geotools.process.vector.TransformProcess
 import org.locationtech.geomesa.features.ScalaSimpleFeature
 import org.locationtech.geomesa.features.SerializationOption._
+import org.locationtech.geomesa.features.kryo.KryoBufferSimpleFeature.{IdParser, WithIdParser}
 import org.locationtech.geomesa.features.kryo.impl.KryoFeatureDeserialization
 import org.locationtech.geomesa.features.serialization.ObjectType
 import org.locationtech.geomesa.utils.geotools.ImmutableFeatureId
-import org.opengis.feature.`type`.Name
+import org.locationtech.jts.geom.Geometry
+import org.opengis.feature.`type`.{AttributeDescriptor, Name}
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 import org.opengis.feature.{GeometryAttribute, Property}
 import org.opengis.filter.expression.PropertyName
@@ -29,25 +28,25 @@ import org.opengis.geometry.BoundingBox
 import scala.collection.JavaConversions._
 
 object LazySimpleFeature {
-  val NULL_BYTE = 0.asInstanceOf[Byte]
+  val NULL_BYTE: Byte = 0
 }
 
 class KryoBufferSimpleFeature(sft: SimpleFeatureType,
-                              readers: Array[(Input) => AnyRef],
-                              readUserData: (Input) => jMap[AnyRef, AnyRef],
+                              readers: Array[Input => AnyRef],
+                              readUserData: Input => java.util.Map[AnyRef, AnyRef],
                               options: Set[SerializationOption]) extends SimpleFeature {
   private var offset: Int = _
   private var length: Int = _
 
-  private val input = new Input
+  private val input = new Input()
   private val offsets = Array.ofDim[Int](sft.getAttributeCount)
   private var startOfOffsets: Int = -1
   private var missingAttributes: Boolean = false
   private lazy val geomIndex = sft.indexOf(sft.getGeometryDescriptor.getLocalName)
-  private var userData: jMap[AnyRef, AnyRef] = _
+  private var userData: java.util.Map[AnyRef, AnyRef] = _
   private var userDataOffset: Int = -1
 
-  private var id: String = ""
+  private val idParser = if (options.withoutId) { new IdParser() } else { new WithIdParser(input) }
 
   private var transforms: String = _
   private var transformSchema: SimpleFeatureType = _
@@ -115,8 +114,39 @@ class KryoBufferSimpleFeature(sft: SimpleFeatureType,
     userDataOffset = input.position()
   }
 
-  def setId(id: String): Unit = this.id = id
+  /**
+    * Sets the serialized bytes containing the feature ID (i.e. the row key)
+    *
+    * @param bytes bytes
+    */
+  def setIdBuffer(bytes: Array[Byte]): Unit = setIdBuffer(bytes, 0, bytes.length)
 
+  /**
+    * Sets the serialized bytes containing the feature ID (i.e. the row key)
+    *
+    * @param bytes bytes
+    * @param offset offset into the byte array of valid bytes
+    * @param length number of valid bytes to read from the byte array
+    */
+  def setIdBuffer(bytes: Array[Byte], offset: Int, length: Int): Unit = {
+    idParser.buffer = bytes
+    idParser.offset = offset
+    idParser.length = length
+  }
+
+  /**
+    * Sets the parser for reading feature ids out of the id buffer
+    *
+    * @param parse parse method
+    */
+  def setIdParser(parse: (Array[Byte], Int, Int) => String): Unit = idParser.parse = parse
+
+  /**
+    * Sets the transform to be applied to this feature
+    *
+    * @param transforms transform definition, per geotools format
+    * @param transformSchema schema that results from applying the transform
+    */
   def setTransforms(transforms: String, transformSchema: SimpleFeatureType): Unit = {
     this.transforms = transforms
     this.transformSchema = transformSchema
@@ -221,13 +251,8 @@ class KryoBufferSimpleFeature(sft: SimpleFeatureType,
   override def getFeatureType: SimpleFeatureType = sft
   override def getName: Name = sft.getName
 
-  override def getIdentifier: FeatureId = new ImmutableFeatureId(getID)
-  override def getID: String = {
-    if (options.withoutId) { id } else {
-      input.setPosition(5)
-      input.readString()
-    }
-  }
+  override def getID: String = idParser.id()
+  override def getIdentifier: FeatureId = new ImmutableFeatureId(idParser.id())
 
   override def getAttribute(name: Name): AnyRef = getAttribute(name.getLocalPart)
   override def getAttribute(name: String): Object = {
@@ -243,7 +268,7 @@ class KryoBufferSimpleFeature(sft: SimpleFeatureType,
     case _           => new ReferencedEnvelope(sft.getCoordinateReferenceSystem)
   }
 
-  override def getAttributes: jList[AnyRef] = {
+  override def getAttributes: java.util.List[AnyRef] = {
     val attributes = new java.util.ArrayList[AnyRef](offsets.length)
     var i = 0
     while (i < offsets.length) {
@@ -253,7 +278,7 @@ class KryoBufferSimpleFeature(sft: SimpleFeatureType,
     attributes
   }
 
-  override def getUserData: jMap[AnyRef, AnyRef] = {
+  override def getUserData: java.util.Map[AnyRef, AnyRef] = {
     if (userData == null) {
       input.setPosition(userDataOffset)
       userData = readUserData(input)
@@ -261,31 +286,48 @@ class KryoBufferSimpleFeature(sft: SimpleFeatureType,
     userData
   }
 
-  override def getDefaultGeometryProperty = throw new NotImplementedError
-  override def getProperties: jCollection[Property] = throw new NotImplementedError
-  override def getProperties(name: Name) = throw new NotImplementedError
-  override def getProperties(name: String) = throw new NotImplementedError
-  override def getProperty(name: Name) = throw new NotImplementedError
-  override def getProperty(name: String) = throw new NotImplementedError
-  override def getValue = throw new NotImplementedError
-  override def getDescriptor = throw new NotImplementedError
+  override def getDefaultGeometryProperty: GeometryAttribute = throw new NotImplementedError
+  override def getProperties: java.util.Collection[Property] = throw new NotImplementedError
+  override def getProperties(name: Name): java.util.Collection[Property] = throw new NotImplementedError
+  override def getProperties(name: String): java.util.Collection[Property] = throw new NotImplementedError
+  override def getProperty(name: Name): Property = throw new NotImplementedError
+  override def getProperty(name: String): Property = throw new NotImplementedError
+  override def getValue: java.util.Collection[_ <: Property] = throw new NotImplementedError
+  override def getDescriptor: AttributeDescriptor = throw new NotImplementedError
 
-  override def setAttribute(name: Name, value: Object) = throw new NotImplementedError
-  override def setAttribute(name: String, value: Object) = throw new NotImplementedError
-  override def setAttribute(index: Int, value: Object) = throw new NotImplementedError
-  override def setAttributes(vals: jList[Object]) = throw new NotImplementedError
-  override def setAttributes(vals: Array[Object]) = throw new NotImplementedError
-  override def setDefaultGeometry(geo: Object) = throw new NotImplementedError
-  override def setDefaultGeometryProperty(geoAttr: GeometryAttribute) = throw new NotImplementedError
-  override def setValue(newValue: Object) = throw new NotImplementedError
-  override def setValue(values: jCollection[Property]) = throw new NotImplementedError
+  override def setAttribute(name: Name, value: Object): Unit = throw new NotImplementedError
+  override def setAttribute(name: String, value: Object): Unit = throw new NotImplementedError
+  override def setAttribute(index: Int, value: Object): Unit = throw new NotImplementedError
+  override def setAttributes(vals: java.util.List[Object]): Unit = throw new NotImplementedError
+  override def setAttributes(vals: Array[Object]): Unit = throw new NotImplementedError
+  override def setDefaultGeometry(geo: Object): Unit = throw new NotImplementedError
+  override def setDefaultGeometryProperty(geoAttr: GeometryAttribute): Unit = throw new NotImplementedError
+  override def setValue(newValue: Object): Unit = throw new NotImplementedError
+  override def setValue(values: java.util.Collection[Property]): Unit = throw new NotImplementedError
 
-  override def isNillable = true
-  override def validate() = throw new NotImplementedError
+  override def isNillable: Boolean = true
+  override def validate(): Unit = throw new NotImplementedError
 
-  override def toString = s"KryoBufferSimpleFeature:$getID"
+  override def toString: String = s"KryoBufferSimpleFeature:$getID"
 }
 
 object KryoBufferSimpleFeature {
+
   val longReader: Input => AnyRef = KryoFeatureDeserialization.matchReader(Seq(ObjectType.LONG))
+
+  private class IdParser {
+    var parse: (Array[Byte], Int, Int) => String = _
+    var buffer: Array[Byte] = _
+    var offset: Int = 0
+    var length: Int = 0
+
+    def id(): String = parse(buffer, offset, length)
+  }
+
+  private class WithIdParser(input: Input) extends IdParser {
+    override def id(): String = {
+      input.setPosition(5)
+      input.readString()
+    }
+  }
 }

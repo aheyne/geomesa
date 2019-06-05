@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -10,19 +10,20 @@ package org.locationtech.geomesa.convert.text
 
 import java.io.{ByteArrayInputStream, InputStreamReader}
 import java.nio.charset.StandardCharsets
+import java.util.Collections
 
 import com.google.common.hash.Hashing
 import com.google.common.io.Resources
-import com.typesafe.config.ConfigFactory
-import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory, Point}
+import com.typesafe.config.{ConfigFactory, ConfigValueFactory}
 import org.apache.commons.csv.CSVFormat
 import org.geotools.factory.Hints
 import org.junit.runner.RunWith
-import org.locationtech.geomesa.convert.{DefaultCounter, SimpleFeatureConverters}
+import org.locationtech.geomesa.convert.SimpleFeatureConverters
 import org.locationtech.geomesa.convert2.SimpleFeatureConverter
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes
 import org.locationtech.geomesa.utils.io.WithClose
 import org.locationtech.geomesa.utils.text.WKTUtils
+import org.locationtech.jts.geom.{Coordinate, GeometryFactory, Point}
 import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
 
@@ -211,6 +212,23 @@ class DelimitedTextConverterTest extends Specification {
       }
     }
 
+    "disable quote characters" >> {
+      val quoteConf = conf.withValue("options", ConfigValueFactory.fromMap(Collections.singletonMap("quote", "")))
+      val sft = SimpleFeatureTypes.createType(ConfigFactory.load("sft_testsft.conf"))
+      WithClose(SimpleFeatureConverter(sft, quoteConf)) { converter =>
+        converter must not(beNull)
+        val data = Seq(
+          """1,hello",45.0,45.0""",
+          """2,"world,90.0,90.0""",
+          """willfail,hello""").mkString("\n")
+        val stream = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8))
+        val res = WithClose(converter.process(stream))(_.toList)
+        res.size must be equalTo 2
+        res(0).getAttribute("phrase").asInstanceOf[String] must be equalTo "1hello\""
+        res(1).getAttribute("phrase").asInstanceOf[String] must be equalTo "2\"world"
+      }
+    }
+
     "handle records bigger than buffer size" >> {
       // set the buffer size to 16 bytes and try to write records that are bigger than the buffer size
 
@@ -327,15 +345,14 @@ class DelimitedTextConverterTest extends Specification {
         WithClose(SimpleFeatureConverter(wktSft, trueConf)) { converter =>
           converter must not(beNull)
 
-          val counter = new DefaultCounter
-          val ec = converter.createEvaluationContext(counter = counter)
+          val ec = converter.createEvaluationContext()
           val stream = new ByteArrayInputStream(trueData.getBytes(StandardCharsets.UTF_8))
           val res = WithClose(converter.process(stream, ec))(_.toList)
           res.length mustEqual 2
 
-          counter.getLineCount mustEqual 3
-          counter.getSuccess mustEqual 2
-          counter.getFailure mustEqual 0
+          ec.line mustEqual 3
+          ec.success.getCount mustEqual 2
+          ec.failure.getCount mustEqual 0
 
           val geoFac = new GeometryFactory()
           res(0).getDefaultGeometry mustEqual geoFac.createPoint(new Coordinate(46, 45))
@@ -351,14 +368,13 @@ class DelimitedTextConverterTest extends Specification {
         WithClose(SimpleFeatureConverter(wktSft, falseConf)) { converter =>
           converter must not(beNull)
 
-          val counter = new DefaultCounter
-          val ec = converter.createEvaluationContext(counter = counter)
+          val ec = converter.createEvaluationContext()
           val res = WithClose(converter.process(new ByteArrayInputStream(falseData.getBytes(StandardCharsets.UTF_8)), ec))(_.toList)
           res.length mustEqual 2
 
-          counter.getLineCount mustEqual 2
-          counter.getSuccess mustEqual 2
-          counter.getFailure mustEqual 0
+          ec.line mustEqual 2
+          ec.success.getCount mustEqual 2
+          ec.failure.getCount mustEqual 0
 
           val geoFac = new GeometryFactory()
           res(0).getDefaultGeometry mustEqual geoFac.createPoint(new Coordinate(46, 45))
@@ -376,14 +392,13 @@ class DelimitedTextConverterTest extends Specification {
         WithClose(SimpleFeatureConverter(wktSft, falseConf)) { converter =>
           converter must not(beNull)
 
-          val counter = new DefaultCounter
-          val ec = converter.createEvaluationContext(counter = counter)
+          val ec = converter.createEvaluationContext()
           val res = WithClose(converter.process(new ByteArrayInputStream(falseData.getBytes(StandardCharsets.UTF_8)), ec))(_.toList)
           res.length mustEqual 2
 
-          counter.getLineCount mustEqual 5
-          counter.getSuccess mustEqual 2
-          counter.getFailure mustEqual 0
+          ec.line mustEqual 5
+          ec.success.getCount mustEqual 2
+          ec.failure.getCount mustEqual 0
 
           val geoFac = new GeometryFactory()
           res(0).getDefaultGeometry mustEqual geoFac.createPoint(new Coordinate(46, 45))
@@ -797,6 +812,32 @@ class DelimitedTextConverterTest extends Specification {
       features must haveLength(2)
       features(0).getAttributes.asScala mustEqual Seq(1, "hello", 45f, 45f, WKTUtils.read("POINT (45 45)"))
       features(1).getAttributes.asScala mustEqual Seq(2, "world", 90f, 90f, WKTUtils.read("POINT (90 90)"))
+    }
+
+    "infer a string types from null inputs" >> {
+      import scala.collection.JavaConverters._
+
+      val data =
+        """
+          |num,word,lat,lon
+          |1,,45.0,45.0
+        """.stripMargin
+
+      val factory = new DelimitedTextConverterFactory()
+      val inferred = factory.infer(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)))
+      inferred must beSome
+
+      val (sft, config) = inferred.get
+      sft.getAttributeDescriptors.asScala.map(_.getType.getBinding) mustEqual
+          Seq(classOf[Integer], classOf[String], classOf[java.lang.Float], classOf[java.lang.Float], classOf[Point])
+
+      val converter = factory.apply(sft, config)
+      converter must beSome
+
+      val features = converter.get.process(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8))).toList
+      converter.get.close()
+      features must haveLength(1)
+      features.head.getAttributes.asScala mustEqual Seq(1, "", 45f, 45f, WKTUtils.read("POINT (45 45)"))
     }
 
     "ingest magic files" >> {

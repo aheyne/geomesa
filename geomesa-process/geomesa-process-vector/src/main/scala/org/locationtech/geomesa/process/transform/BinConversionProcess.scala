@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -77,7 +77,7 @@ class BinConversionProcess extends GeoMesaProcess with LazyLogging {
 
     val geomField  = Option(geom).map(indexOf)
     val dtgField   = Option(dtg).map(indexOf).orElse(sft.getDtgIndex)
-    val trackField = Option(track).orElse(sft.getBinTrackId).filter(_ != "id").map(indexOf)
+    val trackField = Option(track).filter(_ != "id").map(indexOf)
     val labelField = Option(label).map(indexOf)
 
     val axis = Option(axisOrder).map {

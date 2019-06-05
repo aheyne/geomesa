@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -8,25 +8,33 @@
 
 package org.locationtech.geomesa.filter.function
 
+import com.typesafe.scalalogging.LazyLogging
 import org.geotools.filter.FunctionExpressionImpl
 import org.geotools.filter.capability.FunctionNameImpl
 import org.opengis.feature.simple.SimpleFeature
+import org.opengis.filter.expression.VolatileFunction
 
 import scala.util.hashing.MurmurHash3
 
-class ProxyIdFunction extends FunctionExpressionImpl(ProxyIdFunction.Name) {
+class ProxyIdFunction extends FunctionExpressionImpl(ProxyIdFunction.Name) with VolatileFunction with LazyLogging {
 
   import org.locationtech.geomesa.utils.geotools.Conversions.RichSimpleFeature
   import org.locationtech.geomesa.utils.geotools.RichSimpleFeatureType.RichSimpleFeatureType
 
-  override def evaluate(obj: AnyRef): Integer = {
-    val sf = obj.asInstanceOf[SimpleFeature]
-    if (sf.getFeatureType.isUuid) {
-      val uuid = sf.getUuid
-      Int.box(ProxyIdFunction.proxyId(uuid._1, uuid._2))
-    } else {
-      Int.box(ProxyIdFunction.proxyId(sf.getID))
-    }
+  override def evaluate(obj: AnyRef): Integer = obj match {
+    case null => null
+
+    case sf: SimpleFeature =>
+      if (sf.getFeatureType.isUuid) {
+        val uuid = sf.getUuid
+        Int.box(ProxyIdFunction.proxyId(uuid._1, uuid._2))
+      } else {
+        Int.box(ProxyIdFunction.proxyId(sf.getID))
+      }
+
+    case _ =>
+      logger.warn(s"Unhandled input: $obj")
+      null
   }
 }
 

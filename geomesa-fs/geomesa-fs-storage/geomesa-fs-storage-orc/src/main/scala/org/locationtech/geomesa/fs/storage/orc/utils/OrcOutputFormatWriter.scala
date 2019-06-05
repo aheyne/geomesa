@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -11,7 +11,7 @@ package org.locationtech.geomesa.fs.storage.orc.utils
 import java.nio.charset.StandardCharsets
 import java.util.UUID
 
-import com.vividsolutions.jts.geom._
+import org.locationtech.jts.geom._
 import org.apache.hadoop.io._
 import org.apache.orc.TypeDescription
 import org.apache.orc.mapred.{OrcList, OrcMap, OrcStruct, OrcTimestamp}
@@ -43,7 +43,6 @@ object OrcOutputFormatWriter {
         case ObjectType.DOUBLE   => new DoubleOutputFormatWriter(col, i)
         case ObjectType.BOOLEAN  => new BooleanOutputFormatWriter(col, i)
         case ObjectType.BYTES    => new BytesOutputFormatWriter(col, i)
-        case ObjectType.JSON     => new StringOutputFormatWriter(col, i)
         case ObjectType.UUID     => new UuidOutputFormatWriter(col, i)
         case ObjectType.LIST     => new ListOutputFormatWriter(col, i, bindings(1), description)
         case ObjectType.MAP      => new MapOutputFormatWriter(col, i, bindings(1), bindings(2), description)
@@ -589,7 +588,6 @@ object OrcOutputFormatWriter {
       case ObjectType.DOUBLE   => new SetOutputFormatDouble {}
       case ObjectType.BOOLEAN  => new SetOutputFormatBoolean {}
       case ObjectType.BYTES    => new SetOutputFormatBytes {}
-      case ObjectType.JSON     => new SetOutputFormatString {}
       case ObjectType.UUID     => new SetOutputFormatUuid {}
       case _ => throw new IllegalArgumentException(s"Unexpected object type $binding")
     }

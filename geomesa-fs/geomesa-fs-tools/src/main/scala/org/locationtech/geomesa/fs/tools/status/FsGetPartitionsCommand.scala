@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -20,9 +20,8 @@ class FsGetPartitionsCommand extends FsDataStoreCommand {
   override val params = new FsGetPartitionsParams
 
   override def execute(): Unit = withDataStore { ds =>
-    import scala.collection.JavaConverters._
     Command.user.info(s"Partitions for type ${params.featureName}:")
-    ds.storage(params.featureName).getMetadata.getPartitions.asScala.map(_.name).sorted.foreach(Command.output.info)
+    ds.storage(params.featureName).metadata.getPartitions().map(_.name).sorted.foreach(Command.output.info)
   }
 }
 

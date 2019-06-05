@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -18,9 +18,13 @@ import org.geotools.data.simple.SimpleFeatureStore
 import org.geotools.factory.Hints
 import org.geotools.filter.text.ecql.ECQL
 import org.locationtech.geomesa.features.ScalaSimpleFeature
+import org.locationtech.geomesa.filter.function.ProxyIdFunction
 import org.locationtech.geomesa.hbase.data.HBaseDataStoreParams._
-import org.locationtech.geomesa.hbase.index.{HBaseAttributeIndex, HBaseIdIndex, HBaseZ3Index}
+import org.locationtech.geomesa.index.api.GeoMesaFeatureIndex
 import org.locationtech.geomesa.index.conf.{QueryHints, QueryProperties, SchemaProperties}
+import org.locationtech.geomesa.index.index.attribute.AttributeIndex
+import org.locationtech.geomesa.index.index.id.IdIndex
+import org.locationtech.geomesa.index.index.z3.Z3Index
 import org.locationtech.geomesa.process.query.ProximitySearchProcess
 import org.locationtech.geomesa.process.tube.TubeSelectProcess
 import org.locationtech.geomesa.utils.collection.SelfClosingIterator
@@ -94,9 +98,15 @@ class HBaseDataStoreTest extends HBaseTest with LazyLogging {
               testQuery(ds, typeName, "attr = 'name5' and bbox(geom,38,48,52,62) and dtg DURING 2014-01-01T00:00:00.000Z/2014-01-08T12:00:00.000Z", transforms, Seq(toAdd(5)))
               testQuery(ds, typeName, "name < 'name5'", transforms, toAdd.take(5))
               testQuery(ds, typeName, "name = 'name5'", transforms, Seq(toAdd(5)))
+              testQuery(ds, typeName, s"bbox(geom,39,49,50,60) AND dtg DURING 2014-01-01T00:00:00.000Z/2014-01-08T12:00:00.000Z AND (proxyId() = ${ProxyIdFunction.proxyId("0")})", transforms, toAdd.take(1))
+              // TODO GEOMESA-2562
+              //   testQuery(ds, typeName, s"bbox(geom,39,49,50,60) AND dtg DURING 2014-01-01T00:00:00.000Z/2014-01-08T12:00:00.000Z AND (proxyId() = ${ProxyIdFunction.proxyId("0")} OR proxyId() = ${ProxyIdFunction.proxyId("1")})", transforms, toAdd.take(2))
 
               // this query should be blocked
               testQuery(ds, typeName, "INCLUDE", transforms, toAdd) must throwA[RuntimeException]
+              // with max features set, it should go through - don't count, that will be blocked
+              testQuery(ds, new Query(typeName, ECQL.toFilter("INCLUDE"), 10, transforms, null), toAdd, count = false)
+
               QueryProperties.BlockFullTableScans.threadLocalValue.remove()
               // now it should go through
               testQuery(ds, typeName, "INCLUDE", transforms, toAdd)
@@ -246,14 +256,19 @@ class HBaseDataStoreTest extends HBaseTest with LazyLogging {
               "attr.name.pattern:[a-f],attr.age.pattern:[0-9],attr.age.pattern2:[8-8][0-9]'"))
 
         def splits(index: String): Seq[Array[Byte]] = {
-          ds.manager.index(index).getTableNames(ds.getSchema(typeName), ds, None).flatMap { table =>
-            ds.connection.getRegionLocator(TableName.valueOf(table)).getStartKeys
+          ds.manager.indices(ds.getSchema(typeName)).find(_.identifier.startsWith(index)).toSeq.flatMap { index =>
+            index.getTableNames(None).flatMap { table =>
+              ds.connection.getRegionLocator(TableName.valueOf(table)).getStartKeys
+            }
           }
         }
 
-        splits(HBaseAttributeIndex.identifier) must haveLength((6 + 10 + 10) * 4) // a-f for name, 0-9 + [8]0-9 for age * 4 shards
-        splits(HBaseZ3Index.identifier) must haveLength(16) // 2 bits * 4 shards
-        splits(HBaseIdIndex.identifier) must haveLength(4) // default 4 splits
+        splits(GeoMesaFeatureIndex.identifier(AttributeIndex.name, AttributeIndex.version, Seq("name"))) must
+            haveLength(24) // a-f * 4 shards
+        splits(GeoMesaFeatureIndex.identifier(AttributeIndex.name, AttributeIndex.version, Seq("age"))) must
+            haveLength(80) // 0-9 + [8]0-9 * 4 shards
+        splits(Z3Index.name) must haveLength(16) // 2 bits * 4 shards
+        splits(IdIndex.name) must haveLength(4) // default 4 splits
       } finally {
         ds.dispose()
       }
@@ -270,7 +285,7 @@ class HBaseDataStoreTest extends HBaseTest with LazyLogging {
 
         try {
           ds.createSchema(SimpleFeatureTypes.createType("test-version", "dtg:Date,*geom:Point:srid=4326"))
-          ds.getDistributeVersion must beSome(SemanticVersion(GeoMesaProperties.ProjectVersion))
+          ds.getDistributedVersion must beSome(SemanticVersion(GeoMesaProperties.ProjectVersion))
         } finally {
           ds.dispose()
         }
@@ -285,10 +300,15 @@ class HBaseDataStoreTest extends HBaseTest with LazyLogging {
                 filter: String,
                 transforms: Array[String],
                 results: Seq[SimpleFeature]): MatchResult[Any] = {
-    val query = new Query(typeName, ECQL.toFilter(filter), transforms)
+    testQuery(ds, new Query(typeName, ECQL.toFilter(filter), transforms), results)
+  }
+
+  def testQuery(ds: HBaseDataStore, query: Query, results: Seq[SimpleFeature], count: Boolean = true): MatchResult[Any] = {
+
     val fr = ds.getFeatureReader(query, Transaction.AUTO_COMMIT)
     val features = SelfClosingIterator(fr).toList
-    val attributes = Option(transforms).getOrElse(ds.getSchema(typeName).getAttributeDescriptors.map(_.getLocalName).toArray)
+    val attributes = Option(query.getPropertyNames)
+        .getOrElse(ds.getSchema(query.getTypeName).getAttributeDescriptors.map(_.getLocalName).toArray)
     features.map(_.getID) must containTheSameElementsAs(results.map(_.getID))
     forall(features) { feature =>
       feature.getAttributes must haveLength(attributes.length)
@@ -298,25 +318,27 @@ class HBaseDataStoreTest extends HBaseTest with LazyLogging {
       }
     }
 
+    if (count) {
+      query.getFilter match {
+        case _: Id =>
+          // id filters use estimated stats based on the filter itself
+          ds.getFeatureSource(query.getTypeName).getCount(query) mustEqual results.length
+          ds.getFeatureSource(query.getTypeName).getFeatures(query).size() mustEqual results.length
+
+        case _ =>
+          ds.getFeatureSource(query.getTypeName).getCount(query) mustEqual -1
+          ds.getFeatureSource(query.getTypeName).getFeatures(query).size() mustEqual 0
+      }
+
+      query.getHints.put(QueryHints.EXACT_COUNT, true)
+      ds.getFeatureSource(query.getTypeName).getFeatures(query).size() mustEqual results.length
+    }
+
     // verify ranges are grouped appropriately to not cross shard boundaries
     forall(ds.getQueryPlan(query).flatMap(_.scans)) { scan =>
       if (scan.getStartRow.isEmpty || scan.getStopRow.isEmpty) { ok } else {
         scan.getStartRow()(0) mustEqual scan.getStopRow()(0)
       }
     }
-
-    query.getFilter match {
-      case _: Id =>
-        // id filters use estimated stats based on the filter itself
-        ds.getFeatureSource(typeName).getCount(query) mustEqual results.length
-        ds.getFeatureSource(typeName).getFeatures(query).size() mustEqual results.length
-
-      case _ =>
-        ds.getFeatureSource(typeName).getCount(query) mustEqual -1
-        ds.getFeatureSource(typeName).getFeatures(query).size() mustEqual 0
-    }
-
-    query.getHints.put(QueryHints.EXACT_COUNT, true)
-    ds.getFeatureSource(typeName).getFeatures(query).size() mustEqual results.length
   }
 }

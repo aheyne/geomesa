@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -15,7 +15,7 @@ import org.geotools.filter.text.ecql.ECQL
 import org.junit.runner.RunWith
 import org.locationtech.geomesa.features.ScalaSimpleFeature
 import org.locationtech.geomesa.index.TestGeoMesaDataStore
-import org.locationtech.geomesa.index.TestGeoMesaDataStore.TestZ3Index
+import org.locationtech.geomesa.index.index.z3.Z3Index
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes
 import org.opengis.feature.simple.SimpleFeature
 import org.specs2.mutable.Specification
@@ -50,7 +50,7 @@ class StatsBasedEstimatorTest extends Specification {
           "INCLUDE")
       val plans = ds.getQueryPlan(new Query(sft.getTypeName, filter, Array("trackId", "dtg")))
       plans must haveLength(1)
-      plans.head.index must beAnInstanceOf[TestZ3Index]
+      plans.head.filter.index must beAnInstanceOf[Z3Index]
     }
   }
 

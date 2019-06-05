@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -12,8 +12,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import java.nio.file.{Files, Path}
 import java.util.Date
 
-import com.typesafe.config.{ConfigFactory, ConfigRenderOptions, ConfigValueFactory}
-import com.vividsolutions.jts.geom.Point
+import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions, ConfigValueFactory}
 import org.apache.arrow.memory.BufferAllocator
 import org.apache.arrow.vector.DirtyRootAllocator
 import org.geotools.data.{DataStoreFinder, Query, Transaction}
@@ -26,6 +25,7 @@ import org.locationtech.geomesa.arrow.io.SimpleFeatureArrowFileReader
 import org.locationtech.geomesa.features.ScalaSimpleFeature
 import org.locationtech.geomesa.index.conf.QueryHints
 import org.locationtech.geomesa.index.iterators.{DensityScan, StatsScan}
+import org.locationtech.geomesa.index.view.MergedDataStoreViewTest.TestConfigLoader
 import org.locationtech.geomesa.process.analytic.DensityProcess
 import org.locationtech.geomesa.utils.bin.BinaryOutputEncoder
 import org.locationtech.geomesa.utils.bin.BinaryOutputEncoder.{BIN_ATTRIBUTE_INDEX, EncodedValues}
@@ -33,8 +33,10 @@ import org.locationtech.geomesa.utils.collection.SelfClosingIterator
 import org.locationtech.geomesa.utils.geotools.{CRS_EPSG_4326, FeatureUtils, SimpleFeatureTypes}
 import org.locationtech.geomesa.utils.io.{PathUtils, WithClose}
 import org.locationtech.geomesa.utils.stats.MinMax
+import org.locationtech.jts.geom.Point
 import org.opengis.filter.Filter
 import org.opengis.filter.sort.SortOrder
+import org.specs2.matcher.MatchResult
 import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
 
@@ -62,24 +64,32 @@ class MergedDataStoreViewTest extends Specification {
 
   implicit val allocator: BufferAllocator = new DirtyRootAllocator(Long.MaxValue, 6.toByte)
 
+  val accumuloParams = Map(
+    AccumuloDataStoreParams.InstanceIdParam.key -> "mycloud",
+    AccumuloDataStoreParams.ZookeepersParam.key -> "myzoo",
+    AccumuloDataStoreParams.UserParam.key       -> "user",
+    AccumuloDataStoreParams.PasswordParam.key   -> "password",
+    AccumuloDataStoreParams.CatalogParam.key    -> sftName,
+    AccumuloDataStoreParams.MockParam.key       -> "true"
+  ).asJava
+
+  var h2Params: java.util.Map[String, String] = _
+
   var path: Path = _
   var ds: MergedDataStoreView = _
+
+  def comboParams(params: java.util.Map[String, String]*): java.util.Map[String, String] = {
+    val configs = params.map(ConfigValueFactory.fromMap).asJava
+    val config = ConfigFactory.empty().withValue("stores", ConfigValueFactory.fromIterable(configs))
+    Map(MergedDataStoreViewFactory.ConfigParam.key -> config.root.render(ConfigRenderOptions.concise())).asJava
+  }
 
   step {
     path = Files.createTempDirectory(s"combo-ds-test")
 
-    val h2Params = Map(
+    h2Params = Map(
       "dbtype"   -> "h2",
       "database" -> path.toFile.getAbsolutePath
-    ).asJava
-
-    val accumuloParams = Map(
-      AccumuloDataStoreParams.InstanceIdParam.key -> "mycloud",
-      AccumuloDataStoreParams.ZookeepersParam.key -> "myzoo",
-      AccumuloDataStoreParams.UserParam.key       -> "user",
-      AccumuloDataStoreParams.PasswordParam.key   -> "password",
-      AccumuloDataStoreParams.CatalogParam.key    -> sftName,
-      AccumuloDataStoreParams.MockParam.key       -> "true"
     ).asJava
 
     val h2Ds = DataStoreFinder.getDataStore(h2Params)
@@ -89,10 +99,7 @@ class MergedDataStoreViewTest extends Specification {
     Seq(h2Ds, accumuloDs).foreach { ds =>
       ds.createSchema(sft)
       WithClose(ds.getFeatureWriterAppend(sftName, Transaction.AUTO_COMMIT)) { writer =>
-        copied.take(5).foreach { copy =>
-          FeatureUtils.copyToWriter(writer, copy, useProvidedFid = true)
-          writer.write()
-        }
+        copied.take(5).foreach(FeatureUtils.write(writer, _, useProvidedFid = true))
       }
     }
 
@@ -102,16 +109,7 @@ class MergedDataStoreViewTest extends Specification {
     h2Ds.dispose()
     accumuloDs.dispose()
 
-    val comboParams = {
-      val configs = java.util.Arrays.asList(
-        ConfigValueFactory.fromMap(h2Params),
-        ConfigValueFactory.fromMap(accumuloParams)
-      )
-      val config = ConfigFactory.empty().withValue("stores", ConfigValueFactory.fromIterable(configs))
-      Map(MergedDataStoreViewFactory.ConfigParam.key -> config.root.render(ConfigRenderOptions.concise())).asJava
-    }
-
-    ds = DataStoreFinder.getDataStore(comboParams).asInstanceOf[MergedDataStoreView]
+    ds = DataStoreFinder.getDataStore(comboParams(h2Params, accumuloParams)).asInstanceOf[MergedDataStoreView]
     ds must not(beNull)
   }
 
@@ -126,6 +124,38 @@ class MergedDataStoreViewTest extends Specification {
       sft.getAttributeDescriptors.asScala.map(_.getLocalName) mustEqual Seq("name", "age", "dtg", "geom")
       sft.getAttributeDescriptors.asScala.map(_.getType.getBinding) mustEqual
           Seq(classOf[String], classOf[Integer], classOf[Date], classOf[Point])
+    }
+
+    "load via SPI config" in {
+      val h2Config = ConfigValueFactory.fromMap(h2Params)
+      val accumuloConfig = ConfigValueFactory.fromMap(accumuloParams)
+
+      def testParams(config: Config): MatchResult[Any] = {
+        val params = Map(
+          MergedDataStoreViewFactory.ConfigParam.key -> config.root.render(ConfigRenderOptions.concise()),
+          MergedDataStoreViewFactory.ConfigLoaderParam.get.key -> classOf[TestConfigLoader].getName
+        )
+        val ds = DataStoreFinder.getDataStore(params.asJava)
+        ds must not(beNull)
+        try {
+          ds must beAnInstanceOf[MergedDataStoreView]
+          ds.asInstanceOf[MergedDataStoreView].stores must haveLength(2)
+        } finally {
+          ds.dispose()
+        }
+      }
+
+      MergedDataStoreViewTest.loadConfig =
+          ConfigFactory.empty().withValue("stores", ConfigValueFactory.fromIterable(Seq(h2Config, accumuloConfig).asJava))
+      testParams(ConfigFactory.empty())
+
+      MergedDataStoreViewTest.loadConfig =
+          ConfigFactory.empty().withValue("stores", ConfigValueFactory.fromIterable(Seq(h2Config).asJava))
+      testParams(ConfigFactory.empty().withValue("stores", ConfigValueFactory.fromIterable(Seq(accumuloConfig).asJava)))
+
+      MergedDataStoreViewTest.loadConfig =
+          ConfigFactory.empty().withValue("stores", ConfigValueFactory.fromIterable(Seq(accumuloConfig).asJava))
+      testParams(ConfigFactory.empty().withValue("stores", ConfigValueFactory.fromIterable(Seq(h2Config).asJava)))
     }
 
     "query multiple data stores" in {
@@ -158,11 +188,43 @@ class MergedDataStoreViewTest extends Specification {
             feature.getAttributes must haveLength(attributes.length)
             forall(attributes.zipWithIndex) { case (attribute, i) =>
               feature.getAttribute(attribute) mustEqual feature.getAttribute(i)
-              feature.getAttribute(attribute) mustEqual
-                  results.find(r => feature.getID.contains(r.getID)).get.getAttribute(attribute)
+              // note: have to compare backwards as java.sql.Timestamp.equals(java.util.Date) always returns false
+              features.find(f => feature.getID.contains(f.getID)).get.getAttribute(attribute) mustEqual
+                  feature.getAttribute(attribute)
             }
           }
         }
+      }
+    }
+
+    "apply filters to each data store impl" in {
+      val filters = Seq(
+        "IN('3', '4', '5', '6')",
+        "bbox(geom,44,52.5,46,56.5)",
+        "bbox(geom,44,52,46,59) and dtg DURING 2018-01-01T00:02:30.000Z/2018-01-01T00:06:30.000Z",
+        "name IN('name3', 'name4', 'name5', 'name6') and bbox(geom,44,52,46,59) and dtg DURING 2018-01-01T00:01:30.000Z/2018-01-01T00:07:30.000Z"
+      )
+
+      // these filters exclude the '5' feature
+      val h2FilteredParams = new java.util.HashMap[String, String](h2Params)
+      h2FilteredParams.put(MergedDataStoreViewFactory.StoreFilterParam.key, "dtg < '2018-01-01T00:06:00.000Z'")
+      val accumuloFilteredParams = new java.util.HashMap[String, String](accumuloParams)
+      accumuloFilteredParams.put(MergedDataStoreViewFactory.StoreFilterParam.key, "dtg >= '2018-01-01T00:06:00.000Z'")
+
+      val ds = DataStoreFinder.getDataStore(comboParams(h2FilteredParams, accumuloFilteredParams))
+      try {
+        foreach(filters) { filter =>
+          val ecql = ECQL.toFilter(filter)
+          val query = new Query(sftName, ecql)
+          val results = SelfClosingIterator(ds.getFeatureReader(query, Transaction.AUTO_COMMIT)).toList
+          results must haveLength(3)
+          forall(results) { feature =>
+            // note: have to compare backwards as java.sql.Timestamp.equals(java.util.Date) always returns false
+            features.find(f => feature.getID.contains(f.getID)).get.getAttributes mustEqual feature.getAttributes
+          }
+        }
+      } finally {
+        ds.dispose()
       }
     }
 
@@ -307,5 +369,14 @@ class MergedDataStoreViewTest extends Specification {
     ds.dispose()
     PathUtils.deleteRecursively(path)
     allocator.close()
+  }
+}
+
+object MergedDataStoreViewTest {
+
+  private var loadConfig: Config = _
+
+  class TestConfigLoader extends MergedViewConfigLoader {
+    override def load(): Config = loadConfig
   }
 }

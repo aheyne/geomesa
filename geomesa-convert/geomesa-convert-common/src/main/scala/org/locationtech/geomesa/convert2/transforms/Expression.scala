@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -84,6 +84,8 @@ object Expression {
 
   case class LiteralBoolean(value: java.lang.Boolean) extends Literal[java.lang.Boolean]
 
+  case class LiteralAny(value: Any) extends Literal[Any]
+
   case object LiteralNull extends Literal[AnyRef] { override def value: AnyRef = null }
 
   abstract class CastExpression(e: Expression, binding: String) extends Expression {
@@ -138,11 +140,11 @@ object Expression {
   }
 
   case class CastToBoolean(e: Expression) extends CastExpression(e, "boolean") {
-    override def eval(args: Array[Any])(implicit ctx: EvaluationContext): Any = e.eval(args).toString.toBoolean
+    override def eval(args: Array[Any])(implicit ctx: EvaluationContext): Boolean = e.eval(args).toString.toBoolean
   }
 
   case class CastToString(e: Expression) extends CastExpression(e, "string") {
-    override def eval(args: Array[Any])(implicit ctx: EvaluationContext): Any = e.eval(args).toString
+    override def eval(args: Array[Any])(implicit ctx: EvaluationContext): String = e.eval(args).toString
   }
 
   case class Column(i: Int) extends Expression {

@@ -1,6 +1,6 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
- * Portions Crown Copyright (c) 2017-2018 Dstl
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
+ * Portions Crown Copyright (c) 2017-2019 Dstl
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -18,7 +18,7 @@ import org.locationtech.geomesa.lambda.tools.data._
 import org.locationtech.geomesa.lambda.tools.export.LambdaExportCommand
 import org.locationtech.geomesa.lambda.tools.stats._
 import org.locationtech.geomesa.tools._
-import org.locationtech.geomesa.tools.export.GenerateAvroSchemaCommand
+import org.locationtech.geomesa.tools.export.{ConvertCommand, GenerateAvroSchemaCommand}
 import org.locationtech.geomesa.tools.status._
 
 object LambdaRunner extends RunnerWithAccumuloEnvironment {

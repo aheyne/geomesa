@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -10,8 +10,7 @@ package org.locationtech.geomesa.features.serialization
 
 import java.util.{UUID, Collections => jCollections, List => jList, Map => jMap}
 
-import com.vividsolutions.jts.geom._
-import org.geotools.factory.Hints
+import org.locationtech.jts.geom._
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes.AttributeConfigs.{USER_DATA_LIST_TYPE, USER_DATA_MAP_KEY_TYPE, USER_DATA_MAP_VALUE_TYPE}
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes.AttributeOptions._
 import org.opengis.feature.`type`.AttributeDescriptor
@@ -20,9 +19,13 @@ object ObjectType extends Enumeration {
 
   type ObjectType = Value
 
-  val STRING, INT, LONG, FLOAT, DOUBLE, BOOLEAN, DATE, UUID, GEOMETRY, HINTS, LIST, MAP, BYTES, JSON = Value
+  val STRING, INT, LONG, FLOAT, DOUBLE, BOOLEAN, DATE, UUID, GEOMETRY, LIST, MAP, BYTES = Value
 
+  // geometry sub-types
   val POINT, LINESTRING, POLYGON, MULTIPOINT, MULTILINESTRING, MULTIPOLYGON, GEOMETRY_COLLECTION = Value
+
+  // string sub-types
+  val JSON = Value
 
   /**
     * @see selectType(clazz: Class[_], metadata: java.util.Map[_, _])
@@ -52,7 +55,7 @@ object ObjectType extends Enumeration {
   def selectType(clazz: Class[_], metadata: jMap[_, _] = jCollections.emptyMap()): Seq[ObjectType] = {
     clazz match {
       case c if classOf[java.lang.String].isAssignableFrom(c) =>
-        if (metadata.get(OPT_JSON) == "true") { Seq(JSON) } else { Seq(STRING) }
+        if (metadata.get(OPT_JSON) == "true") { Seq(STRING, JSON) } else { Seq(STRING) }
       case c if classOf[java.lang.Integer].isAssignableFrom(c) => Seq(INT)
       case c if classOf[java.lang.Long].isAssignableFrom(c) => Seq(LONG)
       case c if classOf[java.lang.Float].isAssignableFrom(c) => Seq(FLOAT)
@@ -61,7 +64,6 @@ object ObjectType extends Enumeration {
       case c if classOf[java.util.Date].isAssignableFrom(c) => Seq(DATE)
       case c if classOf[UUID].isAssignableFrom(c) => Seq(UUID)
       case c if classOf[Geometry].isAssignableFrom(c) => geometryType(c.asInstanceOf[Class[_ <: Geometry]])
-      case c if classOf[Hints.Key].isAssignableFrom(c) => Seq(HINTS)
       case c if classOf[Array[Byte]].isAssignableFrom(c) => Seq(BYTES)
       case c if classOf[jList[_]].isAssignableFrom(c) => listType(metadata)
       case c if classOf[jMap[_, _]].isAssignableFrom(c) => mapType(metadata)

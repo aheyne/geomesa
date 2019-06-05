@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -15,9 +15,9 @@ import org.locationtech.geomesa.fs.tools.export.{FsExportCommand, FsPlaybackComm
 import org.locationtech.geomesa.fs.tools.ingest.{FsIngestCommand, ManageMetadataCommand}
 import org.locationtech.geomesa.fs.tools.stats._
 import org.locationtech.geomesa.fs.tools.status._
-import org.locationtech.geomesa.tools.export.GenerateAvroSchemaCommand
+import org.locationtech.geomesa.tools.export.{ConvertCommand, GenerateAvroSchemaCommand}
 import org.locationtech.geomesa.tools.status._
-import org.locationtech.geomesa.tools.{Command, ConvertCommand, Runner}
+import org.locationtech.geomesa.tools.{Command, Runner}
 
 object FsRunner extends Runner {
 

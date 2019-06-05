@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -16,7 +16,7 @@ import org.locationtech.geomesa.accumulo.tools.raster.LocalRasterIngest
 import org.locationtech.geomesa.accumulo.tools.{AccumuloConnectionParams, AccumuloRasterTableParam}
 import org.locationtech.geomesa.raster.util.RasterUtils.IngestRasterParams
 import org.locationtech.geomesa.tools.Command
-import org.locationtech.geomesa.tools.utils.DataFormats
+import org.locationtech.geomesa.utils.io.PathUtils
 
 import scala.util.{Failure, Success}
 
@@ -82,12 +82,7 @@ object IngestRasterCommand {
     getFileExtension(file.getName)
   }
 
-  def getFileExtension(name: String): String = {
-    DataFormats.fromFileName(name) match {
-      case Right(f) => f.toString
-      case Left(f) => f
-    }
-  }
+  def getFileExtension(name: String): String = PathUtils.getUncompressedExtension(name)
 
   @Parameters(commandDescription = "Ingest raster files into GeoMesa")
   class IngestRasterParameters extends AccumuloConnectionParams

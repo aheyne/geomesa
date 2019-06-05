@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -10,8 +10,6 @@ package org.locationtech.geomesa.hbase.coprocessor.aggregators
 
 import org.apache.hadoop.hbase.Cell
 import org.apache.hadoop.hbase.regionserver.RegionScanner
-import org.locationtech.geomesa.hbase.HBaseIndexManagerType
-import org.locationtech.geomesa.hbase.index.HBaseFeatureIndex
 import org.locationtech.geomesa.index.iterators.AggregatingScan
 
 trait HBaseAggregator[T <: AnyRef { def isEmpty: Boolean; def clear(): Unit }] extends AggregatingScan[T] {
@@ -40,6 +38,4 @@ trait HBaseAggregator[T <: AnyRef { def isEmpty: Boolean; def clear(): Unit }] e
     setValues(cell.getRowArray, cell.getRowOffset, cell.getRowLength,
       cell.getValueArray, cell.getValueOffset, cell.getValueLength)
   }
-
-  override protected def manager: HBaseIndexManagerType = HBaseFeatureIndex
 }

@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -18,6 +18,7 @@ import org.geotools.process.ProcessException
 import org.geotools.process.factory.{DescribeParameter, DescribeProcess, DescribeResult}
 import org.locationtech.geomesa.process.GeoMesaProcess
 import org.locationtech.geomesa.utils.collection.SelfClosingIterator
+import org.locationtech.geomesa.utils.date.DateUtils.toInstant
 
 import scala.collection.JavaConversions._
 
@@ -44,7 +45,7 @@ class DateOffsetProcess extends GeoMesaProcess {
 
     val iter = SelfClosingIterator(obsFeatures.features()).map { sf =>
       val dtg = sf.getAttribute(dateField).asInstanceOf[Date]
-      val offset = ZonedDateTime.ofInstant(dtg.toInstant, ZoneOffset.UTC).plus(period)
+      val offset = ZonedDateTime.ofInstant(toInstant(dtg), ZoneOffset.UTC).plus(period)
       val newDtg = Date.from(offset.toInstant)
       sf.setAttribute(dtgIndex, newDtg)
       sf

@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -13,10 +13,10 @@ import java.util.Date
 import java.util.concurrent.{ScheduledExecutorService, ScheduledFuture, TimeUnit}
 
 import com.typesafe.scalalogging.LazyLogging
-import com.vividsolutions.jts.geom.Geometry
-import org.geotools.util.Converters
+import org.locationtech.jts.geom.Geometry
 import org.locationtech.geomesa.kafka.index.FeatureStateFactory.FeatureState
 import org.locationtech.geomesa.utils.cache.Ticker
+import org.locationtech.geomesa.utils.geotools.converters.FastConverter
 import org.locationtech.geomesa.utils.index.SpatialIndex
 import org.opengis.feature.simple.SimpleFeature
 import org.opengis.filter.expression.Expression
@@ -50,7 +50,7 @@ object FeatureStateFactory extends LazyLogging {
       expression.evaluate(feature) match {
         case d: Date   => d.getTime
         case d: Number => d.longValue()
-        case d => Option(Converters.convert(d, classOf[Date])).map(_.getTime).getOrElse(0L)
+        case d => Option(FastConverter.convert(d, classOf[Date])).map(_.getTime).getOrElse(0L)
       }
     } catch {
       case NonFatal(e) => logger.error(s"Error evaluating event time for $feature", e); 0L
@@ -94,6 +94,8 @@ object FeatureStateFactory extends LazyLogging {
     override def insertIntoIndex(): Unit = index.insert(g, id, feature)
     override def removeFromIndex(): SimpleFeature = index.remove(g, id)
     override def retrieveFromIndex(): SimpleFeature = index.get(g, id)
+
+    override def toString: String = s"FeatureState($feature)"
   }
 
   /**
@@ -128,6 +130,8 @@ object FeatureStateFactory extends LazyLogging {
       future.cancel(false)
       super.removeFromIndex()
     }
+
+    override def toString: String = s"ExpiryState($feature)"
   }
 
   /**
@@ -142,6 +146,7 @@ object FeatureStateFactory extends LazyLogging {
     override def insertIntoIndex(): Unit = expiration.expire(this)
     override def retrieveFromIndex(): SimpleFeature = null
     override def removeFromIndex(): SimpleFeature = null
+    override def toString: String = s"ExpiredState($feature)"
   }
 
 

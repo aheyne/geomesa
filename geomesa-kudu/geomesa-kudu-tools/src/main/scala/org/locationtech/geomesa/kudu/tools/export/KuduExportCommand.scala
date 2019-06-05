@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -13,7 +13,8 @@ import org.locationtech.geomesa.kudu.data.KuduDataStore
 import org.locationtech.geomesa.kudu.tools.KuduDataStoreCommand
 import org.locationtech.geomesa.kudu.tools.KuduDataStoreCommand.KuduParams
 import org.locationtech.geomesa.kudu.tools.export.KuduExportCommand.KuduExportParams
-import org.locationtech.geomesa.tools.export.{ExportCommand, ExportParams}
+import org.locationtech.geomesa.tools.export.ExportCommand
+import org.locationtech.geomesa.tools.export.ExportCommand.ExportParams
 import org.locationtech.geomesa.tools.{OptionalIndexParam, RequiredTypeNameParam}
 
 class KuduExportCommand extends ExportCommand[KuduDataStore] with KuduDataStoreCommand {

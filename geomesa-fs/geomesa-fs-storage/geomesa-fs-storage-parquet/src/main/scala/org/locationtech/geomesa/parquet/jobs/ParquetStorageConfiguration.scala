@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -13,11 +13,13 @@ import org.apache.hadoop.mapreduce.Job
 import org.apache.parquet.hadoop.metadata.CompressionCodecName
 import org.apache.parquet.hadoop.{ParquetInputFormat, ParquetOutputFormat}
 import org.locationtech.geomesa.fs.storage.common.jobs.StorageConfiguration
+import org.locationtech.geomesa.parquet.io.{SimpleFeatureReadSupport, SimpleFeatureWriteSupport}
 import org.opengis.feature.simple.SimpleFeatureType
 
 trait ParquetStorageConfiguration extends StorageConfiguration with LazyLogging {
   override def configureOutput(sft: SimpleFeatureType, job: Job): Unit = {
     job.setOutputFormatClass(classOf[ParquetPartitionOutputFormat])
+    StorageConfiguration.setSft(job.getConfiguration, sft)
 
     ParquetInputFormat.setReadSupportClass(job, classOf[SimpleFeatureReadSupport])
     ParquetOutputFormat.setWriteSupportClass(job, classOf[SimpleFeatureWriteSupport])

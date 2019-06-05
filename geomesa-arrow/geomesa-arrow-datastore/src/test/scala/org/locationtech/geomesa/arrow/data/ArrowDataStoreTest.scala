@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -36,7 +36,7 @@ class ArrowDataStoreTest extends Specification {
 
   implicit val allocator: BufferAllocator = new DirtyRootAllocator(Long.MaxValue, 6.toByte)
 
-  val sft = SimpleFeatureTypes.createType("test", "name:String,foo:String,dtg:Date,*geom:Point:srid=4326")
+  val sft = SimpleFeatureTypes.createImmutableType("test", "name:String,foo:String,dtg:Date,*geom:Point:srid=4326")
 
   val features0 = (0 until 10).map { i =>
     ScalaSimpleFeature.create(sft, s"0$i", s"name0$i", s"foo${i % 2}", s"2017-03-15T00:0$i:00.000Z", s"POINT (4$i 5$i)")
@@ -59,12 +59,9 @@ class ArrowDataStoreTest extends Specification {
         caching.getSchema(sft.getTypeName) mustEqual sft
         caching.dispose() must not(throwAn[Exception])
 
-        var writer = ds.getFeatureWriterAppend(sft.getTypeName, Transaction.AUTO_COMMIT)
-        features0.foreach { f =>
-          FeatureUtils.copyToWriter(writer, f, useProvidedFid = true)
-          writer.write()
+        WithClose(ds.getFeatureWriterAppend(sft.getTypeName, Transaction.AUTO_COMMIT)) { writer =>
+          features0.foreach(FeatureUtils.write(writer, _, useProvidedFid = true))
         }
-        writer.close()
 
         caching = DataStoreFinder.getDataStore(Map(UrlParam.key -> file, CachingParam.key -> true))
 
@@ -79,12 +76,9 @@ class ArrowDataStoreTest extends Specification {
 
         caching.dispose() must not(throwAn[Exception])
 
-        writer = ds.getFeatureWriterAppend(sft.getTypeName, Transaction.AUTO_COMMIT)
-        features1.foreach { f =>
-          FeatureUtils.copyToWriter(writer, f, useProvidedFid = true)
-          writer.write()
+        WithClose(ds.getFeatureWriterAppend(sft.getTypeName, Transaction.AUTO_COMMIT)) { writer =>
+          features1.foreach(FeatureUtils.write(writer, _, useProvidedFid = true))
         }
-        writer.close()
 
         caching = DataStoreFinder.getDataStore(Map(UrlParam.key -> file, CachingParam.key -> true))
 

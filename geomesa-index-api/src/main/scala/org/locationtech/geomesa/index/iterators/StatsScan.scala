@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -58,7 +58,7 @@ object StatsScan {
   }
 
   def configure(sft: SimpleFeatureType,
-                index: GeoMesaFeatureIndex[_, _, _],
+                index: GeoMesaFeatureIndex[_, _],
                 filter: Option[Filter],
                 hints: Hints): Map[String, String] = {
     import org.locationtech.geomesa.index.conf.QueryHints.{RichHints, STATS_STRING}
@@ -73,9 +73,9 @@ object StatsScan {
     * @param sft simple feature type of underlying schema
     * @return function to encode a stat as a base64 string
     */
-  def encodeStat(sft: SimpleFeatureType): (Stat) => String = {
+  def encodeStat(sft: SimpleFeatureType): Stat => String = {
     val serializer = StatSerializer(sft)
-    (stat) => Base64.encodeBase64URLSafeString(serializer.serialize(stat))
+    stat => Base64.encodeBase64URLSafeString(serializer.serialize(stat))
   }
 
   /**
@@ -84,9 +84,9 @@ object StatsScan {
     * @param sft simple feature type of the underlying schema
     * @return function to convert an encoded encoded string to a stat
     */
-  def decodeStat(sft: SimpleFeatureType): (String) => Stat = {
+  def decodeStat(sft: SimpleFeatureType): String => Stat = {
     val serializer = StatSerializer(sft)
-    (encoded) => serializer.deserialize(Base64.decodeBase64(encoded))
+    encoded => serializer.deserialize(Base64.decodeBase64(encoded))
   }
 
 

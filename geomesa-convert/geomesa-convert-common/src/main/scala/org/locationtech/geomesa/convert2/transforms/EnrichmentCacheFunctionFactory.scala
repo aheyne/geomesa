@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -17,7 +17,7 @@ class EnrichmentCacheFunctionFactory extends TransformerFunctionFactory {
 
   private val cacheLookup = new NamedTransformerFunction(Seq("cacheLookup")) {
     override def eval(args: Array[Any])(implicit ctx: EvaluationContext): Any = {
-      val cache = ctx.getCache(args(0).asInstanceOf[String])
+      val cache = ctx.cache(args(0).asInstanceOf[String])
       cache.get(Array(args(1).asInstanceOf[String], args(2).asInstanceOf[String]))
     }
   }

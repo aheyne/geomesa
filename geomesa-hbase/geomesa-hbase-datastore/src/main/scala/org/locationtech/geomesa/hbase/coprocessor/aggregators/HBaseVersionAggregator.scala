@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -11,9 +11,9 @@ package org.locationtech.geomesa.hbase.coprocessor.aggregators
 import java.nio.charset.StandardCharsets
 
 import org.apache.hadoop.hbase.regionserver.RegionScanner
-import org.locationtech.geomesa.hbase.HBaseFeatureIndexType
 import org.locationtech.geomesa.hbase.coprocessor.GeoMesaCoprocessor
 import org.locationtech.geomesa.hbase.coprocessor.aggregators.HBaseVersionAggregator.VersionAggregator
+import org.locationtech.geomesa.index.api.GeoMesaFeatureIndex
 import org.locationtech.geomesa.index.iterators.AggregatingScan
 import org.locationtech.geomesa.utils.conf.GeoMesaProperties
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
@@ -42,9 +42,9 @@ class HBaseVersionAggregator extends HBaseAggregator[VersionAggregator] {
 
 object HBaseVersionAggregator {
 
-  def configure(sft: SimpleFeatureType, index: HBaseFeatureIndexType): Map[String, String] = {
-    AggregatingScan.configure(sft, index, None, None, None) ++
-        Map(GeoMesaCoprocessor.AggregatorClass -> classOf[HBaseVersionAggregator].getName)
+  def configure(sft: SimpleFeatureType, index: GeoMesaFeatureIndex[_, _]): Map[String, String] = {
+    AggregatingScan.configure(sft, index, None, None, None) +
+        (GeoMesaCoprocessor.AggregatorClass -> classOf[HBaseVersionAggregator].getName)
   }
 
   class VersionAggregator {

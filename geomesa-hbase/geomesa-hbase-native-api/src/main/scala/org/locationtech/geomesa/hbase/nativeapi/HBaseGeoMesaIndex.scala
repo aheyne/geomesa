@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -12,23 +12,23 @@ import org.apache.hadoop.classification.InterfaceStability
 import org.apache.hadoop.hbase.client.Connection
 import org.geotools.data.DataStoreFinder
 import org.locationtech.geomesa.api._
-import org.locationtech.geomesa.hbase.data.{HBaseDataStore, HBaseDataStoreParams, HBaseFeatureWriter}
+import org.locationtech.geomesa.hbase.data.{HBaseDataStore, HBaseDataStoreParams}
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 @InterfaceStability.Unstable
+@deprecated("Will be removed without replacement")
 class HBaseGeoMesaIndex[T](override protected val ds: HBaseDataStore,
                            name: String,
                            serde: ValueSerializer[T],
                            view: SimpleFeatureView[T]) extends BaseBigTableIndex[T](ds, name, serde, view) {
 
-  override def flush(): Unit = {
-    writers.asMap().values().map(_.asInstanceOf[HBaseFeatureWriter]).foreach(_.flush())
-  }
+  override def flush(): Unit = writers.asMap().values().foreach(_.flush())
 }
 
 @InterfaceStability.Unstable
+@deprecated("Will be removed without replacement")
 object HBaseGeoMesaIndex {
   def build[T](name: String,
                remote: Boolean,

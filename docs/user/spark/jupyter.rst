@@ -95,9 +95,8 @@ GeoMesa version ``VERSION``:
     # (contains geomesa-accumulo-spark, geomesa-spark-core, geomesa-spark-sql, and dependencies)
     jars="file://$GEOMESA_ACCUMULO_HOME/dist/spark/geomesa-accumulo-spark-runtime_2.11-$VERSION.jar"
 
-    # uncomment to use the converter or GeoTools RDD providers
+    # uncomment to use the converter RDD provider
     #jars="$jars,file://$GEOMESA_ACCUMULO_HOME/lib/geomesa-spark-converter_2.11-$VERSION.jar"
-    #jars="$jars,file://$GEOMESA_ACCUMULO_HOME/lib/geomesa-spark-geotools_2.11-$VERSION.jar"
 
     # uncomment to work with shapefiles (requires $GEOMESA_ACCUMULO_HOME/bin/install-jai.sh)
     #jars="$jars,file://$GEOMESA_ACCUMULO_HOME/lib/jai_codec-1.1.3.jar"
@@ -136,7 +135,7 @@ The following sample notebook shows how you can use Leaflet for data visualizati
    classpath.addRepository("http://central.maven.org/maven2")
    classpath.addRepository("https://repo.locationtech.org/content/repositories/geomesa-releases")
    classpath.addRepository("file:///home/username/.m2/repository")
-   classpath.add("com.vividsolutions" % "jts" % "1.13")
+   classpath.add("org.locationtech.jts" % "jts" % "1.13")
    classpath.add("org.locationtech.geomesa" % "geomesa-accumulo-datastore" % "1.3.0")
    classpath.add("org.apache.accumulo" % "accumulo-core" % "1.6.4")
    classpath.add("org.locationtech.geomesa" % "geomesa-jupyter" % "1.3.0")

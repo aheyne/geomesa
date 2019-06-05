@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -153,7 +153,6 @@ object FeatureSpecificReader {
           case ObjectType.LIST     => if (skip) { (_, in) => d.consumeList(in)     } else { d.setList(_, i, _)     }
           case ObjectType.MAP      => if (skip) { (_, in) => d.consumeMap(in)      } else { d.setMap(_, i, _)      }
           case ObjectType.BYTES    => if (skip) { (_, in) => d.consumeBytes(in)    } else { d.setBytes(_, i, _)    }
-          case ObjectType.JSON     => if (skip) { (_, in) => d.consumeString(in)   } else { d.setString(_, i, _)   }
           case b => throw new IllegalArgumentException(s"Unexpected attribute binding: $b")
         }
 

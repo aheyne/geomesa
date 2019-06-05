@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -63,7 +63,7 @@ class QueryAuditEndpointTest extends TestWithDataStore with MutableScalatraSpec 
 
     // wait for the async auditor to write out the queries
     val start = System.currentTimeMillis()
-    val table = GeoMesaFeatureIndex.formatSharedTableName(catalog, "queries")
+    val table = s"${catalog}_queries"
     var written = false
     while (!written && System.currentTimeMillis() - start < 5000) {
       import scala.collection.JavaConversions._

@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -19,7 +19,8 @@ import org.geotools.data.store.DataFeatureCollection
 import org.geotools.factory.Hints
 import org.geotools.feature.visitor.{BoundsVisitor, MaxVisitor, MinVisitor}
 import org.geotools.geometry.jts.ReferencedEnvelope
-import org.locationtech.geomesa.index.geotools.{DelegatingResourceInfo, GeoMesaFeatureCollection}
+import org.locationtech.geomesa.index.geotools.GeoMesaFeatureCollection
+import org.locationtech.geomesa.index.geotools.GeoMesaFeatureSource.DelegatingResourceInfo
 import org.locationtech.geomesa.index.planning.QueryPlanner
 import org.locationtech.geomesa.index.process.GeoMesaProcessVisitor
 import org.locationtech.geomesa.index.view.MergedFeatureSourceView.MergedQueryCapabilities
@@ -38,26 +39,33 @@ import org.opengis.util.ProgressListener
   * @param sources delegate feature sources
   * @param sft simple feature type
   */
-class MergedFeatureSourceView(ds: MergedDataStoreView, sources: Seq[SimpleFeatureSource], sft: SimpleFeatureType)
-    extends SimpleFeatureSource with LazyLogging {
+class MergedFeatureSourceView(
+    ds: MergedDataStoreView,
+    sources: Seq[(SimpleFeatureSource, Option[Filter])],
+    sft: SimpleFeatureType
+  ) extends SimpleFeatureSource with LazyLogging {
 
   lazy private val hints = Collections.unmodifiableSet(Collections.emptySet[Key])
 
-  lazy private val capabilities = new MergedQueryCapabilities(sources.map(_.getQueryCapabilities))
+  lazy private val capabilities = new MergedQueryCapabilities(sources.map(_._1.getQueryCapabilities))
 
   override def getSchema: SimpleFeatureType = sft
 
-  override def getCount(query: Query): Int = sources.map(_.getCount(query)).sum
+  override def getCount(query: Query): Int =
+    sources.map { case (source, filter) => source.getCount(mergeFilter(query, filter)) }.sum
 
   override def getBounds: ReferencedEnvelope = {
     val bounds = new ReferencedEnvelope(org.locationtech.geomesa.utils.geotools.CRS_EPSG_4326)
-    sources.foreach(s => bounds.expandToInclude(s.getBounds))
+    sources.foreach {
+      case (source, None)    => bounds.expandToInclude(source.getBounds)
+      case (source, Some(f)) => bounds.expandToInclude(source.getBounds(new Query(sft.getTypeName, f)))
+    }
     bounds
   }
 
   override def getBounds(query: Query): ReferencedEnvelope = {
     val bounds = new ReferencedEnvelope(org.locationtech.geomesa.utils.geotools.CRS_EPSG_4326)
-    sources.foreach(s => bounds.expandToInclude(s.getBounds(query)))
+    sources.foreach { case (source, filter) => bounds.expandToInclude(source.getBounds(mergeFilter(query, filter))) }
     bounds
   }
 

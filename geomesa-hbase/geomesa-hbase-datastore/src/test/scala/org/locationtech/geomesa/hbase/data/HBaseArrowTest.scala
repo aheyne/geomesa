@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -18,6 +18,7 @@ import org.geotools.filter.text.ecql.ECQL
 import org.locationtech.geomesa.arrow.io.SimpleFeatureArrowFileReader
 import org.locationtech.geomesa.features.ScalaSimpleFeature
 import org.locationtech.geomesa.hbase.data.HBaseDataStoreParams.{ConnectionParam, HBaseCatalogParam}
+import org.locationtech.geomesa.hbase.data.HBaseQueryPlan.CoprocessorPlan
 import org.locationtech.geomesa.hbase.filters.Z3HBaseFilter
 import org.locationtech.geomesa.index.conf.QueryHints
 import org.locationtech.geomesa.utils.collection.SelfClosingIterator
@@ -46,10 +47,7 @@ class HBaseArrowTest extends HBaseTest with LazyLogging  {
     ds = DataStoreFinder.getDataStore(params).asInstanceOf[HBaseDataStore]
     ds.createSchema(sft)
     val writer = ds.getFeatureWriterAppend(sft.getTypeName, Transaction.AUTO_COMMIT)
-    features.foreach { f =>
-      FeatureUtils.copyToWriter(writer, f, useProvidedFid = true)
-      writer.write()
-    }
+    features.foreach(FeatureUtils.write(writer, _, useProvidedFid = true))
     writer.close()
   }
 

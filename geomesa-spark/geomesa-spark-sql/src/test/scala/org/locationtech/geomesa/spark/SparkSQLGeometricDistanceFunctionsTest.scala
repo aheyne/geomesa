@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -56,7 +56,7 @@ class SparkSQLGeometricDistanceFunctionsTest extends Specification with LazyLogg
           |   size(l) > 1
         """.stripMargin).
           collect().map(_.getDouble(2))
-        Array(70681.00230533161, 141178.0595870766) must beEqualTo(res)
+        Array(70681.00230533126, 141178.05958707482) must beEqualTo(res)
       }
     }
 
@@ -81,7 +81,7 @@ class SparkSQLGeometricDistanceFunctionsTest extends Specification with LazyLogg
           |   size(l) > 1
         """.stripMargin).
           collect().map(_.getDouble(1))
-        Array(70681.00230533161, 141178.0595870766) must beEqualTo(res)
+        Array(70681.00230533126, 141178.05958707482) must beEqualTo(res)
       }
     }
 

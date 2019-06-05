@@ -1,6 +1,6 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
- * Portions Crown Copyright (c) 2017-2018 Dstl
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
+ * Portions Crown Copyright (c) 2017-2019 Dstl
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -8,6 +8,8 @@
  ***********************************************************************/
 
 package org.locationtech.geomesa.spark.accumulo
+
+import java.util.Collections
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.accumulo.core.client.ClientConfiguration
@@ -17,7 +19,6 @@ import org.apache.accumulo.core.client.mapreduce.lib.impl.InputConfigurator
 import org.apache.accumulo.core.client.security.tokens.{KerberosToken, PasswordToken}
 import org.apache.accumulo.core.security.Authorizations
 import org.apache.accumulo.core.util.{Pair => AccPair}
-import org.apache.commons.io.IOUtils
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.io.Text
 import org.apache.hadoop.mapred.JobConf
@@ -26,14 +27,15 @@ import org.apache.spark.deploy.SparkHadoopUtil
 import org.apache.spark.rdd.{NewHadoopRDD, RDD}
 import org.geotools.data.{DataStoreFinder, Query, Transaction}
 import org.geotools.filter.text.ecql.ECQL
-import org.locationtech.geomesa.accumulo.data.{AccumuloDataStore, AccumuloDataStoreFactory, AccumuloDataStoreParams}
-import org.locationtech.geomesa.accumulo.index.{AccumuloQueryPlan, BatchScanPlan, EmptyPlan, ScanPlan}
+import org.locationtech.geomesa.accumulo.data.AccumuloQueryPlan.{BatchScanPlan, EmptyPlan, ScanPlan}
+import org.locationtech.geomesa.accumulo.data.{AccumuloDataStore, AccumuloDataStoreFactory, AccumuloDataStoreParams, AccumuloQueryPlan}
 import org.locationtech.geomesa.index.conf.QueryHints._
 import org.locationtech.geomesa.jobs.GeoMesaConfigurator
 import org.locationtech.geomesa.jobs.accumulo.AccumuloJobUtils
 import org.locationtech.geomesa.jobs.mapreduce._
 import org.locationtech.geomesa.spark.{SpatialRDD, SpatialRDDProvider}
 import org.locationtech.geomesa.utils.geotools.FeatureUtils
+import org.locationtech.geomesa.utils.io.{WithClose, WithStore}
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 import org.opengis.filter.Filter
 
@@ -62,8 +64,8 @@ class AccumuloSpatialRDDProvider extends SpatialRDDProvider with LazyLogging {
         InputConfigurator.setRanges(classOf[AccumuloInputFormat], conf, qp.ranges)
         qp.iterators.foreach(InputConfigurator.addIterator(classOf[AccumuloInputFormat], conf, _))
 
-        if (qp.columnFamilies.nonEmpty) {
-          val cf = qp.columnFamilies.map(cf => new AccPair[Text, Text](cf, null))
+        qp.columnFamily.foreach { colFamily =>
+          val cf = Collections.singletonList(new AccPair[Text, Text](colFamily, null))
           InputConfigurator.fetchColumns(classOf[AccumuloInputFormat], conf, cf)
         }
 
@@ -183,27 +185,17 @@ class AccumuloSpatialRDDProvider extends SpatialRDDProvider with LazyLogging {
     * @param typeName
     */
   def save(rdd: RDD[SimpleFeature], params: Map[String, String], typeName: String): Unit = {
-    val ds = DataStoreFinder.getDataStore(params).asInstanceOf[AccumuloDataStore]
-    try {
+    WithStore(params) { ds =>
       require(ds.getSchema(typeName) != null,
-        "Feature type must exist before calling save.  Call createSchema on the DataStore first.")
-    } finally {
-      ds.dispose()
+        "Feature type must exist before calling save. Call createSchema on the DataStore first.")
     }
 
     rdd.foreachPartition { iter =>
-      val ds = DataStoreFinder.getDataStore(params).asInstanceOf[AccumuloDataStore]
-      val featureWriter = ds.getFeatureWriterAppend(typeName, Transaction.AUTO_COMMIT)
-      try {
-        iter.foreach { rawFeature =>
-          FeatureUtils.copyToWriter(featureWriter, rawFeature, useProvidedFid = true)
-          featureWriter.write()
+      WithStore(params) { ds =>
+        WithClose(ds.getFeatureWriterAppend(typeName, Transaction.AUTO_COMMIT)) { writer =>
+          iter.foreach(FeatureUtils.write(writer, _, useProvidedFid = true))
         }
-      } finally {
-        IOUtils.closeQuietly(featureWriter)
-        ds.dispose()
       }
     }
   }
-
 }

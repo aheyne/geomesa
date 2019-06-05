@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -16,8 +16,11 @@ import org.geotools.data.Query
 import org.geotools.factory.CommonFactoryFinder
 import org.junit.runner.RunWith
 import org.locationtech.geomesa.accumulo.TestWithDataStore
+import org.locationtech.geomesa.accumulo.data.AccumuloIndexAdapter
 import org.locationtech.geomesa.features.SerializationOption.SerializationOptions
 import org.locationtech.geomesa.features.{ScalaSimpleFeature, SerializationType, SimpleFeatureSerializers}
+import org.locationtech.geomesa.index.index.id.IdIndex
+import org.locationtech.geomesa.utils.index.IndexMode
 import org.locationtech.geomesa.utils.iterators.SortingSimpleFeatureIterator
 import org.opengis.filter.sort.SortBy
 import org.specs2.mutable.Specification
@@ -30,9 +33,9 @@ class QueryPlannerTest extends Specification with TestWithDataStore {
 
   override val spec = "*geom:Point,dtg:Date,s:String"
   val sf = new ScalaSimpleFeature(sft, "id")
-  sf.setAttributes(Array[AnyRef]("POINT(45 45)", "2014/10/10T00:00:00Z", "string"))
+  sf.setAttributes(Array[AnyRef]("POINT(45 45)", "2014-10-10T00:00:00Z", "string"))
   val sf2 = new ScalaSimpleFeature(sft, "id2")
-  sf2.setAttributes(Array[AnyRef]("POINT(45 45)", "2014/10/10T00:00:00Z", "astring"))
+  sf2.setAttributes(Array[AnyRef]("POINT(45 45)", "2014-10-10T00:00:00Z", "astring"))
 
   addFeatures(Seq(sf, sf2))
 
@@ -71,7 +74,8 @@ class QueryPlannerTest extends Specification with TestWithDataStore {
         new SimpleEntry[Key, Value](key, value)
       }
 
-      val expectedResult = kvs.map(RecordIndex.entriesToFeatures(sft, sft)).map(_.visibility)
+      val expectedResult =
+        kvs.map(AccumuloIndexAdapter.entriesToFeatures(new IdIndex(null, sft, IndexMode.ReadWrite), sft)).map(_.visibility)
 
       expectedResult must haveSize(kvs.length)
       expectedResult mustEqual expectedVis

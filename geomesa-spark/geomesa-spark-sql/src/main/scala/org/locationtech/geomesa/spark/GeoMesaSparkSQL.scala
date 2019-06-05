@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -13,9 +13,6 @@ import java.time.Instant
 import java.util.{Date, UUID}
 
 import com.typesafe.scalalogging.LazyLogging
-import com.vividsolutions.jts.geom._
-import com.vividsolutions.jts.index.strtree.{AbstractNode, Boundable, STRtree}
-import com.vividsolutions.jts.index.sweepline.{SweepLineIndex, SweepLineInterval, SweepLineOverlapAction}
 import org.apache.hadoop.conf.Configuration
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
@@ -30,10 +27,15 @@ import org.geotools.data.{DataStoreFinder, Query, Transaction}
 import org.geotools.factory.{CommonFactoryFinder, Hints}
 import org.geotools.feature.simple.{SimpleFeatureBuilder, SimpleFeatureTypeBuilder}
 import org.geotools.filter.text.ecql.ECQL
+import org.locationtech.geomesa.features.serialization.ObjectType
 import org.locationtech.geomesa.memory.cqengine.datastore.GeoCQEngineDataStore
 import org.locationtech.geomesa.spark.jts.util.WKTUtils
 import org.locationtech.geomesa.utils.collection.SelfClosingIterator
 import org.locationtech.geomesa.utils.geotools.{SftArgResolver, SftArgs, SimpleFeatureTypes}
+import org.locationtech.geomesa.utils.io.WithStore
+import org.locationtech.jts.geom._
+import org.locationtech.jts.index.strtree.{AbstractNode, Boundable, STRtree}
+import org.locationtech.jts.index.sweepline.{SweepLineIndex, SweepLineInterval, SweepLineOverlapAction}
 import org.opengis.feature.`type`._
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
@@ -74,20 +76,19 @@ class GeoMesaDataSource extends DataSourceRegister
     // TODO: Need different ways to retrieve sft
     //  GEOMESA-1643 Add method to lookup SFT to RDD Provider
     //  Below the details of the Converter RDD Provider and Providers which are backed by GT DSes are leaking through
-    val ds = DataStoreFinder.getDataStore(parameters)
-    val sft = if (ds != null) {
-      ds.getSchema(parameters(GEOMESA_SQL_FEATURE))
-    } else {
-      if (parameters.contains(GEOMESA_SQL_FEATURE) && parameters.contains("geomesa.sft")) {
+    val sft = WithStore(parameters) { ds =>
+      if (ds != null) {
+        ds.getSchema(parameters(GEOMESA_SQL_FEATURE))
+      } else if (parameters.contains(GEOMESA_SQL_FEATURE) && parameters.contains("geomesa.sft")) {
         SimpleFeatureTypes.createType(parameters(GEOMESA_SQL_FEATURE), parameters("geomesa.sft"))
       } else {
         SftArgResolver.getArg(SftArgs(parameters(GEOMESA_SQL_FEATURE), parameters(GEOMESA_SQL_FEATURE))) match {
           case Right(s) => s
           case Left(e) => throw new IllegalArgumentException("Could not resolve simple feature type", e)
         }
-
       }
     }
+
     logger.trace(s"Creating GeoMesa Relation with sft : $sft")
 
     val schema = sft2StructType(sft)
@@ -96,67 +97,68 @@ class GeoMesaDataSource extends DataSourceRegister
 
   // JNH: Q: Why doesn't this method have the call to SQLTypes.init(sqlContext)?
   override def createRelation(sqlContext: SQLContext, parameters: Map[String, String], schema: StructType): BaseRelation = {
-    val ds = DataStoreFinder.getDataStore(parameters)
-    val sft = ds.getSchema(parameters(GEOMESA_SQL_FEATURE))
+    val sft = WithStore(parameters)(_.getSchema(parameters(GEOMESA_SQL_FEATURE)))
     GeoMesaRelation(sqlContext, sft, schema, parameters)
   }
 
-  private def sft2StructType(sft: SimpleFeatureType) = {
-    val fields = sft.getAttributeDescriptors.flatMap { ad => ad2field(ad) }.toList
-    StructType(StructField("__fid__", DataTypes.StringType, nullable =false) :: fields)
-  }
-
   def structType2SFT(struct: StructType, name: String): SimpleFeatureType = {
-    import java.{lang => jl}
-    val fields = struct.fields
-
     val builder = new SimpleFeatureTypeBuilder
-
-    fields.filter( _.name != "__fid__").foreach {
-      field =>
-        field.dataType match {
-          case DataTypes.BooleanType => builder.add(field.name, classOf[jl.Boolean])
-          case DataTypes.DateType => builder.add(field.name, classOf[java.util.Date])
-          case DataTypes.FloatType => builder.add(field.name, classOf[jl.Float])
-          case DataTypes.IntegerType => builder.add(field.name, classOf[jl.Integer])
-          case DataTypes.DoubleType => builder.add(field.name, classOf[jl.Double])
-          case DataTypes.StringType => builder.add(field.name, classOf[jl.String])
-          case DataTypes.LongType   => builder.add(field.name, classOf[jl.Long])
-          case DataTypes.TimestampType => builder.add(field.name, classOf[java.util.Date])
-
-          case JTSTypes.PointTypeInstance => builder.add(field.name, classOf[com.vividsolutions.jts.geom.Point])
-          case JTSTypes.LineStringTypeInstance => builder.add(field.name, classOf[com.vividsolutions.jts.geom.LineString])
-          case JTSTypes.PolygonTypeInstance  => builder.add(field.name, classOf[com.vividsolutions.jts.geom.Polygon])
-          case JTSTypes.MultipolygonTypeInstance  => builder.add(field.name, classOf[com.vividsolutions.jts.geom.MultiPolygon])
-          case JTSTypes.GeometryTypeInstance => builder.add(field.name, classOf[com.vividsolutions.jts.geom.Geometry])
-        }
-    }
     builder.setName(name)
+
+    struct.fields.filter( _.name != "__fid__").foreach { field =>
+      val binding = field.dataType match {
+        case DataTypes.StringType              => classOf[java.lang.String]
+        case DataTypes.DateType                => classOf[java.util.Date]
+        case DataTypes.TimestampType           => classOf[java.util.Date]
+        case DataTypes.IntegerType             => classOf[java.lang.Integer]
+        case DataTypes.LongType                => classOf[java.lang.Long]
+        case DataTypes.FloatType               => classOf[java.lang.Float]
+        case DataTypes.DoubleType              => classOf[java.lang.Double]
+        case DataTypes.BooleanType             => classOf[java.lang.Boolean]
+        case JTSTypes.PointTypeInstance        => classOf[org.locationtech.jts.geom.Point]
+        case JTSTypes.LineStringTypeInstance   => classOf[org.locationtech.jts.geom.LineString]
+        case JTSTypes.PolygonTypeInstance      => classOf[org.locationtech.jts.geom.Polygon]
+        case JTSTypes.MultipolygonTypeInstance => classOf[org.locationtech.jts.geom.MultiPolygon]
+        case JTSTypes.GeometryTypeInstance     => classOf[org.locationtech.jts.geom.Geometry]
+      }
+      builder.add(field.name, binding)
+    }
+
     builder.buildFeatureType()
   }
 
+  private def sft2StructType(sft: SimpleFeatureType): StructType = {
+    val fields = sft.getAttributeDescriptors.flatMap(ad2field).toList
+    StructType(StructField("__fid__", DataTypes.StringType, nullable =false) :: fields)
+  }
+
   private def ad2field(ad: AttributeDescriptor): Option[StructField] = {
-    import java.{lang => jl}
-    val dt = ad.getType.getBinding match {
-      case t if t == classOf[jl.Double]                       => DataTypes.DoubleType
-      case t if t == classOf[jl.Float]                        => DataTypes.FloatType
-      case t if t == classOf[jl.Integer]                      => DataTypes.IntegerType
-      case t if t == classOf[jl.String]                       => DataTypes.StringType
-      case t if t == classOf[jl.Boolean]                      => DataTypes.BooleanType
-      case t if t == classOf[jl.Long]                         => DataTypes.LongType
-      case t if t == classOf[java.util.Date]                  => DataTypes.TimestampType
+    val bindings = Try(ObjectType.selectType(ad)).getOrElse(Seq.empty)
+    val dt = bindings.head match {
+      case ObjectType.STRING   => DataTypes.StringType
+      case ObjectType.INT      => DataTypes.IntegerType
+      case ObjectType.LONG     => DataTypes.LongType
+      case ObjectType.FLOAT    => DataTypes.FloatType
+      case ObjectType.DOUBLE   => DataTypes.DoubleType
+      case ObjectType.BOOLEAN  => DataTypes.BooleanType
+      case ObjectType.DATE     => DataTypes.TimestampType
+      case ObjectType.UUID     => null // not supported
+      case ObjectType.BYTES    => null // not supported
+      case ObjectType.LIST     => null // not supported
+      case ObjectType.MAP      => null // not supported
+      case ObjectType.GEOMETRY =>
+        bindings.last match {
+          case ObjectType.POINT               => JTSTypes.PointTypeInstance
+          case ObjectType.LINESTRING          => JTSTypes.LineStringTypeInstance
+          case ObjectType.POLYGON             => JTSTypes.PolygonTypeInstance
+          case ObjectType.MULTIPOINT          => JTSTypes.MultiPointTypeInstance
+          case ObjectType.MULTILINESTRING     => JTSTypes.MultiLineStringTypeInstance
+          case ObjectType.MULTIPOLYGON        => JTSTypes.MultipolygonTypeInstance
+          case ObjectType.GEOMETRY_COLLECTION => JTSTypes.GeometryTypeInstance
+          case _                              => JTSTypes.GeometryTypeInstance
+        }
 
-      case t if t == classOf[com.vividsolutions.jts.geom.Point]            => JTSTypes.PointTypeInstance
-      case t if t == classOf[com.vividsolutions.jts.geom.MultiPoint]       => JTSTypes.MultiPointTypeInstance
-      case t if t == classOf[com.vividsolutions.jts.geom.LineString]       => JTSTypes.LineStringTypeInstance
-      case t if t == classOf[com.vividsolutions.jts.geom.MultiLineString]  => JTSTypes.MultiLineStringTypeInstance
-      case t if t == classOf[com.vividsolutions.jts.geom.Polygon]          => JTSTypes.PolygonTypeInstance
-      case t if t == classOf[com.vividsolutions.jts.geom.MultiPolygon]     => JTSTypes.MultipolygonTypeInstance
-
-      case t if      classOf[Geometry].isAssignableFrom(t)    => JTSTypes.GeometryTypeInstance
-
-      // NB:  List and Map types are not supported.
-      case _                                                  => null
+      case _ => logger.warn(s"Unexpected bindings for descriptor $ad: ${bindings.mkString(", ")}"); null
     }
     Option(dt).map(StructField(ad.getLocalName, _))
   }
@@ -172,19 +174,16 @@ class GeoMesaDataSource extends DataSourceRegister
       if(fidIndex > -1) (row: Row) => row.getString(fidIndex)
       else _ => "%d%s".format(Instant.now().getEpochSecond, UUID.randomUUID().toString)
 
-
-    val ds = DataStoreFinder.getDataStore(parameters)
-    val schemaInDs = ds.getTypeNames.contains(newFeatureName)
-
-    if (schemaInDs) {
-      if (compare(ds.getSchema(newFeatureName),sft) != 0) {
-        throw new IllegalStateException(s"The schema of the RDD conflicts with schema:$newFeatureName in the data store")
+    WithStore(parameters) { ds =>
+      if (ds.getTypeNames.contains(newFeatureName)) {
+        if (compare(ds.getSchema(newFeatureName),sft) != 0) {
+          throw new IllegalStateException(s"The schema of the RDD conflicts with schema:$newFeatureName in the data store")
+        }
+      } else {
+        sft.getUserData.put("override.reserved.words", java.lang.Boolean.TRUE)
+        ds.createSchema(sft)
       }
-    } else {
-      sft.getUserData.put("override.reserved.words", java.lang.Boolean.TRUE)
-      ds.createSchema(sft)
     }
-
 
     val structType = if (data.queryExecution == null) {
       sft2StructType(sft)
@@ -192,16 +191,12 @@ class GeoMesaDataSource extends DataSourceRegister
       data.schema
     }
 
-    val rddToSave: RDD[SimpleFeature] = data.rdd.mapPartitions( iterRow => {
-      val innerDS = DataStoreFinder.getDataStore(parameters)
-      val sft = innerDS.getSchema(newFeatureName)
+    val rddToSave: RDD[SimpleFeature] = data.rdd.mapPartitions { iterRow =>
+      val sft = WithStore(parameters)(_.getSchema(newFeatureName))
       val builder = new SimpleFeatureBuilder(sft)
-
       val nameMappings: List[(String, Int)] = SparkUtils.getSftRowNameMappings(sft, structType)
-      iterRow.map { r =>
-        SparkUtils.row2Sf(nameMappings, r, builder, fidFn(r))
-      }
-    })
+      iterRow.map(r => SparkUtils.row2Sf(nameMappings, r, builder, fidFn(r)))
+    }
 
     GeoMesaSpark(parameters).save(rddToSave, parameters, newFeatureName)
 

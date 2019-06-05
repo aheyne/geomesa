@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -10,7 +10,7 @@ package org.locationtech.geomesa.accumulo.iterators
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, Closeable}
 
-import com.vividsolutions.jts.geom.LineString
+import org.locationtech.jts.geom.LineString
 import org.apache.arrow.memory.BufferAllocator
 import org.apache.arrow.vector.DirtyRootAllocator
 import org.geotools.data.{Query, Transaction}
@@ -365,6 +365,27 @@ class ArrowBatchIteratorTest extends TestWithMultipleSfts {
           WithClose(SimpleFeatureArrowFileReader.streaming(in)) { reader =>
             compare(reader.features(), features, transform.toSeq)
             reader.dictionaries.keySet mustEqual dictionaries.map(_.toSet).getOrElse(Set.empty)
+          }
+        }
+      }
+    }
+    "sort on dictionary encoded attributes" in {
+      foreach(sfts) { case (sft, features) =>
+        foreach(filters) { filter =>
+          val transform = Array("team", "weight", "dtg", "geom")
+          val query = new Query(sft.getTypeName, filter, transform)
+          query.getHints.put(QueryHints.ARROW_ENCODE, true)
+          query.getHints.put(QueryHints.ARROW_DICTIONARY_FIELDS, "team,weight,dtg")
+          query.getHints.put(QueryHints.ARROW_SORT_FIELD, "dtg")
+          query.getHints.put(QueryHints.ARROW_BATCH_SIZE, 100)
+          val results = SelfClosingIterator(ds.getFeatureReader(query, Transaction.AUTO_COMMIT))
+          val out = new ByteArrayOutputStream
+          results.foreach(sf => out.write(sf.getAttribute(0).asInstanceOf[Array[Byte]]))
+          def in() = new ByteArrayInputStream(out.toByteArray)
+          WithClose(SimpleFeatureArrowFileReader.streaming(in)) { reader =>
+            compare(reader.features(), features, transform.toSeq)
+            reader.dictionaries.keySet mustEqual Set("team", "weight", "dtg")
+            reader.dictionaries.apply("weight").iterator.toSeq must contain(null: AnyRef)
           }
         }
       }

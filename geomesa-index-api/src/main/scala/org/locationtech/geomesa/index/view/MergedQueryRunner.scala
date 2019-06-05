@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -17,12 +17,15 @@ import org.locationtech.geomesa.index.conf.QueryHints
 import org.locationtech.geomesa.index.conf.QueryHints.ARROW_DICTIONARY_CACHED
 import org.locationtech.geomesa.index.geoserver.ViewParams
 import org.locationtech.geomesa.index.iterators.{ArrowScan, DensityScan, StatsScan}
-import org.locationtech.geomesa.index.planning.{InMemoryQueryRunner, QueryPlanner, QueryRunner}
-import org.locationtech.geomesa.index.stats.{GeoMesaStats, HasGeoMesaStats, StatUpdater, UnoptimizedRunnableStats}
+import org.locationtech.geomesa.index.planning.QueryInterceptor.QueryInterceptorFactory
+import org.locationtech.geomesa.index.planning.{LocalQueryRunner, QueryPlanner, QueryRunner}
+import org.locationtech.geomesa.index.stats.GeoMesaStats.StatUpdater
+import org.locationtech.geomesa.index.stats.MetadataBackedStats.UnoptimizedRunnableStats
+import org.locationtech.geomesa.index.stats.{GeoMesaStats, HasGeoMesaStats}
 import org.locationtech.geomesa.index.utils.Explainer
 import org.locationtech.geomesa.utils.bin.BinaryOutputEncoder
 import org.locationtech.geomesa.utils.collection.{CloseableIterator, SelfClosingIterator}
-import org.locationtech.geomesa.utils.geotools.SimpleFeatureOrdering
+import org.locationtech.geomesa.utils.geotools.{SimpleFeatureOrdering, SimpleFeatureTypes}
 import org.locationtech.geomesa.utils.io.CloseWithLogging
 import org.locationtech.geomesa.utils.iterators.SortedMergeIterator
 import org.locationtech.geomesa.utils.stats.{MinMax, Stat, TopK}
@@ -37,9 +40,13 @@ import scala.reflect.ClassTag
   * @param ds merged data store
   * @param stores delegate stores
   */
-class MergedQueryRunner(ds: MergedDataStoreView, stores: Seq[DataStore]) extends QueryRunner with LazyLogging {
+class MergedQueryRunner(ds: MergedDataStoreView, stores: Seq[(DataStore, Option[Filter])])
+    extends QueryRunner with LazyLogging {
 
   import org.locationtech.geomesa.index.conf.QueryHints.RichHints
+
+  // query interceptors are handled by the individual data stores
+  override protected val interceptors: QueryInterceptorFactory = QueryInterceptorFactory.empty()
 
   override def runQuery(sft: SimpleFeatureType, original: Query, explain: Explainer): CloseableIterator[SimpleFeature] = {
 
@@ -55,11 +62,11 @@ class MergedQueryRunner(ds: MergedDataStoreView, stores: Seq[DataStore]) extends
       arrowQuery(sft, query)
     } else {
       // query each delegate store
-      val readers = stores.map { store =>
+      val readers = stores.map { case (store, filter) =>
         val q = new Query(query)
         // make sure to coy the hints so they aren't shared
         q.setHints(new Hints(hints))
-        store.getFeatureReader(q, Transaction.AUTO_COMMIT)
+        store.getFeatureReader(mergeFilter(q, filter), Transaction.AUTO_COMMIT)
       }
 
       if (hints.isDensityQuery) {
@@ -158,24 +165,23 @@ class MergedQueryRunner(ds: MergedDataStoreView, stores: Seq[DataStore]) extends
     }
 
     // now that we have standardized dictionaries, we can query the delegate stores
-    val readers = stores.map { store =>
+    val readers = stores.map { case (store, filter) =>
       val q = new Query(query)
       q.setHints(new Hints(hints))
-      store.getFeatureReader(q, Transaction.AUTO_COMMIT)
+      store.getFeatureReader(mergeFilter(q, filter), Transaction.AUTO_COMMIT)
     }
 
     val results = SelfClosingIterator(readers.iterator).flatMap { reader =>
       val schema = reader.getFeatureType
       if (schema == org.locationtech.geomesa.arrow.ArrowEncodedSft) {
         // arrow processing has been handled by the store already
-        SelfClosingIterator(reader)
+        CloseableIterator(reader)
       } else {
         // the store just returned normal features, do the arrow processing here
-        schema.getUserData.putAll(sft.getUserData) // copy default dtg, etc if necessary
-        val iter = CloseableIterator(reader)
+        val copy = SimpleFeatureTypes.immutable(schema, sft.getUserData) // copy default dtg, etc if necessary
         // note: we don't need to pass in the transform or filter, as the transform should have already been
         // applied and the dictionaries calculated up front (if needed)
-        SelfClosingIterator(InMemoryQueryRunner.transform(schema, iter, None, hints, None), iter.close())
+        LocalQueryRunner.transform(copy, CloseableIterator(reader), None, hints, None)
       }
     }
 
@@ -189,12 +195,11 @@ class MergedQueryRunner(ds: MergedDataStoreView, stores: Seq[DataStore]) extends
       val schema = reader.getFeatureType
       if (schema == DensityScan.DensitySft) {
         // density processing has been handled by the store already
-        SelfClosingIterator(reader)
+        CloseableIterator(reader)
       } else {
         // the store just returned regular features, do the density processing here
-        schema.getUserData.putAll(sft.getUserData) // copy default dtg, etc if necessary
-        val iter = CloseableIterator(reader)
-        SelfClosingIterator(InMemoryQueryRunner.transform(schema, iter, None, hints, None), iter.close())
+        val copy = SimpleFeatureTypes.immutable(schema, sft.getUserData) // copy default dtg, etc if necessary
+        LocalQueryRunner.transform(copy, CloseableIterator(reader), None, hints, None)
       }
     }
   }
@@ -207,12 +212,11 @@ class MergedQueryRunner(ds: MergedDataStoreView, stores: Seq[DataStore]) extends
       val schema = reader.getFeatureType
       if (schema == StatsScan.StatsSft) {
         // stats processing has been handled by the store already
-        SelfClosingIterator(reader)
+        CloseableIterator(reader)
       } else {
         // the store just returned regular features, do the stats processing here
-        schema.getUserData.putAll(sft.getUserData) // copy default dtg, etc if necessary
-        val iter = CloseableIterator(reader)
-        SelfClosingIterator(InMemoryQueryRunner.transform(schema, iter, None, hints, None), iter.close())
+        val copy = SimpleFeatureTypes.immutable(schema, sft.getUserData) // copy default dtg, etc if necessary
+        LocalQueryRunner.transform(copy, CloseableIterator(reader), None, hints, None)
       }
     }
     StatsScan.reduceFeatures(sft, hints)(results)
@@ -225,12 +229,11 @@ class MergedQueryRunner(ds: MergedDataStoreView, stores: Seq[DataStore]) extends
       val schema = reader.getFeatureType
       if (schema == BinaryOutputEncoder.BinEncodedSft) {
         // bin processing has been handled by the store already
-        SelfClosingIterator(reader)
+        CloseableIterator(reader)
       } else {
         // the store just returned regular features, do the bin processing here
-        schema.getUserData.putAll(sft.getUserData) // copy default dtg, etc if necessary
-        val iter = CloseableIterator(reader)
-        SelfClosingIterator(InMemoryQueryRunner.transform(schema, iter, None, hints, None), iter.close())
+        val copy = SimpleFeatureTypes.immutable(schema, sft.getUserData) // copy default dtg, etc if necessary
+        LocalQueryRunner.transform(copy, CloseableIterator(reader), None, hints, None)
       }
     }
   }
@@ -252,45 +255,55 @@ class MergedQueryRunner(ds: MergedDataStoreView, stores: Seq[DataStore]) extends
 
 object MergedQueryRunner {
 
-  class MergedStats(stores: Seq[DataStore]) extends GeoMesaStats {
+  class MergedStats(stores: Seq[(DataStore, Option[Filter])]) extends GeoMesaStats {
 
     private val stats = stores.map {
-      case s: HasGeoMesaStats => s.stats
-      case s => new UnoptimizedRunnableStats(s)
+      case (s: HasGeoMesaStats, f) => (s.stats, f)
+      case (s, f) => (new UnoptimizedRunnableStats(s), f)
     }
 
-    override def getCount(sft: SimpleFeatureType, filter: Filter, exact: Boolean): Option[Long] =
-      stats.flatMap(_.getCount(sft, filter, exact)).reduceLeftOption(_ + _)
+    override def getCount(sft: SimpleFeatureType, filter: Filter, exact: Boolean): Option[Long] = {
+      val counts = stats.flatMap { case (stat, f) => stat.getCount(sft, mergeFilter(filter, f), exact) }
+      counts.reduceLeftOption(_ + _)
+    }
 
     override def getAttributeBounds[T](sft: SimpleFeatureType,
                                        attribute: String,
                                        filter: Filter,
-                                       exact: Boolean): Option[MinMax[T]] =
-      stats.flatMap(_.getAttributeBounds[T](sft, attribute, filter, exact)).reduceLeftOption(_ + _)
+                                       exact: Boolean): Option[MinMax[T]] = {
+      val bounds = stats.flatMap { case (stat, f) =>
+        stat.getAttributeBounds[T](sft, attribute, mergeFilter(filter, f), exact)
+      }
+      bounds.reduceLeftOption(_ + _)
+    }
 
     override def getStats[T <: Stat](sft: SimpleFeatureType,
                                      attributes: Seq[String],
                                      options: Seq[Any])
-                                     (implicit ct: ClassTag[T]): Seq[T] =
-      stats.map(_.getStats[T](sft, attributes, options)(ct)).reduceLeft[Seq[T]] { case (left, right) =>
+                                     (implicit ct: ClassTag[T]): Seq[T] = {
+      stats.map(_._1.getStats[T](sft, attributes, options)(ct)).reduceLeft[Seq[T]] { case (left, right) =>
         left.zip(right).map { case (l, r) => l + r }.asInstanceOf[Seq[T]]
       }
+    }
 
-    override def runStats[T <: Stat](sft: SimpleFeatureType, stats: String, filter: Filter): Seq[T] =
-      this.stats.map(_.runStats[T](sft, stats, filter)).reduceLeft[Seq[T]] { case (left, right) =>
+
+    override def runStats[T <: Stat](sft: SimpleFeatureType, stats: String, filter: Filter): Seq[T] = {
+      val runs = this.stats.map { case (stat, f) => stat.runStats[T](sft, stats, mergeFilter(filter, f)) }
+      runs.reduceLeft[Seq[T]] { case (left, right) =>
         left.zip(right).map { case (l, r) => l + r }.asInstanceOf[Seq[T]]
       }
+    }
 
     override def generateStats(sft: SimpleFeatureType): Seq[Stat] =
-      stats.map(_.generateStats(sft)).reduceLeft[Seq[Stat]] { case (left, right) =>
+      stats.map(_._1.generateStats(sft)).reduceLeft[Seq[Stat]] { case (left, right) =>
         left.zip(right).map { case (l, r) => l + r }
       }
 
-    override def statUpdater(sft: SimpleFeatureType): StatUpdater = new MergedStatUpdater(sft, stats)
+    override def statUpdater(sft: SimpleFeatureType): StatUpdater = new MergedStatUpdater(sft, stats.map(_._1))
 
-    override def clearStats(sft: SimpleFeatureType): Unit = stats.foreach(_.clearStats(sft))
+    override def clearStats(sft: SimpleFeatureType): Unit = stats.foreach(_._1.clearStats(sft))
 
-    override def close(): Unit = stats.foreach(CloseWithLogging.apply)
+    override def close(): Unit = stats.map(_._1).foreach(CloseWithLogging.apply)
   }
 
   class MergedStatUpdater(sft: SimpleFeatureType, stats: Seq[GeoMesaStats]) extends StatUpdater {

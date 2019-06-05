@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -9,17 +9,19 @@
 package org.locationtech.geomesa.convert2
 
 import java.io.{IOException, InputStream}
-import java.nio.charset.Charset
+import java.nio.charset.{Charset, StandardCharsets}
 
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import org.geotools.factory.Hints
-import org.locationtech.geomesa.convert.Modes.ErrorMode
-import org.locationtech.geomesa.convert.Modes.ParseMode
-import org.locationtech.geomesa.convert._
+import org.locationtech.geomesa.convert.Modes.{ErrorMode, ParseMode}
+import org.locationtech.geomesa.convert.{EnrichmentCache, EvaluationContext}
+import org.locationtech.geomesa.convert2.metrics.ConverterMetrics
 import org.locationtech.geomesa.convert2.transforms.Expression
+import org.locationtech.geomesa.convert2.validators.SimpleFeatureValidator
 import org.locationtech.geomesa.features.ScalaSimpleFeature
 import org.locationtech.geomesa.utils.collection.CloseableIterator
+import org.locationtech.geomesa.utils.io.CloseWithLogging
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -33,7 +35,7 @@ import scala.util.control.NonFatal
   * Subclasses need to implement `read` to parse the underlying input stream into raw values that will be
   * transformed to simple features.
   *
-  * @param targetSft simple feature type
+  * @param sft simple feature type
   * @param config converter config
   * @param fields converter fields
   * @param options converter options
@@ -41,68 +43,106 @@ import scala.util.control.NonFatal
   * @tparam F field binding
   * @tparam O options binding
   */
-abstract class AbstractConverter[C <: ConverterConfig, F <: Field, O <: ConverterOptions]
-  (override val targetSft: SimpleFeatureType, val config: C, val fields: Seq[F], val options: O)
-    extends SimpleFeatureConverter with LazyLogging {
+abstract class AbstractConverter[T, C <: ConverterConfig, F <: Field, O <: ConverterOptions]
+  (val sft: SimpleFeatureType, val config: C, val fields: Seq[F], val options: O)
+    extends SimpleFeatureConverter with ParsingConverter[T] with LazyLogging {
 
   private val requiredFields: Array[Field] =
-    AbstractConverter.requiredFields(targetSft, fields, config.userData.values.toSeq ++ config.idField.toSeq)
+    AbstractConverter.requiredFields(sft, fields, config.userData.values.toSeq ++ config.idField.toSeq)
 
   private val requiredFieldsCount: Int = requiredFields.length
 
-  private val requiredFieldsIndices: Array[Int] = requiredFields.map(f => targetSft.indexOf(f.name))
+  private val requiredFieldsIndices: Array[Int] = requiredFields.map(f => sft.indexOf(f.name))
 
-  private val configCaches = config.caches.map { case (k, v) => (k, EnrichmentCache(v)) }
+  private val metrics = ConverterMetrics(sft, options.reporters)
 
-  /**
-    * Read values for simple features out of the input stream. This should be lazily evaluated,
-    * so that any exceptions occur in the call to `hasNext` (and not during the iterator creation),
-    * which lets us handle them appropriately in `ErrorHandlingIterator`. If there is any sense of
-    * 'lines', they should be indicated with `ec.counter.incLineCount`
-    *
-    * @param is input
-    * @param ec evaluation context
-    * @return raw extracted values, one iterator entry per simple feature
-    */
-  protected def read(is: InputStream, ec: EvaluationContext): CloseableIterator[Array[Any]]
+  private val validators = SimpleFeatureValidator(sft, options.validators, metrics)
 
-  override def createEvaluationContext(globalParams: Map[String, Any],
-                                       caches: Map[String, EnrichmentCache],
-                                       counter: Counter): EvaluationContext = {
-    import org.locationtech.geomesa.utils.conversions.ScalaImplicits.RichTraversableOnce
+  private val caches = config.caches.map { case (k, v) => (k, EnrichmentCache(v)) }
 
-    val globalKeys = globalParams.keys.toSeq
-    val names = requiredFields.map(_.name) ++ globalKeys
-    val values = Array.ofDim[Any](names.length)
-    // note, globalKeys are maintained even through EvaluationContext.clear()
-    globalKeys.foreachIndex { case (k, i) => values(requiredFieldsCount + i) = globalParams(k) }
-    new EvaluationContextImpl(names, values, counter, configCaches ++ caches)
+  override def targetSft: SimpleFeatureType = sft
+
+  override def createEvaluationContext(globalParams: Map[String, Any]): EvaluationContext =
+    EvaluationContext(requiredFields.map(_.name), globalParams, caches, metrics)
+
+  // noinspection ScalaDeprecation
+  override def createEvaluationContext(
+      globalParams: Map[String, Any],
+      caches: Map[String, EnrichmentCache],
+      counter: org.locationtech.geomesa.convert.Counter): EvaluationContext = {
+    logger.warn("Using deprecated evaluation context - metrics will not be registered correctly")
+    val keys = requiredFields.map(_.name) ++ globalParams.keys
+    val values = keys.map(key => globalParams.get(key).orNull)
+    EvaluationContext(keys, values, counter, this.caches ++ caches)
   }
 
   override def process(is: InputStream, ec: EvaluationContext): CloseableIterator[SimpleFeature] = {
-    val converted = new ErrorHandlingIterator(read(is, ec), ec.counter).flatMap(convert(_, ec))
+    val converted = convert(new ErrorHandlingIterator(parse(is, ec), options.errorMode, ec.failure), ec)
     options.parseMode match {
       case ParseMode.Incremental => converted
       case ParseMode.Batch => CloseableIterator(converted.to[ListBuffer].iterator, converted.close())
     }
   }
 
-  override def close(): Unit = configCaches.foreach(_._2.close())
+  override def convert(values: CloseableIterator[T], ec: EvaluationContext): CloseableIterator[SimpleFeature] =
+    this.values(values, ec).flatMap(convert(_, ec))
+
+  /**
+    * Parse objects out of the input stream. This should be lazily evaluated, so that any exceptions occur
+    * in the call to `hasNext` (and not during the iterator creation), which lets us handle them appropriately
+    * in `ErrorHandlingIterator`. If there is any sense of 'lines', they should be indicated with
+    * `ec.counter.incLineCount`
+    *
+    * @param is input
+    * @param ec evaluation context
+    * @return raw extracted values, one iterator entry per simple feature
+    */
+  protected def parse(is: InputStream, ec: EvaluationContext): CloseableIterator[T]
+
+  /**
+    * Convert parsed values into the raw array used for reading fields. If line counting was not handled
+    * in `parse` (due to no sense of 'lines' in the input), then the line count should be incremented here
+    * instead
+    *
+    * @param parsed parsed values
+    * @param ec evaluation context
+    * @return
+    */
+  protected def values(parsed: CloseableIterator[T], ec: EvaluationContext): CloseableIterator[Array[Any]]
 
   /**
     * Convert input values into a simple feature with attributes.
     *
-    * This method returns an iterator to simplify flatMapping over inputs, but it will always return either
-    * 0 or 1 feature.
+    * This method returns a CloseableIterator to simplify flatMapping over inputs, but it will always
+    * return either 0 or 1 feature.
     *
     * @param rawValues raw input values
     * @param ec evaluation context
     * @return
     */
-  private def convert(rawValues: Array[Any], ec: EvaluationContext): Iterator[SimpleFeature] = {
-    val sf = new ScalaSimpleFeature(targetSft, "")
-    var i = 0
+  private def convert(rawValues: Array[Any], ec: EvaluationContext): CloseableIterator[SimpleFeature] = {
+    val sf = new ScalaSimpleFeature(sft, "")
 
+    def failure(field: String, e: Throwable): CloseableIterator[SimpleFeature] = {
+      ec.failure.inc()
+      def msg(verbose: Boolean): String = {
+        val values = if (!verbose) { "" } else {
+          // head is the whole record
+          s" using values:\n${rawValues.headOption.orNull}\n[${rawValues.drop(1).mkString(", ")}]"
+        }
+        s"Failed to evaluate field '$field' on line ${ec.line}$values"
+      }
+
+      options.errorMode match {
+        case ErrorMode.RaiseErrors => throw new IOException(msg(true), e)
+        case ErrorMode.SkipBadRecords if logger.underlying.isDebugEnabled => logger.underlying.debug(msg(true), e)
+        case ErrorMode.SkipBadRecords if logger.underlying.isInfoEnabled => logger.underlying.info(msg(false))
+        case _ => // no-op
+      }
+      CloseableIterator.empty
+    }
+
+    var i = 0
     try {
       ec.clear()
       while (i < requiredFieldsCount) {
@@ -114,83 +154,43 @@ abstract class AbstractConverter[C <: ConverterConfig, F <: Field, O <: Converte
         }
         i += 1
       }
-
-      // if no id builder, empty feature id will be replaced with an auto-gen one
-      config.idField.foreach { expr =>
-        sf.setId(expr.eval(rawValues)(ec).asInstanceOf[String])
-        sf.getUserData.put(Hints.USE_PROVIDED_FID, java.lang.Boolean.TRUE)
-      }
-      config.userData.foreach { case (k, v) => sf.getUserData.put(k, v.eval(rawValues)(ec).asInstanceOf[AnyRef]) }
     } catch {
-      case NonFatal(e) =>
-        ec.counter.incFailure()
-        val values = if (!options.verbose) { "" } else {
-          // head is the whole record
-          s" using values:\n${rawValues.headOption.orNull}\n[${rawValues.drop(1).mkString(", ")}]"
-        }
-        val field = if (i < requiredFieldsCount) { s" '${requiredFields(i).name}'" } else { "" }
-        val msg = s"Failed to evaluate field$field on line ${ec.counter.getLineCount}$values"
-        options.errorMode match {
-          case ErrorMode.RaiseErrors => throw new IOException(msg, e)
-          case ErrorMode.SkipBadRecords => if (options.verbose) { logger.debug(msg, e) } else { logger.debug(msg) }
-        }
-        return Iterator.empty
+      case NonFatal(e) => return failure(requiredFields(i).name, e)
     }
 
-    val error = options.validators.validate(sf)
+    // if no id builder, empty feature id will be replaced with an auto-gen one
+    config.idField.foreach { expr =>
+      try { sf.setId(expr.eval(rawValues)(ec).asInstanceOf[String]) } catch {
+        case NonFatal(e) => return failure("feature id", e)
+      }
+      sf.getUserData.put(Hints.USE_PROVIDED_FID, java.lang.Boolean.TRUE)
+    }
+
+    config.userData.foreach { case (k, v) =>
+      try { sf.getUserData.put(k, v.eval(rawValues)(ec).asInstanceOf[AnyRef]) } catch {
+        case NonFatal(e) => return failure(s"user-data:$k", e)
+      }
+    }
+
+    val error = validators.validate(sf)
     if (error == null) {
-      ec.counter.incSuccess()
-      Iterator.single(sf)
+      ec.success.inc()
+      CloseableIterator.single(sf)
     } else {
-      ec.counter.incFailure()
-      val msg = s"Invalid SimpleFeature on line ${ec.counter.getLineCount}: $error"
+      ec.failure.inc()
+      val msg = s"Invalid SimpleFeature on line ${ec.line}: $error"
       options.errorMode match {
         case ErrorMode.SkipBadRecords => logger.debug(msg)
         case ErrorMode.RaiseErrors => throw new IOException(msg)
       }
-      Iterator.empty
+      CloseableIterator.empty
     }
   }
 
-  /**
-    * Handles errors from the underlying parsing of data, before converting to simple features
-    *
-    * @param underlying raw parsed data iterator
-    * @param counter counter
-    */
-  private class ErrorHandlingIterator(underlying: CloseableIterator[Array[Any]], counter: Counter)
-      extends CloseableIterator[Array[Any]] {
-
-    private var staged: Array[Any] = _
-
-    override final def hasNext: Boolean = staged != null || {
-      // make sure that we successfully read an underlying record, so that we can always return
-      // a valid record in `next`, otherwise failures will get double counted
-      try {
-        if (underlying.hasNext) {
-          staged = underlying.next
-          true
-        } else {
-          false
-        }
-      } catch {
-        case NonFatal(e) =>
-          counter.incFailure()
-          options.errorMode match {
-            case ErrorMode.SkipBadRecords => logger.warn("Failed parsing input: ", e)
-            case ErrorMode.RaiseErrors => throw e
-          }
-          false // usually parsing can't continue if there is an exception in the underlying read
-      }
-    }
-
-    override def next(): Array[Any] = {
-      val res = staged
-      staged = null
-      res
-    }
-
-    override def close(): Unit = underlying.close()
+  override def close(): Unit = {
+    CloseWithLogging(caches.values)
+    CloseWithLogging(metrics)
+    CloseWithLogging(validators)
   }
 }
 
@@ -214,25 +214,37 @@ object AbstractConverter {
     * @param caches caches
     * @param userData user data expressions
     */
-  case class BasicConfig(`type`: String,
-                         idField: Option[Expression],
-                         caches: Map[String, Config],
-                         userData: Map[String, Expression]) extends ConverterConfig
+  case class BasicConfig(
+      `type`: String,
+      idField: Option[Expression],
+      caches: Map[String, Config],
+      userData: Map[String, Expression]
+    ) extends ConverterConfig
 
   /**
     * Basic converter options implementation, useful if a converter doesn't have additional options
     *
     * @param validators validator
+    * @param reporters metric reporters
     * @param parseMode parse mode
     * @param errorMode error mode
     * @param encoding file/stream encoding
-    * @param verbose verbose
     */
-  case class BasicOptions(validators: SimpleFeatureValidator,
-                          parseMode: ParseMode,
-                          errorMode: ErrorMode,
-                          encoding: Charset,
-                          verbose: Boolean) extends ConverterOptions
+  case class BasicOptions(
+      validators: Seq[String],
+      reporters: Map[String, Config],
+      parseMode: ParseMode,
+      errorMode: ErrorMode,
+      encoding: Charset
+    ) extends ConverterOptions
+
+  object BasicOptions {
+    // keep as a function to pick up system property changes
+    def default: BasicOptions = {
+      val validators = SimpleFeatureValidator.default
+      BasicOptions(validators, Map.empty, ParseMode.Default, ErrorMode(), StandardCharsets.UTF_8)
+    }
+  }
 
   /**
     * Determines the fields that are actually used for the conversion

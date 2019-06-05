@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -11,11 +11,12 @@ package org.locationtech.geomesa.index.stats
 import java.io.{Closeable, Flushable}
 import java.util.Date
 
-import com.vividsolutions.jts.geom.Geometry
 import org.geotools.geometry.jts.ReferencedEnvelope
 import org.locationtech.geomesa.filter.visitor.BoundsFilterVisitor
+import org.locationtech.geomesa.index.stats.GeoMesaStats.StatUpdater
 import org.locationtech.geomesa.utils.geotools._
 import org.locationtech.geomesa.utils.stats.{Histogram, MinMax, Stat}
+import org.locationtech.jts.geom.Geometry
 import org.opengis.feature.`type`.AttributeDescriptor
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 import org.opengis.filter.Filter
@@ -179,16 +180,12 @@ object GeoMesaStats {
   // TODO GEOMESA-1217 support list/maps in stats
   def okForStats(d: AttributeDescriptor): Boolean =
     !d.isMultiValued && StatClasses.exists(_.isAssignableFrom(d.getType.getBinding))
-}
 
-trait HasGeoMesaStats {
-  def stats: GeoMesaStats
-}
-
-/**
-  * Trait for tracking stats based on simple features
-  */
-trait StatUpdater extends Closeable with Flushable {
-  def add(sf: SimpleFeature): Unit
-  def remove(sf: SimpleFeature): Unit
+  /**
+    * Trait for tracking stats based on simple features
+    */
+  trait StatUpdater extends Closeable with Flushable {
+    def add(sf: SimpleFeature): Unit
+    def remove(sf: SimpleFeature): Unit
+  }
 }

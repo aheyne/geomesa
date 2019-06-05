@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -12,7 +12,7 @@ import java.time.{LocalDateTime, ZoneId, ZoneOffset}
 import java.util.Date
 
 import com.typesafe.scalalogging.LazyLogging
-import com.vividsolutions.jts.geom.{Envelope, Geometry}
+import org.locationtech.jts.geom.{Envelope, Geometry}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules.Rule
@@ -23,6 +23,7 @@ import org.geotools.factory.CommonFactoryFinder
 import org.locationtech.geomesa.spark.jts.rules.GeometryLiteral
 import org.locationtech.geomesa.spark.jts.udf.SpatialRelationFunctions._
 import org.locationtech.geomesa.spark.{GeoMesaJoinRelation, GeoMesaRelation, RelationUtils, SparkVersions}
+import org.locationtech.geomesa.utils.date.DateUtils.toInstant
 import org.opengis.filter.expression.{Expression => GTExpression, Literal => GTLiteral}
 import org.opengis.filter.{FilterFactory2, Filter => GTFilter}
 
@@ -117,7 +118,7 @@ object SQLRules extends LazyLogging {
       lazy val zone = c.timeZoneId.map(ZoneId.of).orNull
       sparkExprToGTExpr(c.child).map {
         case lit: GTLiteral if lit.getValue.isInstanceOf[Date] && zone != null =>
-          val date = LocalDateTime.ofInstant(lit.getValue.asInstanceOf[Date].toInstant, zone)
+          val date = LocalDateTime.ofInstant(toInstant(lit.getValue.asInstanceOf[Date]), zone)
           ff.literal(new Date(date.atZone(ZoneOffset.UTC).toInstant.toEpochMilli))
         case e => e
       }

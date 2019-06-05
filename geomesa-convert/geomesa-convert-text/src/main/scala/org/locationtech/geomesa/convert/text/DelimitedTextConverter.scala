@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -10,15 +10,15 @@ package org.locationtech.geomesa.convert.text
 
 import java.io._
 import java.nio.charset.{Charset, StandardCharsets}
+import java.util.Locale
 
 import com.typesafe.config.Config
-import org.apache.commons.csv.{CSVFormat, QuoteMode}
+import org.apache.commons.csv.{CSVFormat, CSVRecord, QuoteMode}
 import org.geotools.factory.GeoTools
 import org.geotools.util.Converters
-import org.locationtech.geomesa.convert.Modes.ErrorMode
-import org.locationtech.geomesa.convert.Modes.ParseMode
+import org.locationtech.geomesa.convert.EvaluationContext
+import org.locationtech.geomesa.convert.Modes.{ErrorMode, ParseMode}
 import org.locationtech.geomesa.convert.text.DelimitedTextConverter.{DelimitedTextConfig, DelimitedTextOptions}
-import org.locationtech.geomesa.convert.{EvaluationContext, SimpleFeatureValidator}
 import org.locationtech.geomesa.convert2.AbstractConverter.BasicField
 import org.locationtech.geomesa.convert2._
 import org.locationtech.geomesa.convert2.transforms.Expression
@@ -30,88 +30,46 @@ import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
 import scala.annotation.tailrec
 
-class DelimitedTextConverter(targetSft: SimpleFeatureType,
-                             config: DelimitedTextConfig,
-                             fields: Seq[BasicField],
-                             options: DelimitedTextOptions)
-    extends AbstractConverter(targetSft, config, fields, options) {
+class DelimitedTextConverter(
+    sft: SimpleFeatureType,
+    config: DelimitedTextConfig,
+    fields: Seq[BasicField],
+    options: DelimitedTextOptions
+  ) extends AbstractConverter[CSVRecord, DelimitedTextConfig, BasicField, DelimitedTextOptions](
+    sft, config, fields, options) {
 
-  private val format = {
-    var format = DelimitedTextConverter.formats.getOrElse(config.format.toUpperCase,
-      throw new IllegalArgumentException(s"Unknown delimited text format '${config.format}'"))
-    options.quote.foreach(c => format = format.withQuote(c))
-    options.escape.foreach(c => format = format.withEscape(c))
-    options.delimiter.foreach(c => format = format.withDelimiter(c))
-    format
-  }
+  private val format = DelimitedTextConverter.createFormat(config.format, options)
 
-  override protected def read(is: InputStream, ec: EvaluationContext): CloseableIterator[Array[Any]] = {
+  override protected def parse(is: InputStream, ec: EvaluationContext): CloseableIterator[CSVRecord] =
+    DelimitedTextConverter.iterator(format, is, options.encoding, options.skipLines.getOrElse(0), ec)
+
+  override protected def values(parsed: CloseableIterator[CSVRecord],
+                                ec: EvaluationContext): CloseableIterator[Array[Any]] = {
     var array = Array.empty[Any]
     val writer = new StringWriter
-
     // printer used to re-create the original line
     // suppress the final newline so that we match the original behavior of splitting on newlines
     val printer = format.withRecordSeparator(null).print(writer)
 
-    val parser = format.parse(new InputStreamReader(is, options.encoding))
-    val records = parser.iterator()
-
-    val elements: Iterator[Array[Any]] = new Iterator[Array[Any]] {
-
-      private var lastLine = 0L
-      private var staged: Array[Any] = _
-
-      @tailrec
-      override final def hasNext: Boolean = staged != null || {
-        if (!records.hasNext) {
-          false
-        } else {
-          val record = records.next
-          val line = parser.getCurrentLineNumber
-          if (line == lastLine) {
-            // commons-csv doesn't always increment the line count for the final line in a file...
-            ec.counter.incLineCount()
-            lastLine = line + 1
-          } else {
-            ec.counter.incLineCount(line - lastLine)
-            lastLine = line
-          }
-
-          if (options.skipLines.exists(lastLine <= _)) {
-            hasNext
-          } else {
-            writer.getBuffer.setLength(0)
-
-            val len = record.size()
-            if (array.length != len + 1) {
-              array = Array.ofDim[Any](len + 1)
-            }
-
-            var i = 0
-            while (i < len) {
-              val value = record.get(i)
-              array(i + 1) = value
-              printer.print(value)
-              i += 1
-            }
-
-            printer.println()
-            array(0) = writer.toString
-
-            staged = array
-            true
-          }
-        }
+    parsed.map { record =>
+      writer.getBuffer.setLength(0)
+      val len = record.size() + 1
+      // it's possible that not all records have the same number of columns
+      if (array.length != len) {
+        array = Array.ofDim[Any](len)
+      }
+      var i = 1
+      while (i < len) {
+        val value = record.get(i - 1)
+        array(i) = value
+        printer.print(value)
+        i += 1
       }
 
-      override def next(): Array[Any] = {
-        val res = staged
-        staged = null
-        res
-      }
+      printer.println()
+      array(0) = writer.toString
+      array
     }
-
-    CloseableIterator(elements, parser.close())
   }
 }
 
@@ -128,6 +86,41 @@ object DelimitedTextConverter {
     val QuotedQuoteEscape: CSVFormat = CSVFormat.DEFAULT.withEscape('"').withQuoteMode(QuoteMode.ALL)
     val QuotedMinimal    : CSVFormat = CSVFormat.DEFAULT.withQuoteMode(QuoteMode.MINIMAL)
     val TabsQuotedMinimal: CSVFormat = CSVFormat.TDF.withQuoteMode(QuoteMode.MINIMAL)
+  }
+
+  /**
+    * Create a csv format for parsing
+    *
+    * @param name format name
+    * @param options configuration options
+    * @return
+    */
+  def createFormat(name: String, options: DelimitedTextOptions): CSVFormat = {
+    var format = formats.getOrElse(name.toUpperCase(Locale.US),
+      throw new IllegalArgumentException(s"Unknown delimited text format '$name'"))
+    options.quote.foreach(c => format = format.withQuote(c))
+    options.escape.foreach(c => format = format.withEscape(c))
+    options.delimiter.foreach(c => format = format.withDelimiter(c))
+    format
+  }
+
+  /**
+    * Creates a csv iterator over an input stream
+    *
+    * @param format parsing format
+    * @param is input stream
+    * @param encoding charset
+    * @param skip number of header lines to skip
+    * @param ec evalution context
+    * @return
+    */
+  def iterator(
+      format: CSVFormat,
+      is: InputStream,
+      encoding: Charset,
+      skip: Int,
+      ec: EvaluationContext): CloseableIterator[CSVRecord] = {
+    new CsvIterator(format, is, encoding, skip, ec)
   }
 
   /**
@@ -213,19 +206,89 @@ object DelimitedTextConverter {
   // check quoted before default - if values are quoted, we don't want the quotes to be captured as part of the value
   private [text] val inferences = Seq(Formats.Tabs, Formats.Quoted, Formats.Default)
 
-  case class DelimitedTextConfig(`type`: String,
-                                 format: String,
-                                 idField: Option[Expression],
-                                 caches: Map[String, Config],
-                                 userData: Map[String, Expression]) extends ConverterConfig
+  case class DelimitedTextConfig(
+      `type`: String,
+      format: String,
+      idField: Option[Expression],
+      caches: Map[String, Config],
+      userData: Map[String, Expression]
+    ) extends ConverterConfig
 
-  case class DelimitedTextOptions(skipLines: Option[Int],
-                                  quote: Option[Char],
-                                  escape: Option[Char],
-                                  delimiter: Option[Char],
-                                  validators: SimpleFeatureValidator,
-                                  parseMode: ParseMode,
-                                  errorMode: ErrorMode,
-                                  encoding: Charset,
-                                  verbose: Boolean) extends ConverterOptions
+  case class DelimitedTextOptions(
+      skipLines: Option[Int],
+      quote: OptionalChar,
+      escape: OptionalChar,
+      delimiter: Option[Char],
+      validators: Seq[String],
+      reporters: Map[String, Config],
+      parseMode: ParseMode,
+      errorMode: ErrorMode,
+      encoding: Charset
+    ) extends ConverterOptions
+
+  sealed trait OptionalChar {
+    def foreach[U](f: Character => U): Unit
+  }
+
+  final case object CharNotSpecified extends OptionalChar {
+    override def foreach[U](f: Character => U): Unit = {}
+  }
+  final case class CharEnabled(char: Char) extends OptionalChar {
+    override def foreach[U](f: Character => U): Unit = f.apply(char)
+  }
+  final case object CharDisabled extends OptionalChar {
+    override def foreach[U](f: Character => U): Unit = f.apply(null)
+  }
+
+  /**
+    * Parses an input stream into CSV records
+    *
+    * @param format csv format
+    * @param is input
+    * @param encoding encoding
+    * @param skip skip lines up front, used for e.g. headers
+    * @param ec evaluation context
+    */
+  private class CsvIterator(format: CSVFormat, is: InputStream, encoding: Charset, skip: Int, ec: EvaluationContext)
+      extends CloseableIterator[CSVRecord] {
+
+    private val parser = format.parse(new InputStreamReader(is, encoding))
+    private val records = parser.iterator()
+    private var lastLine = 0L
+    private var staged: CSVRecord = _
+
+    @tailrec
+    override final def hasNext: Boolean = staged != null || {
+      if (!records.hasNext) {
+        false
+      } else {
+        val record = records.next()
+        val line = parser.getCurrentLineNumber
+        if (line == lastLine) {
+          // commons-csv doesn't always increment the line count for the final line in a file...
+          ec.line += 1
+          lastLine = line + 1
+        } else {
+          ec.line += (line - lastLine)
+          lastLine = line
+        }
+        if (lastLine <= skip) {
+          hasNext
+        } else {
+          staged = record
+          true
+        }
+      }
+    }
+
+    override def next(): CSVRecord = {
+      if (!hasNext) { Iterator.empty.next() } else {
+        val record = staged
+        staged = null
+        record
+      }
+    }
+
+    override def close(): Unit = parser.close()
+  }
 }

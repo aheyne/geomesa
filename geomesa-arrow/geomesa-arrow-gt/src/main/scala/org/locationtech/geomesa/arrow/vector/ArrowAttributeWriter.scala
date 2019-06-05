@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -11,7 +11,7 @@ package org.locationtech.geomesa.arrow.vector
 import java.nio.charset.StandardCharsets
 import java.util.Date
 
-import com.vividsolutions.jts.geom._
+import org.locationtech.jts.geom._
 import org.apache.arrow.memory.BufferAllocator
 import org.apache.arrow.vector._
 import org.apache.arrow.vector.complex.{FixedSizeListVector, ListVector, StructVector}
@@ -222,9 +222,6 @@ object ArrowAttributeWriter {
 
           case ObjectType.BYTES =>
             new ArrowBytesWriter(toVector(MinorType.VARBINARY.getType, null, metadata))
-
-          case ObjectType.JSON =>
-            new ArrowStringWriter(toVector(MinorType.VARCHAR.getType, null, metadata))
 
           case ObjectType.UUID =>
             new ArrowStringWriter(toVector(MinorType.VARCHAR.getType, null, metadata))

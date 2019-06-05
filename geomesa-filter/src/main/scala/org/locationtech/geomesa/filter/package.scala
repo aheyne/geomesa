@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -12,6 +12,7 @@ import org.geotools.factory.CommonFactoryFinder
 import org.geotools.filter.text.ecql.ECQL
 import org.locationtech.geomesa.filter.expression.AttributeExpression
 import org.locationtech.geomesa.filter.expression.AttributeExpression.{FunctionLiteral, PropertyLiteral}
+import org.locationtech.geomesa.utils.conf.GeoMesaSystemProperties.SystemProperty
 import org.opengis.feature.simple.SimpleFeatureType
 import org.opengis.filter._
 import org.opengis.filter.expression.{Expression, Function, Literal, PropertyName}
@@ -27,6 +28,10 @@ package object filter {
   //  'namespace' and 'function' calls.
   // As such, we can get away with using a shared Filter Factory.
   implicit val ff: FilterFactory2 = CommonFactoryFinder.getFilterFactory2
+
+  object FilterProperties {
+    val GeometryProcessing = SystemProperty("geomesa.geometry.processing", "spatial4j")
+  }
 
   def filterToString(filter: Filter): String = Try(ECQL.toCQL(filter)).getOrElse(filter.toString)
   def filterToString(filter: Option[Filter]): String = filter.map(filterToString).getOrElse("None")
@@ -240,6 +245,7 @@ package object filter {
     filters.partition(isTemporal)
   }
 
+  @deprecated("Deprecated with no replacement")
   def partitionIndexedAttributes(filters: Seq[Filter], sft: SimpleFeatureType): PartionedFilter =
     filters.partition(isIndexedAttributeFilter(_, sft))
 
@@ -281,11 +287,13 @@ package object filter {
     sft.getDtgField.exists(isTemporalFilter(f, _))
   }
 
+  @deprecated("Replaced with org.locationtech.geomesa.index.index.attribute.AttributeIndex.indexed")
   def attrIndexed(name: String, sft: SimpleFeatureType): Boolean = {
-    import org.locationtech.geomesa.utils.geotools.RichAttributeDescriptors.RichAttributeDescriptor
-    Option(sft.getDescriptor(name)).exists(_.isIndexed)
+    import org.locationtech.geomesa.utils.geotools.RichSimpleFeatureType.RichSimpleFeatureType
+    sft.getIndices.exists(_.attributes.headOption.contains(name))
   }
 
+  @deprecated("Deprecated with no replacement")
   def isIndexedAttributeFilter(f: Filter, sft: SimpleFeatureType): Boolean =
     getAttributeProperty(f).exists(attrIndexed(_, sft))
 

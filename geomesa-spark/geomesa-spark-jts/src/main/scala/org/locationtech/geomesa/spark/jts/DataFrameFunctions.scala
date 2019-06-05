@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -10,7 +10,7 @@ package org.locationtech.geomesa.spark.jts
 
 import java.{lang => jl}
 
-import com.vividsolutions.jts.geom._
+import org.locationtech.jts.geom._
 import org.apache.spark.sql.catalyst.expressions.Literal
 import org.apache.spark.sql.functions.{array, lit}
 import org.apache.spark.sql.jts._
@@ -80,10 +80,10 @@ object DataFrameFunctions extends SpatialEncoders {
     def st_makeBox2D(lowerLeft: Point, upperRight: Point): TypedColumn[Any, Geometry] =
       st_makeBox2D(pointLit(lowerLeft), pointLit(upperRight))
 
-    def st_makeBBOX(lowerX: Column, upperX: Column, lowerY: Column, upperY: Column): TypedColumn[Any, Geometry] =
-      udfToColumn(ST_MakeBBOX, constructorNames, lowerX, upperX, lowerY, upperY)
-    def st_makeBBOX(lowerX: Double, upperX: Double, lowerY: Double, upperY: Double): TypedColumn[Any, Geometry] =
-      st_makeBBOX(lit(lowerX), lit(upperX), lit(lowerY), lit(upperY))
+    def st_makeBBOX(lowerX: Column, lowerY: Column, upperX: Column, upperY: Column): TypedColumn[Any, Geometry] =
+      udfToColumn(ST_MakeBBOX, constructorNames, lowerX, lowerY, upperX, upperY)
+    def st_makeBBOX(lowerX: Double, lowerY: Double, upperX: Double, upperY: Double): TypedColumn[Any, Geometry] =
+      st_makeBBOX(lit(lowerX), lit(lowerY), lit(upperX), lit(upperY))
 
     def st_makePolygon(lineString: Column): TypedColumn[Any, Polygon] =
       udfToColumn(ST_MakePolygon, constructorNames, lineString)
@@ -93,7 +93,7 @@ object DataFrameFunctions extends SpatialEncoders {
     def st_makePoint(x: Column, y: Column): TypedColumn[Any, Point] =
       udfToColumn(ST_MakePoint, constructorNames, x, y)
     def st_makePoint(x: Double, y: Double): TypedColumn[Any, Point] =
-      st_makePoint(lit(x), lit(x))
+      st_makePoint(lit(x), lit(y))
 
     def st_makeLine(pointSeq: Column): TypedColumn[Any, LineString] =
       udfToColumn(ST_MakeLine, constructorNames, pointSeq)
@@ -166,6 +166,9 @@ object DataFrameFunctions extends SpatialEncoders {
 
     def st_castToLineString(geom: Column): TypedColumn[Any, LineString] =
       udfToColumn(ST_CastToLineString, castingNames, geom)
+
+    def st_castToGeometry(geom: Column): TypedColumn[Any, Geometry] =
+      udfToColumn(ST_CastToGeometry, castingNames, geom)
 
     def st_byteArray(str: Column): TypedColumn[Any, Array[Byte]] =
       udfToColumn(ST_ByteArray, castingNames, str)

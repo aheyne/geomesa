@@ -8,9 +8,7 @@ how to work with the GeoMesa GeoServer plugins.
 
 .. warning::
 
-   GeoServer 2.13.0 and 2.13.1 are not recommended due to two serious bugs:
-     * GeoMesa WPS processes are not triggered correctly, and will run slowly or not at all
-     * GeoMesa count optimizations are bypassed, potentially resulting in large duplicate scans for WFS queries
+    GeoMesa 2.2.0 and later require GeoServer 2.14.0 or later. GeoMesa 2.1.0 and earlier require GeoServer 2.12.5.
 
 Installation
 ------------
@@ -181,7 +179,7 @@ Due to licensing, GeoServer-specific code related to GeoMesa is maintained in a 
 `repository <https://github.com/geomesa/geomesa-geoserver/>`__. It can be downloaded from Maven
 central, or built from source.
 
-It is required for Arrow output and raster stores in GeoServer, among other things.
+It is required for Arrow output in GeoServer, among other things.
 
 Once obtained, the GeoServer modules can be installed by copying ``geomesa-gs-*.jar`` into
 the GeoServer ``lib`` directory.

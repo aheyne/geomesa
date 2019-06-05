@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -12,19 +12,19 @@ import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.typesafe.scalalogging.LazyLogging
-import com.vividsolutions.jts.geom._
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
+import org.locationtech.jts.geom._
+import org.locationtech.jts.geom.impl.CoordinateArraySequence
 import org.geotools.data.simple.SimpleFeatureCollection
 import org.geotools.feature.simple.SimpleFeatureBuilder
 import org.geotools.referencing.GeodeticCalculator
-import org.geotools.util.Converters
 import org.locationtech.geomesa.features.ScalaSimpleFeatureFactory
 import org.locationtech.geomesa.utils.collection.SelfClosingIterator
 import org.locationtech.geomesa.utils.geotools.RichSimpleFeatureType._
-import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes
+import org.locationtech.geomesa.utils.geotools.{GeometryUtils, SimpleFeatureTypes}
+import org.locationtech.geomesa.utils.geotools.converters.FastConverter
 import org.locationtech.geomesa.utils.text.WKTUtils
+import org.locationtech.geomesa.utils.date.DateUtils.toInstant
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
-import org.locationtech.geomesa.utils.geotools.GeometryUtils
 
 import scala.collection.immutable.NumericRange
 
@@ -82,7 +82,7 @@ abstract class TubeBuilder(val tubeFeatures: SimpleFeatureCollection,
   // handle date parsing from input -> TODO revisit date parsing...
   def transform(tubeFeatures: SimpleFeatureCollection, dtgField: String): Iterator[SimpleFeature] = {
     SelfClosingIterator(tubeFeatures.features).map { sf =>
-      val date = Converters.convert(sf.getAttribute(dtgField), classOf[Date])
+      val date = FastConverter.convert(sf.getAttribute(dtgField), classOf[Date])
 
       if (date == null) {
         logger.error("Unable to retrieve date field from input tubeFeatures...ensure there a field named " + dtgField)
@@ -241,10 +241,10 @@ class InterpolatedGapFill(tubeFeatures: SimpleFeatureCollection,
         //If the distance between points is greater than the buffer distance, segment the line
         //So that no segment is larger than the buffer. This ensures that each segment has an
         //times and distance. Also ensure that features do not share a time value.
-        val timeDiffMillis = t2.toInstant.toEpochMilli - t1.toInstant.toEpochMilli
+        val timeDiffMillis = toInstant(t2).toEpochMilli - toInstant(t1).toEpochMilli
         val segCount = (dist / bufferDistance).toInt
         val segDuration = timeDiffMillis / segCount
-        val timeSteps = NumericRange.inclusive(t1.toInstant.toEpochMilli, t2.toInstant.toEpochMilli, segDuration)
+        val timeSteps = NumericRange.inclusive(toInstant(t1).toEpochMilli, toInstant(t2).toEpochMilli, segDuration)
         if (dist > bufferDistance && timeSteps.lengthCompare(1) > 0) {
           val heading = calc.getAzimuth
           var segStep = new Coordinate(p1.getX, p1.getY, 0)

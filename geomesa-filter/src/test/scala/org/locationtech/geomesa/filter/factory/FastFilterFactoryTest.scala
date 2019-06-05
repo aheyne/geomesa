@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -42,7 +42,7 @@ class FastFilterFactoryTest extends Specification {
     }
     "create fast property names via ECQL" >> {
       val sft = SimpleFeatureTypes.createType("test", "geom:Point:srid=4326")
-      val bbox = FastFilterFactory.toFilter(sft, "bbox(geom, -180, -90, 180, 90)")
+      val bbox = FastFilterFactory.toFilter(sft, "bbox(geom, -179, -89, 179, 89)")
       bbox.asInstanceOf[BBOX].getExpression1 must beAnInstanceOf[FastPropertyName]
     }
     "create sequential OR filter" >> {

@@ -37,14 +37,14 @@ Boolean            java.lang.Boolean                              Yes
 UUID               java.util.UUID                                 Yes
 Date               java.util.Date                                 Yes
 Timestamp          java.sql.Timestamp                             Yes
-Point              com.vividsolutions.jts.geom.Point              Yes
-LineString         com.vividsolutions.jts.geom.LineString         Yes
-Polygon            com.vividsolutions.jts.geom.Polygon            Yes
-MultiPoint         com.vividsolutions.jts.geom.MultiPoint         Yes
-MultiLineString    com.vividsolutions.jts.geom.MultiLineString    Yes
-MultiPolygon       com.vividsolutions.jts.geom.MultiPolygon       Yes
-GeometryCollection com.vividsolutions.jts.geom.GeometryCollection Yes
-Geometry           com.vividsolutions.jts.geom.Geometry           Yes
+Point              org.locationtech.jts.geom.Point                Yes
+LineString         org.locationtech.jts.geom.LineString           Yes
+Polygon            org.locationtech.jts.geom.Polygon              Yes
+MultiPoint         org.locationtech.jts.geom.MultiPoint           Yes
+MultiLineString    org.locationtech.jts.geom.MultiLineString      Yes
+MultiPolygon       org.locationtech.jts.geom.MultiPolygon         Yes
+GeometryCollection org.locationtech.jts.geom.GeometryCollection   Yes
+Geometry           org.locationtech.jts.geom.Geometry             Yes
 List[A]            java.util.List<A>                              Yes
 Map[A,B]           java.util.Map<A, B>                            No
 Bytes              byte[]                                         No
@@ -60,4 +60,8 @@ Notes
 * Non-geometry types (including dates) may be indexed as separate attribute indices. For details, see
   :ref:`attribute_indices`.
 * Container types (List and Map) must be parameterized with non-container types from the above table.
-* List types may be indexed, but querying a list type may be slow due to deduplication.
+
+.. warning::
+
+  List types may be indexed, but querying a list type may result in duplicate results. If duplicate
+  results are a problem, users should implement their own de-duplication logic for list queries

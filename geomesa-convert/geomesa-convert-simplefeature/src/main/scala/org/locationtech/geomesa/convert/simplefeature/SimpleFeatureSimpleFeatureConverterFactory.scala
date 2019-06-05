@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -9,13 +9,15 @@
 package org.locationtech.geomesa.convert.simplefeature
 
 import com.typesafe.config.Config
-import org.locationtech.geomesa.convert.Transformers.{Expr, FieldLookup}
+import org.locationtech.geomesa.convert.Transformers.{Expr, ExpressionWrapper, FieldLookup}
 import org.locationtech.geomesa.convert._
+import org.locationtech.geomesa.convert2.transforms.Expression
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypeLoader
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
 import scala.collection.immutable
 
+@deprecated("replaced with FeatureToFeatureConverter")
 class SimpleFeatureSimpleFeatureConverterFactory extends AbstractSimpleFeatureConverterFactory[SimpleFeature] {
 
   override protected def typeToProcess: String = "simple-feature"
@@ -66,6 +68,7 @@ class SimpleFeatureSimpleFeatureConverterFactory extends AbstractSimpleFeatureCo
     else Transformers.parseTransform(field.getString("transform")) match {
       // convert field lookups to col lookups
       case FieldLookup(n) => Transformers.Col(inputSFT.indexOf(n))
+      case ExpressionWrapper(Expression.FieldLookup(n)) => Transformers.Col(inputSFT.indexOf(n))
       case t => t
     }
   }

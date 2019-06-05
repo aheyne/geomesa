@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -13,7 +13,7 @@ import java.util.{Date, UUID}
 
 import com.google.common.hash.Hashing
 import com.typesafe.scalalogging.LazyLogging
-import com.vividsolutions.jts.geom.{Geometry, Point}
+import org.locationtech.jts.geom.{Geometry, Point}
 import org.apache.commons.codec.binary.Base64
 import org.locationtech.geomesa.convert.EvaluationContext
 import org.locationtech.geomesa.convert2.transforms.TransformerFunction.NamedTransformerFunction
@@ -24,15 +24,14 @@ import scala.util.control.NonFatal
 
 class IdFunctionFactory extends TransformerFunctionFactory with LazyLogging {
 
-  override def functions = Seq(string2Bytes, md5, uuid, uuidZ3, uuidZ3Centroid, base64, murmur3_32, murmur3_128)
+  override def functions: Seq[TransformerFunction] =
+    Seq(string2Bytes, md5, uuid, uuidZ3, uuidZ3Centroid, base64, murmur3_32, murmur3_128)
 
   private val string2Bytes = TransformerFunction("string2bytes", "stringToBytes") {
     args => args(0).asInstanceOf[String].getBytes(StandardCharsets.UTF_8)
   }
 
-  private val uuid = TransformerFunction("uuid") { args =>
-    UUID.randomUUID().toString
-  }
+  private val uuid = TransformerFunction("uuid") { _ => UUID.randomUUID().toString }
 
   private val uuidZ3 = TransformerFunction("uuidZ3") { args =>
     val geom = args(0).asInstanceOf[Point]
@@ -56,25 +55,26 @@ class IdFunctionFactory extends TransformerFunctionFactory with LazyLogging {
     }
   }
 
-  private val base64 = TransformerFunction("base64") { args =>
+  private val base64 = TransformerFunction.pure("base64") { args =>
     Base64.encodeBase64URLSafeString(args(0).asInstanceOf[Array[Byte]])
   }
 
-  private val md5 = new NamedTransformerFunction(Seq("md5")) {
+  private val md5: TransformerFunction = new NamedTransformerFunction(Seq("md5"), pure = true) {
     private val hasher = Hashing.md5()
     override def eval(args: Array[Any])(implicit ctx: EvaluationContext): Any =
       hasher.hashBytes(args(0).asInstanceOf[Array[Byte]]).toString
   }
 
-  private val murmur3_32 = new NamedTransformerFunction(Seq("murmur3_32")) {
+  private val murmur3_32: TransformerFunction = new NamedTransformerFunction(Seq("murmur3_32"), pure = true) {
     private val hasher = Hashing.murmur3_32()
     override def eval(args: Array[Any])(implicit ctx: EvaluationContext): Any =
       hasher.hashString(args(0).toString, StandardCharsets.UTF_8)
   }
 
-  private val murmur3_128 = new NamedTransformerFunction(Seq("murmur3_128", "murmur3_64")) {
-    private val hasher = Hashing.murmur3_128()
-    override def eval(args: Array[Any])(implicit ctx: EvaluationContext): Any =
-      hasher.hashString(args(0).toString, StandardCharsets.UTF_8).asLong()
-  }
+  private val murmur3_128: TransformerFunction =
+    new NamedTransformerFunction(Seq("murmur3_128", "murmur3_64"), pure = true) {
+      private val hasher = Hashing.murmur3_128()
+      override def eval(args: Array[Any])(implicit ctx: EvaluationContext): Any =
+        hasher.hashString(args(0).toString, StandardCharsets.UTF_8).asLong()
+    }
 }

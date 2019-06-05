@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -10,7 +10,6 @@ package org.locationtech.geomesa.fs
 
 import java.io.{File, IOException}
 import java.nio.file.Files
-import java.time.temporal.ChronoUnit
 import java.util.Collections
 
 import org.apache.commons.io.FileUtils
@@ -19,12 +18,12 @@ import org.geotools.filter.text.ecql.ECQL
 import org.geotools.geometry.jts.ReferencedEnvelope
 import org.junit.runner.RunWith
 import org.locationtech.geomesa.features.ScalaSimpleFeature
-import org.locationtech.geomesa.fs.storage.common.PartitionScheme
-import org.locationtech.geomesa.fs.storage.common.partitions.DateTimeScheme
+import org.locationtech.geomesa.fs.data.FileSystemDataStore
 import org.locationtech.geomesa.utils.collection.SelfClosingIterator
 import org.locationtech.geomesa.utils.geotools.{CRS_EPSG_4326, FeatureUtils, SimpleFeatureTypes}
 import org.locationtech.geomesa.utils.io.WithClose
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
+import org.opengis.filter.Filter
 import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
 
@@ -33,12 +32,14 @@ import scala.collection.JavaConversions._
 @RunWith(classOf[JUnitRunner])
 class FileSystemDataStoreTest extends Specification {
 
+  import org.locationtech.geomesa.fs.storage.common.RichSimpleFeatureType
+
   sequential
 
   def createFormat(format: String): (String, SimpleFeatureType, Seq[SimpleFeature]) = {
     val sft = SimpleFeatureTypes.createType(format, "name:String,age:Int,dtg:Date,*geom:Point:srid=4326")
-    PartitionScheme.addToSft(sft, new DateTimeScheme(DateTimeScheme.Formats.Daily.format, ChronoUnit.DAYS, 1, "dtg", false))
-
+    sft.setScheme("daily")
+    sft.setLeafStorage(false)
     val features = Seq.tabulate(10) { i =>
       ScalaSimpleFeature.create(sft, s"$i", s"test$i", 100 + i, s"2017-06-0${5 + (i % 3)}T04:03:02.0001Z", s"POINT(10 10.$i)")
     }
@@ -67,10 +68,7 @@ class FileSystemDataStoreTest extends Specification {
         ds.createSchema(sft)
 
         WithClose(ds.getFeatureWriterAppend(format, Transaction.AUTO_COMMIT)) { writer =>
-          features.foreach { feature =>
-            FeatureUtils.copyToWriter(writer, feature, useProvidedFid = true)
-            writer.write()
-          }
+          features.foreach(FeatureUtils.write(writer, _, useProvidedFid = true))
         }
 
         // metadata
@@ -94,7 +92,7 @@ class FileSystemDataStoreTest extends Specification {
         results must containTheSameElementsAs(features)
 
         // This shows that a new FeatureSource has a correct view of the metadata on disk
-        val ds2 =  DataStoreFinder.getDataStore(dsParams)
+        val ds2 = DataStoreFinder.getDataStore(dsParams)
         val fs2 = ds2.getFeatureSource(format)
         fs2.getCount(Query.ALL) must beEqualTo(10)
         fs2.getBounds must equalTo(new ReferencedEnvelope(10.0, 10.0, 10.0, 10.9, CRS_EPSG_4326))
@@ -122,6 +120,23 @@ class FileSystemDataStoreTest extends Specification {
 
         val results = SelfClosingIterator(ds.getFeatureReader(new Query(format), Transaction.AUTO_COMMIT)).toList
         results must containTheSameElementsAs(features)
+
+        val dsWithNs = DataStoreFinder.getDataStore(Map("fs.path" -> dir.getPath, "fs.read-threads" -> "4", "namespace" -> "ns0"))
+        val name = dsWithNs.getSchema(sft.getTypeName).getName
+        name.getNamespaceURI mustEqual "ns0"
+        name.getLocalPart mustEqual sft.getTypeName
+
+        val queries = Seq(
+          new Query(sft.getTypeName),
+          new Query(sft.getTypeName, Filter.INCLUDE, Array("geom"))
+        )
+        foreach(queries) { query =>
+          val reader = dsWithNs.getFeatureReader(query, Transaction.AUTO_COMMIT)
+          reader.getFeatureType.getName mustEqual name
+          val features = SelfClosingIterator(reader).toList
+          features must not(beEmpty)
+          foreach(features)(_.getFeatureType.getName mustEqual name)
+        }
       }
     }
 
@@ -130,8 +145,7 @@ class FileSystemDataStoreTest extends Specification {
         val dir = dirs(format)
         val ds = DataStoreFinder.getDataStore(Collections.singletonMap("fs.path", dir.getPath))
         val sameSft = SimpleFeatureTypes.createType(format, "name:String,age:Int,dtg:Date,*geom:Point:srid=4326")
-        PartitionScheme.addToSft(sameSft, PartitionScheme.extractFromSft(sft).get)
-
+        sameSft.setScheme("daily")
         ds.createSchema(sameSft) must not(throwA[Throwable])
       }
     }
@@ -140,7 +154,7 @@ class FileSystemDataStoreTest extends Specification {
       foreach(formats) { case (format, sft, features) =>
         val dir = dirs(format)
         val reserved = SimpleFeatureTypes.createType("reserved", "dtg:Date,*point:Point:srid=4326")
-        PartitionScheme.addToSft(reserved, PartitionScheme.extractFromSft(sft).get)
+        reserved.setScheme("daily")
         val ds = DataStoreFinder.getDataStore(Map(
           "fs.path" -> dir.getPath,
           "fs.encoding" -> format,

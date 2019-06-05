@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -18,5 +18,5 @@ class ArrowGetTypeNamesCommand extends GetTypeNamesCommand[ArrowDataStore] with 
   override val params = new ArrowGetTypeNamesParams()
 }
 
-@Parameters(commandDescription = "List GeoMesa feature type for a given Arrow resource")
+@Parameters(commandDescription = "List the feature type for a given Arrow resource")
 class ArrowGetTypeNamesParams extends UrlParam

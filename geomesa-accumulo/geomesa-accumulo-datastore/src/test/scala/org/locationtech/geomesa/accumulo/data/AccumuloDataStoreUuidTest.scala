@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -18,12 +18,12 @@ import org.geotools.factory.Hints
 import org.geotools.filter.text.ecql.ECQL
 import org.junit.runner.RunWith
 import org.locationtech.geomesa.accumulo.TestWithDataStore
-import org.locationtech.geomesa.accumulo.index.RecordIndex
 import org.locationtech.geomesa.arrow.io.SimpleFeatureArrowFileReader
 import org.locationtech.geomesa.features.ScalaSimpleFeature
 import org.locationtech.geomesa.filter.function.ProxyIdFunction
 import org.locationtech.geomesa.index.api.GeoMesaFeatureIndex
 import org.locationtech.geomesa.index.conf.QueryHints
+import org.locationtech.geomesa.index.index.id.IdIndex
 import org.locationtech.geomesa.utils.collection.SelfClosingIterator
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes.Configs
 import org.locationtech.geomesa.utils.index.ByteArrays
@@ -103,7 +103,7 @@ class AccumuloDataStoreUuidTest extends Specification with TestWithDataStore {
     "still query by feature id" in {
       val query = new Query(sftName, ECQL.toFilter("IN ('28a12c18-e5ae-4c04-ae7b-bf7cdbfaf235')"))
       foreach(ds.getQueryPlan(query)) { plan =>
-        plan.filter.index mustEqual RecordIndex
+        plan.filter.index.name mustEqual IdIndex.name
       }
       val result = SelfClosingIterator(ds.getFeatureReader(query, Transaction.AUTO_COMMIT)).toList
       result mustEqual Seq(features(5))
@@ -123,16 +123,42 @@ class AccumuloDataStoreUuidTest extends Specification with TestWithDataStore {
       results.foreach(sf => out.write(sf.getAttribute(0).asInstanceOf[Array[Byte]]))
       def in() = new ByteArrayInputStream(out.toByteArray)
       val ids = WithClose(SimpleFeatureArrowFileReader.streaming(in)) { reader =>
-        WithClose(reader.features())(_.map(_.getID).toList)
+        WithClose(reader.features())(_.map(_.getID.toInt).toList)
       }
       val proxy = new ProxyIdFunction()
-      features.map(proxy.evaluate(_).toString) must containAllOf(ids)
+      features.map(proxy.evaluate(_)) must containAllOf(ids)
 
-      val callback = new Query(sftName, ECQL.toFilter(s"$filter AND proxyId() = '${ids.head}'"))
+      val callback = new Query(sftName, ECQL.toFilter(s"$filter AND proxyId() = ${ids.head}"))
       val callbackResults = SelfClosingIterator(ds.getFeatureReader(callback, Transaction.AUTO_COMMIT)).toList
       callbackResults must haveLength(1)
-      proxy.evaluate(callbackResults.head).toString mustEqual ids.head
+      proxy.evaluate(callbackResults.head) mustEqual ids.head
     }
+    "return multiple minified arrow ids and use them for callbacks" in {
+      val filter = "bbox(geom,35,55,45,65) and dtg DURING 2017-02-03T00:00:00.000Z/2017-02-03T00:08:00.000Z"
+      val query = new Query(sftName, ECQL.toFilter(filter))
+      query.getHints.put(QueryHints.ARROW_ENCODE, true)
+      query.getHints.put(QueryHints.ARROW_PROXY_FID, true)
+      query.getHints.put(QueryHints.ARROW_SORT_FIELD, "dtg")
+      query.getHints.put(QueryHints.ARROW_DICTIONARY_FIELDS, "name,age")
+      query.getHints.put(QueryHints.ARROW_DICTIONARY_CACHED, false)
+      query.getHints.put(QueryHints.ARROW_BATCH_SIZE, 100)
+
+      val results = SelfClosingIterator(ds.getFeatureReader(query, Transaction.AUTO_COMMIT))
+      val out = new ByteArrayOutputStream
+      results.foreach(sf => out.write(sf.getAttribute(0).asInstanceOf[Array[Byte]]))
+      def in() = new ByteArrayInputStream(out.toByteArray)
+      val ids = WithClose(SimpleFeatureArrowFileReader.streaming(in)) { reader =>
+        WithClose(reader.features())(_.map(_.getID.toInt).toList)
+      }
+      val proxy = new ProxyIdFunction()
+      features.map(proxy.evaluate(_)) must containAllOf(ids)
+
+      val callback = new Query(sftName, ECQL.toFilter(s"$filter AND (proxyId() = ${ids.head} OR proxyId() = ${ids.last})"))
+      val callbackResults = SelfClosingIterator(ds.getFeatureReader(callback, Transaction.AUTO_COMMIT)).toList
+      callbackResults must haveLength(2)
+      proxy.evaluate(callbackResults.head) mustEqual ids.head
+      proxy.evaluate(callbackResults.last) mustEqual ids.last
+    }.pendingUntilFixed("GEOMESA-2562")
   }
 
   step {

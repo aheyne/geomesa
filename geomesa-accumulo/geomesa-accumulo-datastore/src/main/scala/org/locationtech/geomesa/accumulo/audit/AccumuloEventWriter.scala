@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -70,7 +70,7 @@ class AccumuloEventWriter(connector: Connector, table: String) extends Runnable 
 
   private def getWriter: BatchWriter = synchronized {
     if (maybeWriter == null) {
-      AccumuloVersion.ensureTableExists(connector, table)
+      AccumuloVersion.createTableIfNeeded(connector, table)
       maybeWriter = connector.createBatchWriter(table, batchWriterConfig)
     }
     maybeWriter

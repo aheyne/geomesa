@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -9,6 +9,7 @@
 package org.locationtech.geomesa.kafka.data
 
 import java.io.Closeable
+import java.time.Duration
 import java.util.Collections
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.{ConcurrentHashMap, CountDownLatch, Executors}
@@ -17,12 +18,13 @@ import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.consumer.{Consumer, ConsumerRecord}
 import org.geotools.data.simple.SimpleFeatureSource
 import org.geotools.data.{FeatureEvent, FeatureListener}
-import org.locationtech.geomesa.kafka.{KafkaConsumerVersions, RecordVersions}
 import org.locationtech.geomesa.kafka.consumer.ThreadedConsumer
-import org.locationtech.geomesa.kafka.data.KafkaDataStore.IndexConfig
+import org.locationtech.geomesa.kafka.data.KafkaDataStore.EventTimeConfig
 import org.locationtech.geomesa.kafka.index.KafkaFeatureCache
 import org.locationtech.geomesa.kafka.utils.GeoMessage.{Change, Clear, Delete}
 import org.locationtech.geomesa.kafka.utils.{GeoMessageSerializer, KafkaFeatureEvent}
+import org.locationtech.geomesa.kafka.{KafkaConsumerVersions, RecordVersions}
+import org.locationtech.geomesa.utils.io.CloseWithLogging
 import org.opengis.feature.simple.SimpleFeatureType
 import org.opengis.filter.Filter
 
@@ -96,40 +98,46 @@ object KafkaCacheLoader {
     override def close(): Unit = {}
   }
 
-  class KafkaCacheLoaderImpl(sft: SimpleFeatureType,
-                             override val cache: KafkaFeatureCache,
-                             override protected val consumers: Seq[Consumer[Array[Byte], Array[Byte]]],
-                             override protected val topic: String,
-                             override protected val frequency: Long,
-                             lazyDeserialization: Boolean,
-                             initialLoadConfig: Option[IndexConfig]) extends ThreadedConsumer with KafkaCacheLoader {
-
-    private val serializer = GeoMessageSerializer(sft, `lazy` = lazyDeserialization)
+  class KafkaCacheLoaderImpl(
+      sft: SimpleFeatureType,
+      override val cache: KafkaFeatureCache,
+      consumers: Seq[Consumer[Array[Byte], Array[Byte]]],
+      topic: String,
+      frequency: Long,
+      serializer: GeoMessageSerializer,
+      doInitialLoad: Boolean,
+      initialLoadConfig: Option[EventTimeConfig]
+    ) extends ThreadedConsumer(consumers, Duration.ofMillis(frequency)) with KafkaCacheLoader {
 
     try { classOf[ConsumerRecord[Any, Any]].getMethod("timestamp") } catch {
       case _: NoSuchMethodException => logger.warn("This version of Kafka doesn't support timestamps, using system time")
     }
 
-    initialLoadConfig match {
-      case None => startConsumers()
-      case Some(config) =>
-        // for the initial load, don't bother spatially indexing until we have the final state
-        val executor = Executors.newSingleThreadExecutor()
-        executor.submit(new InitialLoader(sft, consumers, topic, frequency, serializer, config, this))
-        executor.shutdown()
+    private val initialLoader = if (doInitialLoad) {
+      // for the initial load, don't bother spatially indexing until we have the final state
+      val loader = new InitialLoader(sft, consumers, topic, frequency, serializer, initialLoadConfig, this)
+      val executor = Executors.newSingleThreadExecutor()
+      executor.submit(loader)
+      executor.shutdown()
+      Some(loader)
+    } else {
+      startConsumers()
+      None
     }
 
     override def close(): Unit = {
       try {
         super.close()
       } finally {
+        initialLoader.foreach(CloseWithLogging.apply)
         cache.close()
       }
     }
 
     override protected [KafkaCacheLoader] def consume(record: ConsumerRecord[Array[Byte], Array[Byte]]): Unit = {
-      val message = serializer.deserialize(record.key(), record.value(), RecordVersions.getHeaders(record))
-      val timestamp = try { record.timestamp() } catch { case _: NoSuchMethodError => System.currentTimeMillis() }
+      val headers = RecordVersions.getHeaders(record)
+      val timestamp = RecordVersions.getTimestamp(record)
+      val message = serializer.deserialize(record.key(), record.value(), headers, timestamp)
       logger.trace(s"Consumed message [$topic:${record.partition}:${record.offset}] $message")
       message match {
         case m: Change => fireEvent(m, timestamp); cache.put(m.feature)
@@ -150,27 +158,28 @@ object KafkaCacheLoader {
     * @param serializer message serializer
     * @param toLoad main cache loader, used for callback when bulk loading is done
     */
-  private class InitialLoader(sft: SimpleFeatureType,
-                              override protected val consumers: Seq[Consumer[Array[Byte], Array[Byte]]],
-                              override protected val topic: String,
-                              override protected val frequency: Long,
-                              serializer: GeoMessageSerializer,
-                              config: IndexConfig,
-                              toLoad: KafkaCacheLoaderImpl) extends ThreadedConsumer with Runnable {
+  private class InitialLoader(
+      sft: SimpleFeatureType,
+      consumers: Seq[Consumer[Array[Byte], Array[Byte]]],
+      topic: String,
+      frequency: Long,
+      serializer: GeoMessageSerializer,
+      eventTime: Option[EventTimeConfig],
+      toLoad: KafkaCacheLoaderImpl
+  ) extends ThreadedConsumer(consumers, Duration.ofMillis(frequency), false) with Runnable {
 
-    private val cache = KafkaFeatureCache.nonIndexing(sft, config.eventTime)
+    private val cache = KafkaFeatureCache.nonIndexing(sft, eventTime)
 
     // track the offsets that we want to read to
     private val offsets = new ConcurrentHashMap[Int, Long]()
     private var latch: CountDownLatch = _
     private val done = new AtomicBoolean(false)
 
-    override protected def closeConsumers: Boolean = false
-
     override protected def consume(record: ConsumerRecord[Array[Byte], Array[Byte]]): Unit = {
       if (done.get) { toLoad.consume(record) } else {
-        val message = serializer.deserialize(record.key, record.value, RecordVersions.getHeaders(record))
-        val timestamp = try { record.timestamp() } catch { case _: NoSuchMethodError => System.currentTimeMillis() }
+        val headers = RecordVersions.getHeaders(record)
+        val timestamp = RecordVersions.getTimestamp(record)
+        val message = serializer.deserialize(record.key, record.value, headers, timestamp)
         logger.trace(s"Consumed message [$topic:${record.partition}:${record.offset}] $message")
         message match {
           case m: Change => toLoad.fireEvent(m, timestamp); cache.put(m.feature)

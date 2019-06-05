@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -13,54 +13,27 @@ import java.util.concurrent.{Executors, LinkedBlockingQueue, TimeUnit}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.hadoop.fs.Path
 import org.locationtech.geomesa.features.ScalaSimpleFeature
-import org.locationtech.geomesa.fs.storage.api.FileSystemReader
+import org.locationtech.geomesa.fs.storage.common.AbstractFileSystemStorage.FileSystemPathReader
 import org.locationtech.geomesa.utils.collection.CloseableIterator
-import org.locationtech.geomesa.utils.io.{CloseWithLogging, WithClose}
+import org.locationtech.geomesa.utils.io.WithClose
 import org.opengis.feature.simple.SimpleFeature
 
-import scala.annotation.tailrec
 import scala.util.control.NonFatal
 
 object FileSystemThreadedReader {
 
-  def apply(factory: FileSystemPathReader, paths: Iterator[Path], threads: Int): FileSystemReader = {
+  def apply(
+      readers: Iterator[(FileSystemPathReader, Iterator[Path])],
+      threads: Int): CloseableIterator[SimpleFeature] = {
     if (threads < 2) {
-      new SingleThreadedFileSystemReader(factory, paths)
+      CloseableIterator(readers).flatMap { case (factory, paths) => CloseableIterator(paths).flatMap(factory.read) }
     } else {
-      new MultiThreadedFileSystemReader(factory, paths, threads)
+      new MultiThreadedFileSystemReader(readers, threads)
     }
   }
 
-  class SingleThreadedFileSystemReader(factory: FileSystemPathReader, paths: Iterator[Path])
-      extends FileSystemReader {
-
-    private val iters = paths.map(factory.read)
-    private var iter: CloseableIterator[SimpleFeature] = CloseableIterator.empty
-
-    @tailrec
-    override final def hasNext: Boolean = {
-      iter.hasNext || {
-        CloseWithLogging(iter)
-        if (!iters.hasNext) {
-          iter = CloseableIterator.empty
-          false
-        } else {
-          iter = iters.next
-          hasNext
-        }
-      }
-    }
-
-    override def next(): SimpleFeature = iter.next()
-    override def close(): Unit = iter.close()
-    override def close(wait: Long, unit: TimeUnit): Boolean = {
-      close()
-      true
-    }
-  }
-
-  class MultiThreadedFileSystemReader(factory: FileSystemPathReader, paths: Iterator[Path], threads: Int)
-      extends FileSystemReader with StrictLogging {
+  class MultiThreadedFileSystemReader(readers: Iterator[(FileSystemPathReader, Iterator[Path])], threads: Int)
+      extends CloseableIterator[SimpleFeature] with StrictLogging {
 
     private val es = Executors.newFixedThreadPool(threads)
 
@@ -70,26 +43,28 @@ object FileSystemThreadedReader {
 
     private var current: SimpleFeature = _
 
-    paths.foreach { file =>
-      val runnable = new Runnable {
-        override def run(): Unit = {
-          var count = 0
-          try {
-            logger.debug(s"Reading file $file")
-            WithClose(factory.read(file)) { reader =>
-              while (reader.hasNext) {
-                // need to copy the feature as it can be re-used
-                queue.put(ScalaSimpleFeature.copy(reader.next()))
-                count += 1
+    readers.foreach { case (reader, paths) =>
+      paths.foreach { path =>
+        val runnable = new Runnable {
+          override def run(): Unit = {
+            var count = 0
+            try {
+              logger.debug(s"Reading file $path")
+              WithClose(reader.read(path)) { features =>
+                while (features.hasNext) {
+                  // need to copy the feature as it can be re-used
+                  queue.put(ScalaSimpleFeature.copy(features.next()))
+                  count += 1
+                }
               }
+              logger.debug(s"File $path produced $count records")
+            } catch {
+              case NonFatal(e) => logger.error(s"Error reading file $path", e)
             }
-            logger.debug(s"File $file produced $count records")
-          } catch {
-            case NonFatal(e) => logger.error(s"Error reading file $file", e)
           }
         }
+        es.submit(runnable)
       }
-      es.submit(runnable)
     }
     es.shutdown()
 
@@ -129,10 +104,5 @@ object FileSystemThreadedReader {
     }
 
     override def close(): Unit = es.shutdownNow()
-
-    override def close(wait: Long, unit: TimeUnit): Boolean = {
-      close()
-      es.awaitTermination(wait, unit)
-    }
   }
 }

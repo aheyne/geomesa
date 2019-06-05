@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -10,7 +10,7 @@ package org.locationtech.geomesa.features
 
 import java.util.{Collection => jCollection, List => jList, Map => jMap}
 
-import com.vividsolutions.jts.geom.Geometry
+import org.locationtech.jts.geom.Geometry
 import org.geotools.geometry.jts.ReferencedEnvelope
 import org.geotools.process.vector.TransformProcess
 import org.opengis.feature.`type`.Name
@@ -27,7 +27,7 @@ import org.opengis.geometry.BoundingBox
   * @param attributes attribute evaluations, in order
   */
 class TransformSimpleFeature(transformSchema: SimpleFeatureType,
-                             attributes: Array[(SimpleFeature) => AnyRef],
+                             attributes: Array[SimpleFeature => AnyRef],
                              private var underlying: SimpleFeature = null) extends SimpleFeature {
 
   private lazy val geomIndex = transformSchema.indexOf(transformSchema.getGeometryDescriptor.getLocalName)
@@ -125,14 +125,14 @@ object TransformSimpleFeature {
 
   def attributes(sft: SimpleFeatureType,
                  transformSchema: SimpleFeatureType,
-                 transforms: String): Array[(SimpleFeature) => AnyRef] = {
+                 transforms: String): Array[SimpleFeature => AnyRef] = {
     TransformProcess.toDefinition(transforms).map(attribute(sft, _)).toArray
   }
 
-  private def attribute(sft: SimpleFeatureType, d: TransformProcess.Definition): (SimpleFeature) => AnyRef = {
+  private def attribute(sft: SimpleFeatureType, d: TransformProcess.Definition): SimpleFeature => AnyRef = {
     d.expression match {
-      case p: PropertyName => val i = sft.indexOf(p.getPropertyName); (sf) => sf.getAttribute(i)
-      case e: Expression   => (sf) => e.evaluate(sf)
+      case p: PropertyName => val i = sft.indexOf(p.getPropertyName); sf => sf.getAttribute(i)
+      case e: Expression   => sf => e.evaluate(sf)
     }
   }
 }

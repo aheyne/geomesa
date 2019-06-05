@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -11,7 +11,7 @@ package org.locationtech.geomesa.fs.storage.orc.utils
 import java.nio.charset.StandardCharsets
 import java.util.UUID
 
-import com.vividsolutions.jts.geom._
+import org.locationtech.jts.geom._
 import org.apache.orc.storage.ql.exec.vector._
 import org.locationtech.geomesa.features.serialization.ObjectType
 import org.locationtech.geomesa.features.serialization.ObjectType.ObjectType
@@ -56,7 +56,6 @@ object OrcAttributeWriter {
         case ObjectType.DOUBLE   => new DoubleWriter(batch.cols(col).asInstanceOf[DoubleColumnVector], i)
         case ObjectType.BOOLEAN  => new BooleanWriter(batch.cols(col).asInstanceOf[LongColumnVector], i)
         case ObjectType.BYTES    => new BytesWriter(batch.cols(col).asInstanceOf[BytesColumnVector], i)
-        case ObjectType.JSON     => new StringWriter(batch.cols(col).asInstanceOf[BytesColumnVector], i)
         case ObjectType.UUID     => new UuidWriter(batch.cols(col).asInstanceOf[BytesColumnVector], i)
         case ObjectType.LIST     => new ListWriter(batch.cols(col).asInstanceOf[ListColumnVector], i, bindings(1))
         case ObjectType.MAP      => new MapWriter(batch.cols(col).asInstanceOf[MapColumnVector], i, bindings(1), bindings(2))
@@ -636,7 +635,6 @@ object OrcAttributeWriter {
       case ObjectType.DOUBLE   => new SetVectorDouble { override val vector: DoubleColumnVector = vec.asInstanceOf[DoubleColumnVector] }
       case ObjectType.BOOLEAN  => new SetVectorBoolean { override val vector: LongColumnVector = vec.asInstanceOf[LongColumnVector] }
       case ObjectType.BYTES    => new SetVectorBytes { override val vector: BytesColumnVector = vec.asInstanceOf[BytesColumnVector] }
-      case ObjectType.JSON     => new SetVectorString { override val vector: BytesColumnVector = vec.asInstanceOf[BytesColumnVector] }
       case ObjectType.UUID     => new SetVectorUuid { override val vector: BytesColumnVector = vec.asInstanceOf[BytesColumnVector] }
       case _ => throw new IllegalArgumentException(s"Unexpected object type $binding")
     }

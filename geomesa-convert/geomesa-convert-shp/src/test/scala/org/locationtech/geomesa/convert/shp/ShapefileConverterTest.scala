@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -8,10 +8,11 @@
 
 package org.locationtech.geomesa.convert.shp
 
+import java.io.ByteArrayInputStream
 import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
-import com.vividsolutions.jts.geom.MultiPolygon
+import org.locationtech.jts.geom.MultiPolygon
 import org.junit.runner.RunWith
 import org.locationtech.geomesa.convert.EvaluationContext
 import org.locationtech.geomesa.convert2.SimpleFeatureConverter
@@ -50,7 +51,6 @@ class ShapefileConverterTest extends Specification {
           |     { name = "area", transform = "add(shp('ALAND'),shp('AWATER'))" },
           |     { name = "geom", transform = "shp('the_geom')" },
           |   ]
-          |   options = { verbose = true }
           | }
         """.stripMargin)
 
@@ -76,7 +76,7 @@ class ShapefileConverterTest extends Specification {
     }
 
     "infer converters" in {
-      val inferred = ShapefileConverterFactory.infer(shpFile, None)
+      val inferred = new ShapefileConverterFactory().infer(new ByteArrayInputStream(Array.empty), None, Some(shpFile))
       inferred must beSome
 
       val (sft, conf) = inferred.get

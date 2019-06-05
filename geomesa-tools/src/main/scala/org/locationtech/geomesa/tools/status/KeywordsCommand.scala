@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -12,6 +12,7 @@ import com.beust.jcommander.{Parameter, ParameterException, Parameters}
 import org.geotools.data.DataStore
 import org.locationtech.geomesa.tools.utils.KeywordParamSplitter
 import org.locationtech.geomesa.tools.{Command, DataStoreCommand, RequiredTypeNameParam}
+import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes
 
 trait KeywordsCommand[DS <: DataStore] extends DataStoreCommand[DS] {
 
@@ -26,7 +27,7 @@ trait KeywordsCommand[DS <: DataStore] extends DataStoreCommand[DS] {
 
     import scala.collection.JavaConversions._
 
-    val sft = ds.getSchema(params.featureName)
+    val sft = Option(ds.getSchema(params.featureName)).map(SimpleFeatureTypes.mutable).orNull
     if (sft == null) {
       throw new ParameterException(s"Feature '${params.featureName}' not found")
     }

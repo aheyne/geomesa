@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -12,7 +12,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import java.text.SimpleDateFormat
 import java.util.UUID
 
-import com.vividsolutions.jts.geom.{Point, Polygon}
+import org.locationtech.jts.geom.{Point, Polygon}
 import org.apache.avro.io.{BinaryDecoder, BinaryEncoder, DecoderFactory, EncoderFactory}
 import org.geotools.filter.identity.FeatureIdImpl
 import org.locationtech.geomesa.features.avro.{AvroSimpleFeature, AvroSimpleFeatureWriter, FeatureSpecificReader}

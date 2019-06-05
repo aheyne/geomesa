@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -37,7 +37,6 @@ class DtgAgeOffTest extends Specification with TestWithDataStore {
   sequential
 
   override val spec = "some_id:String,dtg:Date,geom:Point:srid=4326"
-  override val tableSharing = false
 
   "DTGAgeOff" should {
 

@@ -1,6 +1,6 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
- * Portions Crown Copyright (c) 2017-2018 Dstl
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
+ * Portions Crown Copyright (c) 2017-2019 Dstl
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -95,12 +95,12 @@ object GeoMesaConfigurator {
   def getTable(job: Job): String = getTable(job.getConfiguration)
   def getTable(conf: Configuration): String = conf.get(tableKey)
 
-  def setIndexIn(conf: Configuration, index: GeoMesaFeatureIndex[_, _, _]): Unit =
+  def setIndexIn(conf: Configuration, index: GeoMesaFeatureIndex[_, _]): Unit =
     conf.set(indexInKey, index.identifier)
   def getIndexIn(job: Job): String = getIndexIn(job.getConfiguration)
   def getIndexIn(conf: Configuration): String = conf.get(indexInKey)
 
-  def setIndicesOut(conf: Configuration, indices: Seq[GeoMesaFeatureIndex[_, _, _]]): Unit =
+  def setIndicesOut(conf: Configuration, indices: Seq[GeoMesaFeatureIndex[_, _]]): Unit =
     conf.set(indicesOutKey, indices.map(_.identifier).mkString(","))
   def getIndicesOut(job: Job): Option[Seq[String]] = getIndicesOut(job.getConfiguration)
   def getIndicesOut(conf: Configuration): Option[Seq[String]] =

@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -24,6 +24,8 @@ class AccumuloBackedMetadata[T](val connector: Connector, val catalog: String, v
 
   protected val config: BatchWriterConfig = GeoMesaBatchWriterConfig().setMaxMemory(10000L).setMaxWriteThreads(2)
 
+  private val empty = new Text()
+
   private var writerCreated = false
 
   lazy private val writer = synchronized {
@@ -36,12 +38,12 @@ class AccumuloBackedMetadata[T](val connector: Connector, val catalog: String, v
 
   override protected def checkIfTableExists: Boolean = connector.tableOperations().exists(catalog)
 
-  override protected def createTable(): Unit = AccumuloVersion.ensureTableExists(connector, catalog)
+  override protected def createTable(): Unit = AccumuloVersion.createTableIfNeeded(connector, catalog)
 
   override protected def write(rows: Seq[(Array[Byte], Array[Byte])]): Unit = {
     rows.foreach { case (k, v) =>
       val m = new Mutation(k)
-      m.put(EMPTY_TEXT, EMPTY_TEXT, new Value(v))
+      m.put(empty, empty, new Value(v))
       writer.addMutation(m)
     }
     writer.flush()
@@ -122,7 +124,7 @@ class SingleRowAccumuloMetadata[T](metadata: AccumuloBackedMetadata[T]) {
         scanner.setRange(SingleRowAccumuloMetadata.getRange(typeName))
         scanner.iterator.foreach { entry =>
           val key = entry.getKey.getColumnFamily.toString
-          metadata.insert(typeName, key, metadata.serializer.deserialize(typeName, key, entry.getValue.get))
+          metadata.insert(typeName, key, metadata.serializer.deserialize(typeName, entry.getValue.get))
           // delete for the old entry
           val delete = new Mutation(entry.getKey.getRow)
           delete.putDelete(entry.getKey.getColumnFamily, entry.getKey.getColumnQualifier)

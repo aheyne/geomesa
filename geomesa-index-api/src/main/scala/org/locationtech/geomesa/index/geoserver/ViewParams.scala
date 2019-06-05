@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -77,7 +77,7 @@ object ViewParams extends LazyLogging {
               case c if c == classOf[java.lang.Float]    => toFloat(key, value).foreach(setHint.apply)
               case c if c == classOf[ReferencedEnvelope] => toEnvelope(key, value).foreach(setHint.apply)
               case c if c == classOf[CostEvaluation]     => toCost(value).foreach(setHint.apply)
-              case c => logger.warn(s"Unhandled hint type for '$key'")
+              case _ => logger.warn(s"Unhandled hint type for '$key'")
             }
           } catch {
             case NonFatal(e) => logger.warn(s"Error invoking query hint for $key=$value", e)

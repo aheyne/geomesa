@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -8,28 +8,28 @@
 
 package org.locationtech.geomesa.accumulo.nativeapi
 
-import java.util.{List => JList}
-
 import org.apache.accumulo.core.client.Connector
 import org.apache.hadoop.classification.InterfaceStability
 import org.geotools.data.DataStoreFinder
-import org.locationtech.geomesa.accumulo.data.{AccumuloDataStore, AccumuloDataStoreParams, AccumuloFeatureWriter}
+import org.locationtech.geomesa.accumulo.data.{AccumuloDataStore, AccumuloDataStoreParams}
 import org.locationtech.geomesa.api._
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 @InterfaceStability.Unstable
+@deprecated("Will be removed without replacement")
 class AccumuloGeoMesaIndex[T](override protected val ds: AccumuloDataStore,
                               name: String,
                               serde: ValueSerializer[T],
                               view: SimpleFeatureView[T]) extends BaseBigTableIndex[T](ds, name, serde, view) {
   override def flush(): Unit = {
-    writers.asMap().values().map(_.asInstanceOf[AccumuloFeatureWriter]).foreach(_.flush())
+    writers.asMap().values().foreach(_.flush())
   }
 }
 
 @InterfaceStability.Unstable
+@deprecated("Will be removed without replacement")
 object AccumuloGeoMesaIndex {
   def build[T](name: String,
                connector: Connector,

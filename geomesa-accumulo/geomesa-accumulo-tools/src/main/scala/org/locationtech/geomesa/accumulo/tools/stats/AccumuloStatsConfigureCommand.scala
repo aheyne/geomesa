@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -23,7 +23,7 @@ class AccumuloStatsConfigureCommand extends StatsConfigureCommand[AccumuloDataSt
   override val params = new AccumuloStatsConfigureParams
 
   override protected def list(ds: AccumuloDataStore): Unit = {
-    val configured = StatsCombiner.list(ds.connector, ds.stats.metadata.catalog).map { case (k, v) => s"$k -> $v" }
+    val configured = StatsCombiner.list(ds.connector, s"${ds.config.catalog}_stats").map { case (k, v) => s"$k -> $v" }
     Command.user.info(s"Configured stats iterator: ${configured.mkString("\n  ", "\n  ", "")}")
   }
 

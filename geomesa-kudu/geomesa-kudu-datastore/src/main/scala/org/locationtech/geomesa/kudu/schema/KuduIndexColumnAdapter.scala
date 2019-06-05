@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -79,13 +79,6 @@ object KuduIndexColumnAdapter {
   // used for time period (bin) in z3/xz3
   // use run-length encoding, which is good for repeated values
   object PeriodColumnAdapter extends KuduIndexColumnAdapter[Short]("period", INT16, RLE, compression()) {
-    override def readFromRow(row: RowResult): Short = row.getShort(name)
-    override def writeToRow(row: PartialRow, value: Short): Unit = row.addShort(name, value)
-  }
-
-  // used for attribute index to identify the attribute name
-  // use run-length encoding, which is good for repeated values
-  object IdxColumnAdapter extends KuduIndexColumnAdapter[Short]("idx", INT16, RLE, compression()) {
     override def readFromRow(row: RowResult): Short = row.getShort(name)
     override def writeToRow(row: PartialRow, value: Short): Unit = row.addShort(name, value)
   }

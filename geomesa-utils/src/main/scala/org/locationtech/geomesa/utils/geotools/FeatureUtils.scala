@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -123,6 +123,23 @@ object FeatureUtils {
       toWrite.getUserData.put(Hints.USE_PROVIDED_FID, java.lang.Boolean.TRUE)
     }
     toWrite
+  }
+
+  /**
+    * Write a feature to a feature writer
+    *
+    * @param writer feature writer
+    * @param sf feature to write
+    * @param useProvidedFid use provided fid
+    */
+  def write(
+      writer: FeatureWriter[SimpleFeatureType, SimpleFeature],
+      sf: SimpleFeature,
+      useProvidedFid: Boolean = false): SimpleFeature = {
+    val written = writer.next()
+    copyToFeature(written, sf, useProvidedFid)
+    writer.write()
+    written
   }
 
   /**

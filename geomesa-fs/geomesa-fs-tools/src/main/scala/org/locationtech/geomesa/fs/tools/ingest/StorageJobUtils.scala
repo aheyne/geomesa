@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -16,15 +16,11 @@ import org.apache.hadoop.fs.Path
 import org.apache.hadoop.mapreduce.JobStatus
 import org.apache.hadoop.tools.{DistCp, DistCpOptions}
 import org.locationtech.geomesa.tools.Command
-import org.locationtech.geomesa.tools.ingest.AbstractIngest.StatusCallback
+import org.locationtech.geomesa.tools.ingest.AbstractConverterIngest.StatusCallback
 
 object StorageJobUtils extends LazyLogging {
 
-  def distCopy(srcRoot: Path,
-               destRoot: Path,
-               statusCallback: StatusCallback,
-               stageId: Int,
-               numStages: Int): Boolean = {
+  def distCopy(srcRoot: Path, destRoot: Path, statusCallback: StatusCallback): Boolean = {
     statusCallback.reset()
 
     Command.user.info("Submitting DistCp job - please wait...")
@@ -39,11 +35,11 @@ object StorageJobUtils extends LazyLogging {
     // distCp has no reduce phase
     while (!job.isComplete) {
       if (job.getStatus.getState != JobStatus.State.PREP) {
-        statusCallback(s"DistCp (stage $stageId/$numStages): ", job.mapProgress(), Seq.empty, done = false)
+        statusCallback(s"DistCp: ", job.mapProgress(), Seq.empty, done = false)
       }
       Thread.sleep(1000)
     }
-    statusCallback(s"DistCp (stage $stageId/$numStages): ", job.mapProgress(), Seq.empty, done = true)
+    statusCallback(s"DistCp: ", job.mapProgress(), Seq.empty, done = true)
 
     val success = job.isSuccessful
     if (success) {

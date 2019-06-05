@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -10,9 +10,9 @@ package org.locationtech.geomesa.fs.storage.orc
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
-import org.apache.orc.storage.ql.exec.vector.VectorizedRowBatch
 import org.apache.orc.OrcFile
-import org.locationtech.geomesa.fs.storage.api.FileSystemWriter
+import org.apache.orc.storage.ql.exec.vector.VectorizedRowBatch
+import org.locationtech.geomesa.fs.storage.api.FileSystemStorage.FileSystemWriter
 import org.locationtech.geomesa.fs.storage.orc.utils.OrcAttributeWriter
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 

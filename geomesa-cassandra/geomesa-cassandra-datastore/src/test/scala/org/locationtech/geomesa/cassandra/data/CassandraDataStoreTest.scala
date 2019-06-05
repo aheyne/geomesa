@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -29,6 +29,7 @@ import org.locationtech.geomesa.utils.conf.GeoMesaSystemProperties.SystemPropert
 import org.locationtech.geomesa.utils.geotools.{SchemaBuilder, SimpleFeatureTypes}
 import org.locationtech.geomesa.utils.io.PathUtils
 import org.opengis.feature.simple.SimpleFeature
+import org.specs2.matcher.MatchResult
 import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
 
@@ -173,7 +174,7 @@ class CassandraDataStoreTest extends Specification {
         testLooseBbox(ds, loose = false)
       }
 
-      ds.getFeatureSource(typeName).removeFeatures(ECQL.toFilter("INCLUDE"))
+      ds.getFeatureSource(typeName).removeFeatures(ECQL.toFilter(toAdd.map(_.getID).mkString("IN('", "','", "')")))
 
       forall(Seq("INCLUDE",
         "IN('0', '2')",
@@ -185,6 +186,30 @@ class CassandraDataStoreTest extends Specification {
         val fr = ds.getFeatureReader(new Query(typeName, ECQL.toFilter(filter)), Transaction.AUTO_COMMIT)
         SelfClosingIterator(fr).toList must beEmpty
       }
+    }
+
+    "handle bounds exclusivity" in {
+      val typeName = "testquerybounds"
+
+      ds.getSchema(typeName) must beNull
+
+      ds.createSchema(SimpleFeatureTypes.createType(typeName, "dtg:Date,*geom:Point:srid=4326"))
+
+      val sft = ds.getSchema(typeName)
+
+      val feature = ScalaSimpleFeature.create(sft, "0", "2019-03-18T00:00:00.000Z", "POINT (-122.32876 47.75205)")
+      feature.getUserData.put(Hints.USE_PROVIDED_FID, java.lang.Boolean.TRUE)
+
+      val ids = ds.getFeatureSource(typeName).asInstanceOf[SimpleFeatureStore]
+          .addFeatures(new ListFeatureCollection(sft, Array[SimpleFeature](feature)))
+      ids.asScala.map(_.getID) mustEqual Seq("0")
+
+      val filter = ECQL.toFilter("dtg = '2019-03-18T00:00:00.000Z' AND " +
+          "bbox(geom, -122.33072251081467,47.75143951177597,-122.32643097639084,47.753048837184906)")
+
+      val query = new Query(typeName, filter)
+      val results = SelfClosingIterator(ds.getFeatureReader(query, Transaction.AUTO_COMMIT)).toList
+      results mustEqual Seq(feature)
     }
 
     "work with polys" in {
@@ -275,6 +300,15 @@ class CassandraDataStoreTest extends Specification {
 
       ds.getSchema(typeName) must beNull
     }
+
+    "support long attribute names" in {
+      val long = "testsftverylongnaaaaaaaaaaammmmmmmeeeeeeeee"
+      val spec = s"$long:String:index=true,dtg:Date,*geom:Point:srid=4326"
+      foreach(Seq("testnames", long)) { typeName =>
+        ds.getSchema(typeName) must beNull
+        ds.createSchema(SimpleFeatureTypes.createType(typeName, spec)) must not(throwAn[Exception])
+      }
+    }
   }
 
   def testQuery(ds: CassandraDataStore,
@@ -282,7 +316,7 @@ class CassandraDataStoreTest extends Specification {
                 filter: String,
                 transforms: Array[String],
                 results: Seq[SimpleFeature],
-                explain: Option[Explainer] = None) = {
+                explain: Option[Explainer] = None): MatchResult[Traversable[SimpleFeature]] = {
     val query = new Query(typeName, ECQL.toFilter(filter), transforms)
     explain.foreach(e => ds.getQueryPlan(query, explainer = e))
     val fr = ds.getFeatureReader(query, Transaction.AUTO_COMMIT)

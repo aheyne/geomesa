@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -8,11 +8,11 @@
 
 package org.locationtech.geomesa.spark.jts.udf
 
-import com.vividsolutions.jts.geom._
 import org.apache.spark.sql.SQLContext
-import org.locationtech.geomesa.spark.jts.util.SQLFunctionHelper._
-import org.locationtech.geomesa.spark.jts.util.{WKBUtils, WKTUtils}
 import org.locationtech.geomesa.spark.jts.util.GeoHashUtils._
+import org.locationtech.geomesa.spark.jts.util.SQLFunctionHelper._
+import org.locationtech.geomesa.spark.jts.util.{GeometryUtils, WKBUtils, WKTUtils}
+import org.locationtech.jts.geom._
 
 object GeometricConstructorFunctions {
 
@@ -26,7 +26,7 @@ object GeometricConstructorFunctions {
   val ST_MakeBox2D: (Point, Point) => Geometry = nullableUDF((lowerLeft, upperRight) =>
     geomFactory.toGeometry(new Envelope(lowerLeft.getX, upperRight.getX, lowerLeft.getY, upperRight.getY)))
   val ST_MakeBBOX: (Double, Double, Double, Double) => Geometry = nullableUDF((lowerX, lowerY, upperX, upperY) =>
-    geomFactory.toGeometry(new Envelope(lowerX, upperX, lowerY, upperY)))
+    GeometryUtils.addWayPointsToBBOX(geomFactory.toGeometry(new Envelope(lowerX, upperX, lowerY, upperY))))
   val ST_MakePolygon: LineString => Polygon = nullableUDF(shell => {
     val ring = geomFactory.createLinearRing(shell.getCoordinateSequence)
     geomFactory.createPolygon(ring)

@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -9,9 +9,10 @@
 package org.locationtech.geomesa.hbase.coprocessor.aggregators
 import org.geotools.factory.Hints
 import org.locationtech.geomesa.features.ScalaSimpleFeature
-import org.locationtech.geomesa.hbase.HBaseFeatureIndexType
 import org.locationtech.geomesa.hbase.coprocessor.GeoMesaCoprocessor
-import org.locationtech.geomesa.index.iterators.{BinAggregatingScan, ByteBufferResult}
+import org.locationtech.geomesa.index.api.GeoMesaFeatureIndex
+import org.locationtech.geomesa.index.iterators.BinAggregatingScan
+import org.locationtech.geomesa.index.iterators.BinAggregatingScan.ByteBufferResult
 import org.locationtech.geomesa.utils.bin.BinaryOutputEncoder
 import org.locationtech.geomesa.utils.geotools.GeometryUtils
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
@@ -25,7 +26,7 @@ object HBaseBinAggregator {
     new ScalaSimpleFeature(BinaryOutputEncoder.BinEncodedSft, "", Array(bytes, GeometryUtils.zeroPoint))
 
   def configure(sft: SimpleFeatureType,
-                index: HBaseFeatureIndexType,
+                index: GeoMesaFeatureIndex[_, _],
                 filter: Option[Filter],
                 hints: Hints): Map[String, String] = {
     import org.locationtech.geomesa.index.conf.QueryHints.RichHints
@@ -40,7 +41,6 @@ object HBaseBinAggregator {
       hints.getBinLabelField,
       hints.getBinBatchSize,
       hints.isBinSorting,
-      hints) ++
-      Map(GeoMesaCoprocessor.AggregatorClass -> classOf[HBaseBinAggregator].getName)
+      hints.getSampling) + (GeoMesaCoprocessor.AggregatorClass -> classOf[HBaseBinAggregator].getName)
   }
 }

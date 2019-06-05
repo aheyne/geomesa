@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -13,9 +13,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.mock.MockInstance;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
@@ -26,13 +26,12 @@ import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.locationtech.geomesa.accumulo.data.AccumuloDataStore;
-import org.locationtech.geomesa.accumulo.index.AccumuloFeatureIndex;
-import org.locationtech.geomesa.accumulo.index.AccumuloFeatureIndex$;
 import org.locationtech.geomesa.api.DefaultSimpleFeatureView;
 import org.locationtech.geomesa.api.GeoMesaIndex;
 import org.locationtech.geomesa.api.GeoMesaQuery;
 import org.locationtech.geomesa.api.SimpleFeatureView;
 import org.locationtech.geomesa.api.ValueSerializer;
+import org.locationtech.geomesa.index.api.GeoMesaFeatureIndex;
 import org.locationtech.geomesa.utils.index.IndexMode$;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -303,11 +302,11 @@ public class GeoMesaIndexTest {
         Assert.assertFalse("creating a MockAccumulo instance should create at least one table", preTables.isEmpty());
 
         // require that the function to pre-compute the names of all tables for this feature type is accurate
-        scala.collection.Iterator<AccumuloFeatureIndex> indices =
-                AccumuloFeatureIndex$.MODULE$.indices(ds.getSchema(featureName), scala.Option.apply(null), IndexMode$.MODULE$.Any()).iterator();
+        scala.collection.Iterator<GeoMesaFeatureIndex<?, ?>> indices =
+                ds.manager().indices(ds.getSchema(featureName), IndexMode$.MODULE$.Any()).iterator();
         List<String> expectedTables = new ArrayList<>();
         while (indices.hasNext()) {
-            expectedTables.add(indices.next().getTableNames(ds.getSchema(featureName), ds, Option$.MODULE$.empty()).head());
+            expectedTables.add(indices.next().getTableNames(Option$.MODULE$.empty()).head());
         }
         expectedTables.add(featureName);
         expectedTables.add(featureName + "_stats");

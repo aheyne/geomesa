@@ -90,6 +90,70 @@ Compatibility Matrix
 | Dependencies | N     | N     | Y     |
 +--------------+-------+-------+-------+
 
+Version 2.3.0 Upgrade Guide
++++++++++++++++++++++++++++
+
+Default Query Planning Type
+---------------------------
+
+GeoMesa 2.3.0 changes the default query planning type from stat-based to heuristic-based. This will only affect the
+Accumulo data store, as other stores have not implemented statistics. To enable stat-based query planning, refer
+to :ref:`query_planning_hint`.
+
+Immutable Simple Feature Types
+------------------------------
+
+GeoMesa 2.3.0 returns immutable objects from calls to ``getSchema``. This allows for the re-use of SimpleFeatureType
+instances, which reduces overhead. In most cases, this will have no effect on end users, however note that mutable
+and immutable feature types will never be ``equals`` when compared directly.
+
+In order to update a schema, or if mutability is desired for some other reason, call
+``org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes.mutable()`` to create a mutable copy. Java users
+can call ``org.locationtech.geomesa.utils.interop.SimpleFeatureTypes.mutable()`` instead.
+
+FileSystem Storage API Changes
+------------------------------
+
+The FileSystem Storage API is still considered beta-level software, and has been updated in this release. The
+DataStore API has not changed, however the internal class interfaces have changed in this release, potentially
+requiring changes in user code.
+
+In addition, the format used to store metadata files has been updated, so older versions of GeoMesa will not be
+able to read metadata created with this version.
+
+Deprecated Modules
+------------------
+
+The following modules have been deprecated, and will be removed in a future version:
+
+* GeoMesa Raster
+* GeoMesa Native API
+* GeoMesa Blob Store
+* GeoMesa Metrics
+
+Version 2.2.0 Upgrade Guide
++++++++++++++++++++++++++++
+
+GeoTools 20 and GeoServer 2.14
+------------------------------
+
+GeoMesa 2.2.0 is compiled against GeoTools 20.0 and GeoServer 2.14. This version of GeoTools upgrades JTS
+from 1.14 to 1.16, which includes a transition of the project to Locationtech. The new version
+of JTS renames the packages from ``com.vividsolutions`` to ``org.locationtech.jts``. Due to the package renaming,
+GeoMesa will no longer work with older versions of GeoTools and GeoServer.
+
+.. warning::
+
+  GeoMesa 2.2.0 requires GeoTools 20.0 or later and GeoServer 2.14 or later.
+
+Accumulo DataStore GeoServer Installation
+-----------------------------------------
+
+When using GeoServer, the GeoMesa Accumulo data store now requires Accumulo client JARs 1.9.2 or later.
+This is due to classpath conflicts between earlier Accumulo clients and GeoServer 2.14. Fortunately, newer Accumulo
+clients can talk to older Accumulo instances, so it is only necessary to upgrade the client JARs in GeoServer,
+but not the entire Accumulo cluster.
+
 Version 2.1.0 Upgrade Guide
 +++++++++++++++++++++++++++
 

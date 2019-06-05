@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -12,7 +12,7 @@ import java.io.{File, FileInputStream, FileOutputStream}
 import java.nio.file.Files
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.vividsolutions.jts.geom.LineString
+import org.locationtech.jts.geom.LineString
 import org.apache.arrow.memory.BufferAllocator
 import org.apache.arrow.vector.DirtyRootAllocator
 import org.geotools.filter.text.ecql.ECQL
@@ -33,7 +33,7 @@ class SimpleFeatureArrowFileTest extends Specification {
 
   val fileCount = new AtomicInteger(0)
 
-  val sft = SimpleFeatureTypes.createType("test", "name:String,foo:String,age:Int,dtg:Date,*geom:Point:srid=4326")
+  val sft = SimpleFeatureTypes.createImmutableType("test", "name:String,foo:String,age:Int,dtg:Date,*geom:Point:srid=4326")
   val lineSft = SimpleFeatureTypes.createType("test", "name:String,team:String,age:Int,weight:Int,dtg:Date,*geom:LineString:srid=4326")
 
   val features0 = (0 until 10).map { i =>

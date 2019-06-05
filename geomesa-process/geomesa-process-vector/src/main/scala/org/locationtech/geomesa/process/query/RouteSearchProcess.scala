@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -11,19 +11,20 @@ package org.locationtech.geomesa.process.query
 import java.util.concurrent.ConcurrentHashMap
 
 import com.typesafe.scalalogging.LazyLogging
-import com.vividsolutions.jts.geom._
-import com.vividsolutions.jts.operation.distance.DistanceOp
+import org.locationtech.jts.geom._
+import org.locationtech.jts.operation.distance.DistanceOp
 import org.geotools.data.Query
 import org.geotools.data.collection.ListFeatureCollection
 import org.geotools.data.simple.{SimpleFeatureCollection, SimpleFeatureIterator, SimpleFeatureSource}
 import org.geotools.feature.collection.DecoratingSimpleFeatureCollection
 import org.geotools.process.factory.{DescribeParameter, DescribeProcess, DescribeResult}
 import org.geotools.referencing.GeodeticCalculator
-import org.geotools.util.{Converters, NullProgressListener}
+import org.geotools.util.NullProgressListener
 import org.locationtech.geomesa.filter.factory.FastFilterFactory
 import org.locationtech.geomesa.filter.{ff, orFilters}
 import org.locationtech.geomesa.process.{FeatureResult, GeoMesaProcess, GeoMesaProcessVisitor}
 import org.locationtech.geomesa.utils.collection.{CloseableIterator, SelfClosingIterator}
+import org.locationtech.geomesa.utils.geotools.converters.FastConverter
 import org.locationtech.geomesa.utils.text.WKTUtils
 import org.opengis.feature.Feature
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
@@ -221,7 +222,7 @@ object RouteVisitor {
 
     // gets the heading for an input feature
     val getFeatureHeading: (SimpleFeature) => Double = headingIndex match {
-      case Some(index) => (sf) => Converters.convert(sf.getAttribute(index), classOf[Double])
+      case Some(index) => (sf) => FastConverter.convert(sf.getAttribute(index), classOf[Double])
       case None =>
       (sf) => {
         val geom = sf.getAttribute(geomIndex).asInstanceOf[LineString]

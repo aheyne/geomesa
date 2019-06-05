@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -8,24 +8,43 @@
 
 package org.locationtech.geomesa.index.planning
 
+import com.typesafe.scalalogging.Logger
 import org.geotools.data.Query
 import org.geotools.factory.Hints
 import org.geotools.geometry.jts.ReferencedEnvelope
-import org.locationtech.geomesa.filter.visitor.QueryPlanFilterVisitor
-import org.locationtech.geomesa.filter.{andFilters, decomposeAnd, ff}
+import org.locationtech.geomesa.filter.factory.FastFilterFactory
+import org.locationtech.geomesa.filter.{FilterHelper, andFilters, ff}
 import org.locationtech.geomesa.index.conf.QueryHints
 import org.locationtech.geomesa.index.geoserver.ViewParams
+import org.locationtech.geomesa.index.iterators.{DensityScan, StatsScan}
+import org.locationtech.geomesa.index.planning.QueryInterceptor.QueryInterceptorFactory
 import org.locationtech.geomesa.index.utils.{ExplainLogging, Explainer}
+import org.locationtech.geomesa.utils.bin.BinaryOutputEncoder
 import org.locationtech.geomesa.utils.collection.CloseableIterator
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 import org.opengis.filter.Filter
-import org.opengis.filter.spatial.BBOX
+import org.slf4j.LoggerFactory
 
 trait QueryRunner {
 
+  /**
+    * Execute a query
+    *
+    * @param sft simple feature type
+    * @param query query to run
+    * @param explain explain output
+    * @return
+    */
   def runQuery(sft: SimpleFeatureType,
                query: Query,
                explain: Explainer = new ExplainLogging): CloseableIterator[SimpleFeature]
+
+  /**
+    * Hook for query interceptors
+    *
+    * @return
+    */
+  protected def interceptors: QueryInterceptorFactory
 
   /**
     * Configure the query - set hints, transforms, etc.
@@ -35,8 +54,15 @@ trait QueryRunner {
     */
   protected [geomesa] def configureQuery(sft: SimpleFeatureType, original: Query): Query = {
     import org.locationtech.geomesa.index.conf.QueryHints.RichHints
+    import org.locationtech.geomesa.utils.geotools.RichSimpleFeatureType.RichSimpleFeatureType
 
     val query = new Query(original) // note: this ends up sharing a hints object between the two queries
+
+    // query rewriting
+    interceptors(sft).foreach { interceptor =>
+      interceptor.rewrite(query)
+      QueryRunner.logger.trace(s"Query rewritten by $interceptor to: $query")
+    }
 
     // set query hints - we need this in certain situations where we don't have access to the query directly
     QueryPlanner.threadedHints.get.foreach { hints =>
@@ -55,50 +81,29 @@ trait QueryRunner {
 
     // set sorting in the query
     QueryPlanner.setQuerySort(sft, query)
+    QueryPlanner.setMaxFeatures(query)
 
-    // add the bbox from the density query to the filter
-    if (query.getHints.isDensityQuery) {
-      val env = query.getHints.getDensityEnvelope.get.asInstanceOf[ReferencedEnvelope]
-      val bbox = ff.bbox(ff.property(sft.getGeometryDescriptor.getLocalName), env)
-      if (query.getFilter == Filter.INCLUDE) {
-        query.setFilter(bbox)
-      } else {
-        // add the bbox - try to not duplicate an existing bbox
-        val bounds = bbox.getBounds
-        val filters = decomposeAnd(query.getFilter).filter {
-          case b: BBOX if bounds.contains(b.getBounds) => false
-          case _ => true
+    // add the bbox from the density query to the filter, if there is no more restrictive filter
+    query.getHints.getDensityEnvelope.foreach { env =>
+      val geoms = FilterHelper.extractGeometries(query.getFilter, sft.getGeomField)
+      if (geoms.isEmpty || geoms.exists(g => !env.contains(g.getEnvelopeInternal))) {
+        val bbox = ff.bbox(ff.property(sft.getGeometryDescriptor.getLocalName), env.asInstanceOf[ReferencedEnvelope])
+        if (query.getFilter == Filter.INCLUDE) {
+          query.setFilter(bbox)
+        } else {
+          query.setFilter(andFilters(Seq(query.getFilter, bbox)))
         }
-        query.setFilter(andFilters(filters ++ Seq(bbox)))
       }
     }
 
-    query
-  }
-
-  /**
-    * Updates the filter in the query by binding values, optimizing predicates, etc
-    *
-    * @param sft simple feature type
-    * @param query query
-    */
-  private [geomesa] def optimizeFilter(sft: SimpleFeatureType, query: Query): Unit = {
     if (query.getFilter != null && query.getFilter != Filter.INCLUDE) {
-      query.setFilter(optimizeFilter(sft, query.getFilter))
+      // bind the literal values to the appropriate type, so that it isn't done every time the filter is evaluated
+      // update the filter to remove namespaces, handle null property names, and tweak topological filters
+      // replace filters with 'fast' implementations where possible
+      query.setFilter(FastFilterFactory.optimize(sft, query.getFilter))
     }
-  }
 
-  /**
-    * Optimizes the filter - extension point for subclasses
-    *
-    * @param sft simple feature poinnt
-    * @param filter filter
-    * @return optimized filter
-    */
-  protected def optimizeFilter(sft: SimpleFeatureType, filter: Filter): Filter = {
-    // bind the literal values to the appropriate type, so that it isn't done every time the filter is evaluated
-    // update the filter to remove namespaces, handle null property names, and tweak topological filters
-    QueryPlanFilterVisitor.apply(sft, filter)
+    query
   }
 
   /**
@@ -110,15 +115,31 @@ trait QueryRunner {
     */
   protected [geomesa] def getReturnSft(sft: SimpleFeatureType, hints: Hints): SimpleFeatureType = {
     import org.locationtech.geomesa.index.conf.QueryHints.RichHints
-    hints.getTransformSchema.getOrElse(sft)
+    if (hints.isBinQuery) {
+      BinaryOutputEncoder.BinEncodedSft
+    } else if (hints.isArrowQuery) {
+      org.locationtech.geomesa.arrow.ArrowEncodedSft
+    } else if (hints.isDensityQuery) {
+      DensityScan.DensitySft
+    } else if (hints.isStatsQuery) {
+      StatsScan.StatsSft
+    } else {
+      hints.getTransformSchema.getOrElse(sft)
+    }
   }
 }
 
 object QueryRunner {
+
+  private val logger = Logger(LoggerFactory.getLogger(classOf[QueryRunner]))
+
   // used for configuring input queries
-  val default: QueryRunner = new QueryRunner {
+  private val default: QueryRunner = new QueryRunner {
+    override protected val interceptors: QueryInterceptorFactory = QueryInterceptorFactory.empty()
     override def runQuery(sft: SimpleFeatureType,
                           query: Query,
                           explain: Explainer): CloseableIterator[SimpleFeature] = throw new NotImplementedError
   }
+
+  def configureDefaultQuery(sft: SimpleFeatureType, original: Query): Query = default.configureQuery(sft, original)
 }

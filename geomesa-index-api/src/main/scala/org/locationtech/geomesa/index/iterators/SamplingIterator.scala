@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -27,7 +27,7 @@ trait SamplingIterator {
     * @param options iterator options
     * @return sampling function, if defined
     */
-  def sample(options: jMap[String, String]): Option[(SimpleFeature) => Boolean] = {
+  def sample(options: jMap[String, String]): Option[SimpleFeature => Boolean] = {
     import scala.collection.JavaConverters._
     sample(options.asScala.toMap)
   }
@@ -38,7 +38,7 @@ trait SamplingIterator {
     * @param options iterator options
     * @return sampling function, if defined
     */
-  def sample(options: Map[String, String]): Option[(SimpleFeature) => Boolean] = {
+  def sample(options: Map[String, String]): Option[SimpleFeature => Boolean] = {
     import SamplingIterator.Configuration.{SampleByOpt, SampleOpt}
     val sampling = options.get(SampleOpt).map(_.toInt)
     val sampleBy = options.get(SampleByOpt).map(_.toInt)

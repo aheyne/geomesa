@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -10,7 +10,7 @@ package org.locationtech.geomesa.fs.storage.orc.utils
 
 import java.util.UUID
 
-import com.vividsolutions.jts.geom.{Coordinate, LineString, LinearRing, Polygon}
+import org.locationtech.jts.geom.{Coordinate, LineString, LinearRing, Polygon}
 import org.apache.hadoop.io._
 import org.apache.orc.mapred.{OrcList, OrcMap, OrcStruct, OrcTimestamp}
 import org.geotools.filter.identity.FeatureIdImpl
@@ -46,7 +46,6 @@ object OrcInputFormatReader {
           case ObjectType.DOUBLE   => new DoubleInputFormatReader(col, i)
           case ObjectType.BOOLEAN  => new BooleanInputFormatReader(col, i)
           case ObjectType.BYTES    => new BytesInputFormatReader(col, i)
-          case ObjectType.JSON     => new StringInputFormatReader(col, i)
           case ObjectType.UUID     => new UuidInputFormatReader(col, i)
           case ObjectType.LIST     => new ListInputFormatReader(col, i, bindings(1))
           case ObjectType.MAP      => new MapInputFormatReader(col, i, bindings(1), bindings(2))
@@ -434,7 +433,6 @@ object OrcInputFormatReader {
       case ObjectType.DOUBLE   => new ConvertInputFormatDouble {}
       case ObjectType.BOOLEAN  => new ConvertInputFormatBoolean {}
       case ObjectType.BYTES    => new ConvertInputFormatBytes {}
-      case ObjectType.JSON     => new ConvertInputFormatString {}
       case ObjectType.UUID     => new ConvertInputFormatUuid {}
       case _ => throw new IllegalArgumentException(s"Unexpected object type $binding")
     }

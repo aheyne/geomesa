@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicLong
 import java.util.{Date, UUID}
 
-import com.vividsolutions.jts.geom._
+import org.locationtech.jts.geom._
 import org.apache.arrow.vector._
 import org.apache.arrow.vector.complex.{BaseRepeatedValueVector, FixedSizeListVector, ListVector, StructVector}
 import org.apache.arrow.vector.holders._
@@ -145,7 +145,6 @@ object ArrowAttributeReader {
           case ObjectType.LIST     => new ArrowListReader(vector.asInstanceOf[ListVector], bindings(1), encoding)
           case ObjectType.MAP      => new ArrowMapReader(vector.asInstanceOf[StructVector], bindings(1), bindings(2), encoding)
           case ObjectType.BYTES    => new ArrowByteReader(vector.asInstanceOf[VarBinaryVector])
-          case ObjectType.JSON     => new ArrowStringReader(vector.asInstanceOf[VarCharVector])
           case ObjectType.UUID     => new ArrowUuidReader(vector.asInstanceOf[FixedSizeListVector])
           case _ => throw new IllegalArgumentException(s"Unexpected object type ${bindings.head}")
         }

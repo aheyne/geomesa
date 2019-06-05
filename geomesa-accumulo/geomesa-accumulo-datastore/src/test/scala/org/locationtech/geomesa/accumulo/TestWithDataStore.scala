@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2013-2018 Commonwealth Computer Research, Inc.
+ * Copyright (c) 2013-2019 Commonwealth Computer Research, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Apache License, Version 2.0
  * which accompanies this distribution and is available at
@@ -14,13 +14,12 @@ import org.apache.accumulo.core.client.security.tokens.PasswordToken
 import org.apache.accumulo.core.data.Key
 import org.apache.accumulo.core.security.Authorizations
 import org.geotools.data.{DataStoreFinder, Query, Transaction}
-import org.geotools.factory.Hints
-import org.geotools.feature.DefaultFeatureCollection
 import org.geotools.filter.text.ecql.ECQL
 import org.locationtech.geomesa.accumulo.data.{AccumuloDataStore, AccumuloDataStoreParams}
 import org.locationtech.geomesa.index.utils.ExplainString
 import org.locationtech.geomesa.utils.geotools.RichSimpleFeatureType.RichSimpleFeatureType
-import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes
+import org.locationtech.geomesa.utils.geotools.{FeatureUtils, SimpleFeatureTypes}
+import org.locationtech.geomesa.utils.io.WithClose
 import org.opengis.feature.simple.SimpleFeature
 import org.opengis.filter.Filter
 import org.specs2.mutable.Specification
@@ -35,9 +34,6 @@ trait TestWithDataStore extends Specification {
 
   def spec: String
   def dtgField: Option[String] = Some("dtg")
-
-  // TODO GEOMESA-1146 refactor to allow running of tests with table sharing on and off...
-  def tableSharing: Boolean = true
 
   def additionalDsParams(): Map[String, Any] = Map.empty
 
@@ -77,7 +73,6 @@ trait TestWithDataStore extends Specification {
 
   lazy val (ds, sft) = {
     val sft = SimpleFeatureTypes.createType(sftName, spec)
-    sft.setTableSharing(tableSharing)
     dtgField.foreach(sft.setDtgField)
     val ds = DataStoreFinder.getDataStore(dsParams.asJava).asInstanceOf[AccumuloDataStore]
     ds.createSchema(sft)
@@ -96,13 +91,12 @@ trait TestWithDataStore extends Specification {
    * Call to load the test features into the data store
    */
   def addFeatures(features: Seq[SimpleFeature]): Unit = {
-    val featureCollection = new DefaultFeatureCollection(sftName, sft)
-    features.foreach { f =>
-      f.getUserData.put(Hints.USE_PROVIDED_FID, java.lang.Boolean.TRUE)
-      featureCollection.add(f)
+    WithClose(ds.getFeatureWriterAppend(sftName, Transaction.AUTO_COMMIT)) { writer =>
+      features.foreach { f =>
+        FeatureUtils.copyToWriter(writer, f, useProvidedFid = true)
+        writer.write()
+      }
     }
-    // write the feature to the store
-    fs.addFeatures(featureCollection)
   }
 
   def clearFeatures(): Unit = {
