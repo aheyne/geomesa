@@ -214,6 +214,11 @@ object ManagePartitionsCommand {
     var partitions: java.util.List[String] = _
   }
 
+  trait PartitionParam {
+    @Parameter(names = Array("--partition"), description = "Partition to operate on", required = false)
+    var partition: String = _
+  }
+
   trait AdoptPartitionParam extends RequiredTypeNameParam {
     @Parameter(names = Array("--partition"), description = "Partition name to adopt", required = true)
     var partition: String = _

@@ -97,16 +97,23 @@ object HBaseIndexFileMapper {
                 params: Map[String, String],
                 typeName: String,
                 index: String,
-                output: Path): Unit = {
+                output: Path,
+                partition: Option[String] = None): Unit = {
     import scala.collection.JavaConversions._
     val ds = DataStoreFinder.getDataStore(params).asInstanceOf[HBaseDataStore]
     require(ds != null, s"Could not find data store with provided parameters ${params.mkString(",")}")
     try {
       val sft = ds.getSchema(typeName)
       require(sft != null, s"Schema $typeName does not exist, please create it first")
-      require(!TablePartition.partitioned(sft), "Writing to partitioned tables is not currently supported")
+//      require(!TablePartition.partitioned(sft), "Writing to partitioned tables is not currently supported")
+
       val idx = ds.manager.index(index)
-      val tableName = TableName.valueOf(idx.getTableNames(sft, ds, None).head)
+      val tableName = partition match {
+        case Some(part) =>
+          TableName.valueOf(idx.getTableNames(sft, ds, Option(part)).find(_.endsWith(part)).head)
+        case None => TableName.valueOf(idx.getTableNames(sft, ds, None).head)
+      }
+
       val table = ds.connection.getTable(tableName)
 
       GeoMesaConfigurator.setDataStoreOutParams(job.getConfiguration, params)

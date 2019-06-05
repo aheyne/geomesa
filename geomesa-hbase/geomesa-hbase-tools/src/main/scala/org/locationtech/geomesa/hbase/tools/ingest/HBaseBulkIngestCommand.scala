@@ -19,6 +19,7 @@ import org.locationtech.geomesa.hbase.jobs.HBaseIndexFileMapper
 import org.locationtech.geomesa.hbase.tools.ingest.HBaseBulkIngestCommand.HBaseBulkIngestParams
 import org.locationtech.geomesa.hbase.tools.ingest.HBaseIngestCommand.HBaseIngestParams
 import org.locationtech.geomesa.tools.DistributedRunParam.RunModes
+import org.locationtech.geomesa.tools.data.ManagePartitionsCommand
 import org.locationtech.geomesa.tools.ingest.AbstractIngest.StatusCallback
 import org.locationtech.geomesa.tools.ingest.{ConverterCombineIngestJob, ConverterIngest, ConverterIngestJob}
 import org.locationtech.geomesa.tools.{Command, OutputPathParam, RequiredIndexParam}
@@ -69,7 +70,7 @@ class HBaseBulkIngestCommand extends HBaseIngestCommand {
     new ConverterCombineIngestJob(dsParams, sft, converterConfig, inputs, Option(params.maxSplitSize), libjarsFile, libjarsPaths) {
       override def configureJob(job: Job): Unit = {
         super.configureJob(job)
-        HBaseIndexFileMapper.configure(job, connection, sft.getTypeName, index, new Path(params.outputPath))
+        HBaseIndexFileMapper.configure(job, connection, sft.getTypeName, index, new Path(params.outputPath), Option(params.partition))
       }
     }
   }
@@ -82,7 +83,7 @@ class HBaseBulkIngestCommand extends HBaseIngestCommand {
     new ConverterIngestJob(dsParams, sft, converterConfig, inputs, libjarsFile, libjarsPaths) {
       override def configureJob(job: Job): Unit = {
         super.configureJob(job)
-        HBaseIndexFileMapper.configure(job, connection, sft.getTypeName, index, new Path(params.outputPath))
+        HBaseIndexFileMapper.configure(job, connection, sft.getTypeName, index, new Path(params.outputPath), Option(params.partition))
       }
     }
   }
@@ -91,5 +92,6 @@ class HBaseBulkIngestCommand extends HBaseIngestCommand {
 
 object HBaseBulkIngestCommand {
   @Parameters(commandDescription = "Convert various file formats into HBase HFiles suitable for incremental load")
-  class HBaseBulkIngestParams extends HBaseIngestParams with RequiredIndexParam with OutputPathParam
+  class HBaseBulkIngestParams extends HBaseIngestParams with RequiredIndexParam with OutputPathParam with ManagePartitionsCommand.PartitionParam
+
 }

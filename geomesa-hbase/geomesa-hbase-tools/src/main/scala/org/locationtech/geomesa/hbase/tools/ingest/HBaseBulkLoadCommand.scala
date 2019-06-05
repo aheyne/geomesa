@@ -19,6 +19,7 @@ import org.locationtech.geomesa.hbase.tools.HBaseDataStoreCommand
 import org.locationtech.geomesa.hbase.tools.HBaseDataStoreCommand.{HBaseParams, RemoteFilterNotUsedParam}
 import org.locationtech.geomesa.hbase.tools.ingest.HBaseBulkLoadCommand.BulkLoadParams
 import org.locationtech.geomesa.index.conf.partition.TablePartition
+import org.locationtech.geomesa.tools.data.ManagePartitionsCommand
 import org.locationtech.geomesa.tools.{Command, RequiredIndexParam, RequiredTypeNameParam}
 import org.locationtech.geomesa.utils.index.IndexMode
 import org.locationtech.geomesa.utils.text.TextTools
@@ -35,14 +36,18 @@ class HBaseBulkLoadCommand extends HBaseDataStoreCommand {
     if (sft == null) {
       throw new ParameterException(s"Schema '${params.featureName}' does not exist")
     }
-    require(!TablePartition.partitioned(sft), "Bulk loading partitioned tables is not currently supported")
 
     val index = params.loadRequiredIndex(ds, IndexMode.Write).asInstanceOf[HBaseFeatureIndex]
     val input = new Path(params.input)
 
     Command.user.info(s"Running HBase incremental load...")
     val start = System.currentTimeMillis()
-    val tableName = TableName.valueOf(index.getTableNames(sft, ds, None).head)
+    val partition: Option[String] = Option(params.partition)
+    val tableName = partition match {
+      case Some(part) =>
+        TableName.valueOf(index.getTableNames(sft, ds, Option(part)).find(_.endsWith(part)).head)
+      case None => TableName.valueOf(index.getTableNames(sft, ds, None).head)
+    }
     val table = ds.connection.getTable(tableName)
     val locator = ds.connection.getRegionLocator(tableName)
     val config = new Configuration
@@ -55,7 +60,7 @@ class HBaseBulkLoadCommand extends HBaseDataStoreCommand {
 object HBaseBulkLoadCommand {
   @Parameters(commandDescription = "Bulk load HFiles into HBase")
   class BulkLoadParams extends HBaseParams
-      with RequiredTypeNameParam with RequiredIndexParam with RemoteFilterNotUsedParam {
+      with RequiredTypeNameParam with RequiredIndexParam with RemoteFilterNotUsedParam with ManagePartitionsCommand.PartitionParam {
     @Parameter(names = Array("--input"), description = "Path to HFiles to be loaded", required = true)
     var input: String = _
 
