@@ -20,7 +20,8 @@ import org.locationtech.geomesa.hbase.tools.HBaseDataStoreCommand.{HBaseParams, 
 import org.locationtech.geomesa.hbase.tools.ingest.HBaseBulkLoadCommand.BulkLoadParams
 import org.locationtech.geomesa.index.conf.partition.TablePartition
 import org.locationtech.geomesa.tools.data.ManagePartitionsCommand
-import org.locationtech.geomesa.tools.{Command, RequiredIndexParam, RequiredTypeNameParam}
+import org.locationtech.geomesa.tools.utils.Prompt
+import org.locationtech.geomesa.tools.{Command, OptionalForceParam, RequiredIndexParam, RequiredTypeNameParam}
 import org.locationtech.geomesa.utils.index.IndexMode
 import org.locationtech.geomesa.utils.text.TextTools
 
@@ -45,22 +46,31 @@ class HBaseBulkLoadCommand extends HBaseDataStoreCommand {
     val partition: Option[String] = Option(params.partition)
     val tableName = partition match {
       case Some(part) =>
-        TableName.valueOf(index.getTableNames(sft, ds, Option(part)).find(_.endsWith(part)).head)
+        val names = index.getTableNames(sft, ds, Option(part))
+        val name = if (names.size == 1) names.head else names.find(_.endsWith(part)).head
+        TableName.valueOf(name)
       case None => TableName.valueOf(index.getTableNames(sft, ds, None).head)
     }
-    val table = ds.connection.getTable(tableName)
-    val locator = ds.connection.getRegionLocator(tableName)
-    val config = new Configuration
-    config.set("hbase.loadincremental.validate.hfile", params.validate.toString)
-    new LoadIncrementalHFiles(config).doBulkLoad(input, ds.connection.getAdmin, table, locator)
-    Command.user.info(s"HBase incremental load complete in ${TextTools.getTime(start)}")
+
+    lazy val prompt = s"Loading into table ${tableName.getNameAsString}. Is this correct? y/N: "
+
+    if (params.force || Prompt.confirm(prompt)) {
+      val table = ds.connection.getTable(tableName)
+      val locator = ds.connection.getRegionLocator(tableName)
+      val config = new Configuration
+      config.set("hbase.loadincremental.validate.hfile", params.validate.toString)
+      new LoadIncrementalHFiles(config).doBulkLoad(input, ds.connection.getAdmin, table, locator)
+      Command.user.info(s"HBase incremental load complete in ${TextTools.getTime(start)}")
+    } else {
+      Command.user.info("Cancelled")
+    }
   }
 }
 
-object HBaseBulkLoadCommand {
+object HBaseBulkLoadCommand {1
   @Parameters(commandDescription = "Bulk load HFiles into HBase")
   class BulkLoadParams extends HBaseParams
-      with RequiredTypeNameParam with RequiredIndexParam with RemoteFilterNotUsedParam with ManagePartitionsCommand.PartitionParam {
+      with RequiredTypeNameParam with RequiredIndexParam with RemoteFilterNotUsedParam with ManagePartitionsCommand.PartitionParam with OptionalForceParam {
     @Parameter(names = Array("--input"), description = "Path to HFiles to be loaded", required = true)
     var input: String = _
 
