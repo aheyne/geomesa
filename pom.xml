@@ -21,24 +21,24 @@
     </licenses>
 
     <modules>
-        <module>geomesa-accumulo</module>
+<!--        <module>geomesa-accumulo</module>-->
         <module>geomesa-archetypes</module>
         <module>geomesa-arrow</module>
-        <module>geomesa-bigtable</module>
-        <module>geomesa-blobstore</module>
-        <module>geomesa-cassandra</module>
+<!--        <module>geomesa-bigtable</module>-->
+<!--        <module>geomesa-blobstore</module>-->
+<!--        <module>geomesa-cassandra</module>-->
         <module>geomesa-convert</module>
         <module>geomesa-features</module>
         <module>geomesa-filter</module>
-        <module>geomesa-fs</module>
-        <module>geomesa-geojson</module>
+<!--        <module>geomesa-fs</module>-->
+<!--        <module>geomesa-geojson</module>-->
         <module>geomesa-hbase</module>
         <module>geomesa-index-api</module>
         <module>geomesa-jobs</module>
         <module>geomesa-jupyter</module>
-        <module>geomesa-kafka</module>
-        <module>geomesa-kudu</module>
-        <module>geomesa-lambda</module>
+<!--        <module>geomesa-kafka</module>-->
+<!--        <module>geomesa-kudu</module>-->
+<!--        <module>geomesa-lambda</module>-->
         <module>geomesa-memory</module>
         <module>geomesa-metrics</module>
         <module>geomesa-native-api</module>
@@ -46,10 +46,10 @@
         <module>geomesa-security</module>
         <module>geomesa-spark</module>
         <module>geomesa-stream</module>
-        <module>geomesa-test</module>
+<!--        <module>geomesa-test</module>-->
         <module>geomesa-tools</module>
         <module>geomesa-utils</module>
-        <module>geomesa-web</module>
+<!--        <module>geomesa-web</module>-->
         <module>geomesa-z3</module>
         <module>geomesa-zk-utils</module>
         <module>docs</module>
@@ -1524,18 +1524,18 @@
                 <artifactId>geomesa-index-api_${scala.binary.version}</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-accumulo-datastore_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-accumulo-datastore_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-                <classifier>tests</classifier>
-                <scope>test</scope>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-accumulo-datastore_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-accumulo-datastore_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--                <classifier>tests</classifier>-->
+<!--                <scope>test</scope>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-arrow-jts</artifactId>
@@ -1556,36 +1556,36 @@
                 <artifactId>geomesa-arrow-tools_${scala.binary.version}</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-kudu-datastore_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-kudu-gs-plugin_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-kudu-spark_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-kudu-tools_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-lambda-datastore_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-lambda-tools_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-kudu-datastore_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-kudu-gs-plugin_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-kudu-spark_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-kudu-tools_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-lambda-datastore_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-lambda-tools_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-utils_${scala.binary.version}</artifactId>
@@ -1601,16 +1601,16 @@
                 <artifactId>geomesa-filter_${scala.binary.version}</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-accumulo-distributed-runtime_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-accumulo-raster-distributed-runtime_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-accumulo-distributed-runtime_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-accumulo-raster-distributed-runtime_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-hbase-datastore_${scala.binary.version}</artifactId>
@@ -1636,26 +1636,26 @@
                 <artifactId>geomesa-hbase-distributed-runtime_${scala.binary.version}</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-bigtable-datastore_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-bigtable-tools_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-cassandra-datastore_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-cassandra-tools_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-bigtable-datastore_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-bigtable-tools_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-cassandra-datastore_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-cassandra-tools_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-feature-all_${scala.binary.version}</artifactId>
@@ -1681,52 +1681,52 @@
                 <artifactId>geomesa-feature-nio_${scala.binary.version}</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-accumulo-raster_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-accumulo-raster_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-tools_${scala.binary.version}</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-accumulo-tools_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-kafka-datastore_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-kafka-utils_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-kafka-tools_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-accumulo-jobs_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-accumulo-compute_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-accumulo-compute_${scala.binary.version}</artifactId>
-                <classifier>shaded</classifier>
-                <version>${project.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-accumulo-tools_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-kafka-datastore_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-kafka-utils_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-kafka-tools_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-accumulo-jobs_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-accumulo-compute_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-accumulo-compute_${scala.binary.version}</artifactId>-->
+<!--                <classifier>shaded</classifier>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-native-api_${scala.binary.version}</artifactId>
@@ -1792,16 +1792,16 @@
                 <artifactId>geomesa-metrics_${scala.binary.version}</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-blobstore-api_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-blobstore-web_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-blobstore-api_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-blobstore-web_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-archetypes-gs-plugin_${scala.binary.version}</artifactId>
@@ -1822,31 +1822,31 @@
                 <artifactId>geomesa-process-wps_${scala.binary.version}</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-web_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-web-core_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-web-data_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-web_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-web-core_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-web-data_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-security_${scala.binary.version}</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-accumulo-security_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-accumulo-security_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-z3_${scala.binary.version}</artifactId>
@@ -1857,16 +1857,16 @@
                 <artifactId>geomesa-convert-scripting_${scala.binary.version}</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-geojson-api_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-geojson-rest_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-geojson-api_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-geojson-rest_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-spark-core_${scala.binary.version}</artifactId>
@@ -1887,11 +1887,11 @@
                 <artifactId>geomesa-spark-converter_${scala.binary.version}</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-accumulo-spark_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-accumulo-spark_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-cqengine_${scala.binary.version}</artifactId>
@@ -1902,56 +1902,56 @@
                 <artifactId>geomesa-jupyter-leaflet_${scala.binary.version}</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-fs-storage-api_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-fs-storage-common_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-fs-storage-convert_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-fs-storage-orc_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-fs-storage-parquet_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-fs-spark_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-fs-spark-runtime_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-fs-gs-plugin_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-fs-datastore_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-fs-tools_${scala.binary.version}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-fs-storage-api_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-fs-storage-common_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-fs-storage-convert_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-fs-storage-orc_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-fs-storage-parquet_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-fs-spark_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-fs-spark-runtime_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-fs-gs-plugin_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-fs-datastore_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa-fs-tools_${scala.binary.version}</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-tools_${scala.binary.version}</artifactId>
@@ -2783,6 +2783,7 @@
                     <artifactId>maven-release-plugin</artifactId>
                     <version>2.5.3</version>
                     <configuration>
+                        <arguments>-DskipTests</arguments>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                     </configuration>
                 </plugin>
