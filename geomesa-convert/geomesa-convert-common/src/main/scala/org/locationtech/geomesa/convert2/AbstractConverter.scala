@@ -127,8 +127,8 @@ abstract class AbstractConverter[T, C <: ConverterConfig, F <: Field, O <: Conve
 
       options.errorMode match {
         case ErrorMode.RaiseErrors => throw new IOException(msg(true), e)
-        case ErrorMode.SkipBadRecords if logger.underlying.isDebugEnabled => logger.underlying.debug(msg(true), e)
-        case ErrorMode.SkipBadRecords if logger.underlying.isInfoEnabled => logger.underlying.info(msg(false))
+        case ErrorMode.SkipBadRecords if logger.underlying.isDebugEnabled => //logger.underlying.debug(msg(true), e)
+        case ErrorMode.SkipBadRecords if logger.underlying.isInfoEnabled => //logger.underlying.info(msg(false))
         case _ => // no-op
       }
       CloseableIterator.empty

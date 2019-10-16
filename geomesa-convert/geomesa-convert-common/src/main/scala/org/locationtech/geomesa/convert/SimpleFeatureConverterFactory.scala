@@ -362,6 +362,7 @@ trait ToSimpleFeatureConverter[I] extends SimpleFeatureConverter[I] with LazyLog
         ec.set(i, requiredFields(i).eval(t)(ec))
       } catch {
         case e: Exception =>
+          if (parseOpts.validationMode == ValidationMode.SkipBadRecords) { return null }
           val msg = if (parseOpts.verbose) {
             val valuesStr = if (t.length > 0) t.tail.mkString(", ") else ""
             s"Failed to evaluate field '${requiredFields(i).name}' " +
@@ -371,7 +372,7 @@ trait ToSimpleFeatureConverter[I] extends SimpleFeatureConverter[I] with LazyLog
             s"Failed to evaluate field '${requiredFields(i).name}' on line ${ec.counter.getLineCount}"
           }
           if (parseOpts.validationMode == ValidationMode.SkipBadRecords) {
-            if (parseOpts.verbose) { logger.debug(msg, e) } else { logger.debug(msg) }
+            //if (parseOpts.verbose) { logger.debug(msg, e) } else { logger.debug(msg) }
             return null
           } else {
             throw new IOException(msg, e)
