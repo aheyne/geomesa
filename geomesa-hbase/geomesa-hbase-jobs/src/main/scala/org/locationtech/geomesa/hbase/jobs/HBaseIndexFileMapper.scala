@@ -9,6 +9,7 @@
 package org.locationtech.geomesa.hbase.jobs
 
 import java.nio.charset.StandardCharsets
+import java.util.Date
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.hadoop.fs.Path
@@ -71,11 +72,11 @@ class HBaseIndexFileMapper extends Mapper[Writable, SimpleFeature, ImmutableByte
   override def map(key: Writable, value: SimpleFeature, context: HBaseIndexFileMapper.MapContext): Unit = {
     // TODO create a common writer that will create mutations without writing them
     try {
-      val feature = wrapper.wrap(value)
+      val feature: WritableFeature = wrapper.wrap(value)
       writer.convert(feature) match {
         case kv: SingleRowKeyValue[_] =>
           kv.values.foreach { value =>
-            val put = new Put(kv.row)
+            val put = new Put(kv.row, feature.feature.getAttribute("dtg").asInstanceOf[Date].getTime)
             put.addImmutable(value.cf, value.cq, value.value)
             if (!value.vis.isEmpty) {
               put.setCellVisibility(new CellVisibility(new String(value.vis, StandardCharsets.UTF_8)))
@@ -90,7 +91,7 @@ class HBaseIndexFileMapper extends Mapper[Writable, SimpleFeature, ImmutableByte
         case mkv: MultiRowKeyValue[_] =>
           mkv.rows.foreach { row =>
             mkv.values.foreach { value =>
-              val put = new Put(row)
+              val put = new Put(row, feature.feature.getAttribute("dtg").asInstanceOf[Date].getTime)
               put.addImmutable(value.cf, value.cq, value.value)
               if (!value.vis.isEmpty) {
                 put.setCellVisibility(new CellVisibility(new String(value.vis, StandardCharsets.UTF_8)))
