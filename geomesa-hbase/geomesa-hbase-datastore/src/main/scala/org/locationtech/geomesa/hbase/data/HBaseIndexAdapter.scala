@@ -10,7 +10,7 @@ package org.locationtech.geomesa.hbase.data
 
 import java.nio.charset.StandardCharsets
 import java.util.regex.Pattern
-import java.util.{Collections, Date, Locale}
+import java.util.{Collections, Locale}
 
 import com.typesafe.scalalogging.{LazyLogging, StrictLogging}
 import org.apache.hadoop.fs.Path
@@ -288,7 +288,7 @@ class HBaseIndexAdapter(ds: HBaseDataStore) extends IndexAdapter[HBaseDataStore]
   override def createWriter(sft: SimpleFeatureType,
                             indices: Seq[GeoMesaFeatureIndex[_, _]],
                             partition: Option[String]): HBaseIndexWriter =
-    new HBaseIndexWriter(ds, indices, WritableFeature.wrapper(sft, groups), sft, partition)
+    new HBaseIndexWriter(ds, indices, WritableFeature.wrapper(sft, groups), partition)
 
   /**
     * Configure the hbase scan
@@ -475,7 +475,6 @@ object HBaseIndexAdapter extends LazyLogging {
   class HBaseIndexWriter(ds: HBaseDataStore,
                          indices: Seq[GeoMesaFeatureIndex[_, _]],
                          wrapper: FeatureWrapper,
-                         sft: SimpleFeatureType,
                          partition: Option[String]) extends IndexWriter(indices, wrapper) {
 
     private val batchSize = HBaseSystemProperties.WriteBatchSize.toLong
@@ -490,28 +489,17 @@ object HBaseIndexAdapter extends LazyLogging {
       ds.connection.getBufferedMutator(params)
     }
 
-    private var i = 0
-
-    private val writeTTL = HBaseSystemProperties.WriteTTL.toLong
-    private lazy val dtgIndex = {
-      import org.locationtech.geomesa.utils.geotools.RichSimpleFeatureType.RichSimpleFeatureType
-      sft.getDtgIndex match {
-        case Some(index) => index
-        case None => throw new RuntimeException("Sft must have default dtg WriteTTL setting")
-      }
+    private val writeTTL: Long = HBaseSystemProperties.WriteTTL.toLong match {
+      case Some(value) if value > 0 => value
+      case None => 0
     }
 
+    private var i = 0
     override protected def write(feature: WritableFeature, values: Array[RowKeyValue[_]], update: Boolean): Unit = {
       if (update) {
         // for updates, ensure that our timestamps don't clobber each other
         flush()
         Thread.sleep(1)
-      }
-      val ttlValue: Long = writeTTL match {
-        case Some(ttl) if ttl > 0 =>
-          val featureTime = feature.getAttribute(dtgIndex).asInstanceOf[Date].getTime
-          ttl + featureTime
-        case None => 0
       }
 
       i = 0
@@ -526,7 +514,7 @@ object HBaseIndexAdapter extends LazyLogging {
                 put.setCellVisibility(new CellVisibility(new String(value.vis, StandardCharsets.UTF_8)))
               }
               put.setDurability(durability)
-              if (ttlValue > 0) put.setTTL(ttlValue)
+              if (writeTTL > 0) put.setTTL(writeTTL)
               mutator.mutate(put)
             }
 
@@ -539,7 +527,7 @@ object HBaseIndexAdapter extends LazyLogging {
                   put.setCellVisibility(new CellVisibility(new String(value.vis, StandardCharsets.UTF_8)))
                 }
                 put.setDurability(durability)
-                if (ttlValue > 0) put.setTTL(ttlValue)
+                if (writeTTL > 0) put.setTTL(writeTTL)
                 mutator.mutate(put)
               }
             }
