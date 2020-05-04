@@ -489,10 +489,7 @@ object HBaseIndexAdapter extends LazyLogging {
       ds.connection.getBufferedMutator(params)
     }
 
-    private val writeTTL: Long = HBaseSystemProperties.WriteTTL.toLong match {
-      case Some(value) if value > 0 => value
-      case None => 0
-    }
+    private val writeTTL: Long = HBaseSystemProperties.WriteTTL.toLong.getOrElse(0L)
 
     private var i = 0
     override protected def write(feature: WritableFeature, values: Array[RowKeyValue[_]], update: Boolean): Unit = {
