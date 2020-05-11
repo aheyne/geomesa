@@ -503,6 +503,13 @@ object HBaseIndexAdapter extends LazyLogging {
         Thread.sleep(1)
       }
 
+      val ttl = if (writeTTL > 0 && dtgIndex != -1) {
+        val ts = feature.getAttribute(dtgIndex).asInstanceOf[Date].toInstant.toEpochMilli
+        val now = System.currentTimeMillis()
+        val t = writeTTL-(now-ts)
+        if (t > 0) { t } else { return }
+      } else { 0 }
+
       i = 0
       while (i < values.length) {
         val mutator = mutators(i)
@@ -515,11 +522,7 @@ object HBaseIndexAdapter extends LazyLogging {
                 put.setCellVisibility(new CellVisibility(new String(value.vis, StandardCharsets.UTF_8)))
               }
               put.setDurability(durability)
-              if (writeTTL > 0 && dtgIndex != -1) {
-                val ts = feature.getAttribute(dtgIndex).asInstanceOf[Date].toInstant.toEpochMilli
-                val now = System.currentTimeMillis()
-                put.setTTL(writeTTL-(now-ts))
-              }
+              if (ttl > 0) put.setTTL(ttl)
               mutator.mutate(put)
             }
 
@@ -532,11 +535,7 @@ object HBaseIndexAdapter extends LazyLogging {
                   put.setCellVisibility(new CellVisibility(new String(value.vis, StandardCharsets.UTF_8)))
                 }
                 put.setDurability(durability)
-                if (writeTTL > 0 && dtgIndex != -1) {
-                  val ts = feature.getAttribute(dtgIndex).asInstanceOf[Date].toInstant.toEpochMilli
-                  val now = System.currentTimeMillis()
-                  put.setTTL(writeTTL-(now-ts))
-                }
+                if (ttl > 0) put.setTTL(ttl)
                 mutator.mutate(put)
               }
             }
